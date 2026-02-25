@@ -1,5 +1,6 @@
 package com.example.discoverlib.ui.screens.HomeScreen
 
+import android.R.attr.label
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,9 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -31,6 +34,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,30 +50,30 @@ fun HomeScreen(onGoToItinerary: () -> Unit) { // Eliminamos @Composable del par�
             modifier = Modifier
                 .fillMaxWidth()
                 .background(colorResource(id = R.color.logo))
-                .padding(20.dp),
+                .padding(10.dp),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            /*Text(
-                text = "DISCOVERLIB",
-                color = Color.White,
-                style = MaterialTheme.typography.titleLarge,
-                fontFamily = FontFamily.Serif, // Cambia Serif por Cursive o Monospace
-                fontWeight = FontWeight.Bold
-            )*/
-            /*Image(
-                painter = painterResource(id = R.drawable.logo_color),
-                contentDescription = "Logo Discoverlib",
-                modifier = Modifier.size(50.dp)
-            )*/
-        }
-
-        /*IconButton(onClick = { /* Acción */ }) {
-            Icon(
-                painter = painterResource(id = R.drawable.info),
-                contentDescription = "Botón About Us",
-                modifier = Modifier.size(25.dp),
-                tint = Color.Unspecified
+            val iconosTop = listOf(
+                R.drawable.about_us,
+                R.drawable.settings
             )
-        }*/
+
+            iconosTop.forEach { iconRes ->
+                IconButton(
+                    onClick = { /* Acción */ },
+                    modifier = Modifier.padding(start = 0.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = iconRes),
+                        contentDescription = null,
+                        modifier = Modifier.size(15.dp),
+                        tint = Color.Unspecified // Esto los hace blancos y limpios
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(25.dp))
 
         Column(
             modifier = Modifier
@@ -93,6 +97,72 @@ fun HomeScreen(onGoToItinerary: () -> Unit) { // Eliminamos @Composable del par�
                 fontFamily = FontFamily.Serif, // Cambia Serif por Cursive o Monospace
                 fontSize = 15.sp
             )
+
+            Spacer(modifier = Modifier.height(32.dp))
+            // --- TABLA SEMANAL ---
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, colorResource(id = R.color.logo))
+                    .background(Color.White)
+            ) {
+                // 1. CABECERA: Días de la semana
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFF8257).copy(alpha = 0.1f))
+                        .border(0.5.dp, colorResource(id = R.color.logo))
+                ) {
+                    val diasSemana = listOf("Lun 23", "Mar 24", "Mie 25", "Jue 26", "Vie 27", "Sab 28", "Dom 29")
+
+                    diasSemana.forEach { dia ->
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .border(0.5.dp, colorResource(id = R.color.logo))
+                                .padding(vertical = 8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = dia,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center,
+                                color = Color.Black
+                            )
+                        }
+                    }
+                }
+
+                // 2. CUERPO: Filas de tiempo (Scrollable)
+                // Usamos un Column con scroll para poder bajar por las horas
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp) // Altura fija para que quepa en tu pantalla
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    val horas = (8..20).toList() // De 8:00 a 20:00
+
+                    horas.forEach { hora ->
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            // Celda de cada día en esa hora
+                            repeat(7) {
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(50.dp) // Altura de cada "celda" de actividad
+                                        .border(0.5.dp, colorResource(id = R.color.logo)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    // Aquí es donde luego podrías poner un círculo o texto
+                                    // si hay una actividad a esa hora
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
         }
         Box(
@@ -137,7 +207,7 @@ fun HomeScreen(onGoToItinerary: () -> Unit) { // Eliminamos @Composable del par�
                     "Maps" to R.drawable.mapa, // Cambia por tus iconos reales
                     "Photos" to R.drawable.photos,
                     "Trips" to R.drawable.trips,
-                    "Suggestion" to R.drawable.suggestions
+                    "Hotels" to R.drawable.hotel
                 )
 
                 botones.forEach { (label, iconRes) ->
@@ -158,7 +228,7 @@ fun HomeScreen(onGoToItinerary: () -> Unit) { // Eliminamos @Composable del par�
                                 tint = Color.Unspecified // Mantiene los colores originales de tus XML
                             )
                         }
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = label,
                             color = Color.Black, // Texto ahora en negro
