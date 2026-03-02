@@ -11,37 +11,29 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import com.example.discoverlib.ui.screens.HomeScreen.HomeScreen
+import com.example.discoverlib.navegation.AppNavigation
+import com.example.discoverlib.ui.screens.HomeScreen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        // 1. Instalar Splash ANTES de todo
         val splashScreen = installSplashScreen()
 
-        super.onCreate(savedInstanceState) // 2. Luego el super
+        super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // 3. Configurar la lógica de espera
-        var isChecking = true
-        lifecycleScope.launch {
-            delay(3000L)
-            isChecking = false
-        }
+        splashScreen.setKeepOnScreenCondition { false }
 
-        splashScreen.setKeepOnScreenCondition { isChecking }
-
-        // 4. Cargar el contenido
         setContent {
             DiscoverlibTheme {
-                HomeScreen(onGoToItinerary = { })
+                AppNavigation()
             }
         }
     }
 }
 
-
+/*
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(
@@ -56,4 +48,4 @@ fun GreetingPreview() {
     DiscoverlibTheme {
         Greeting("Android")
     }
-}
+}*/
