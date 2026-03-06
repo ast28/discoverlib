@@ -8,8 +8,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.discoverlib.ui.theme.DiscoverlibTheme
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.example.discoverlib.ui.theme.DiscoverlibTheme
 import androidx.lifecycle.lifecycleScope
 import com.example.discoverlib.navegation.AppNavigation
 import com.example.discoverlib.ui.screens.HomeScreen
@@ -32,20 +32,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-/*
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    DiscoverlibTheme {
-        Greeting("Android")
-    }
-}*/
