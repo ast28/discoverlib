@@ -14,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -38,14 +39,13 @@ fun TermsScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
             Spacer(modifier = Modifier.height(20.dp))
             Text("Terms & Conditions", fontSize = 32.sp, fontWeight = FontWeight.Bold)
-            Text("Ultima actualizacion: 1 de marzo de 2025", color = Color.Gray)
             Spacer(modifier = Modifier.height(12.dp))
 
             MockData.termsSections.forEachIndexed { index, item ->
@@ -63,12 +63,12 @@ fun TermsScreen(navController: NavController) {
                     onClick = { navController.navigate(Routes.Home) },
                     modifier = Modifier.weight(1f).height(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
-                ) { Text("Rechazar", color = Color.Black) }
+                ) { Text("Decline", color = MaterialTheme.colorScheme.onBackground) }
                 Button(
                     onClick = { navController.navigate(Routes.Home) },
                     modifier = Modifier.weight(1f).height(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.logo))
-                ) { Text("Aceptar", color = Color.White) }
+                ) { Text("Accept", color = Color.White) }
             }
             Spacer(modifier = Modifier.height(12.dp))
         }

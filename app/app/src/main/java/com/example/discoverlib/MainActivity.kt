@@ -4,17 +4,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
-import androidx.lifecycle.lifecycleScope
 import com.example.discoverlib.navegation.AppNavigation
-import com.example.discoverlib.ui.screens.HomeScreen
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,8 +24,15 @@ class MainActivity : ComponentActivity() {
         splashScreen.setKeepOnScreenCondition { false }
 
         setContent {
-            DiscoverlibTheme {
-                AppNavigation()
+            val systemTheme = isSystemInDarkTheme()
+
+            var isDarkTheme by remember { mutableStateOf(systemTheme) }
+
+            DiscoverlibTheme(darkTheme = isDarkTheme) {
+                AppNavigation(
+                    isDarkTheme = isDarkTheme,
+                    onThemeChange = { isDarkTheme = it }
+                )
             }
         }
     }

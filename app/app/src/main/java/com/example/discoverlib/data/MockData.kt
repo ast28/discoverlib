@@ -1,5 +1,6 @@
 package com.example.discoverlib.data
 
+import com.example.discoverlib.R
 import com.example.discoverlib.domain.ActivityCategory
 import com.example.discoverlib.domain.TeamMember
 import com.example.discoverlib.domain.Trip
@@ -15,54 +16,60 @@ object MockData {
         activities = listOf(
             TripActivity(
                 id = "colosseum",
-                title = "Roma Colosseum Tour",
-                description = "Visita guiada al Coliseo y alrededores.",
-                location = "P.za del Colosseo, 1, Roma",
-                dayLabel = "Lun 23",
+                title = "Rome Colosseum Tour",
+                description = "Explore the heart of Ancient Rome with a guided tour of the Colosseum, including access to the arena floor and historical insights into the surrounding Roman Forum ruins.",
+                location = "Piazza del Colosseo, 1, Rome",
+                dayLabel = "Mon 23",
                 time = "10:00",
                 category = ActivityCategory.CULTURE,
-                costEur = 10
+                costEur = 10,
+                photo = R.drawable.photo_roma,
+                photo_mapa = R.drawable.roma_maps
             ),
             TripActivity(
                 id = "lunch",
-                title = "Almuerzo en Trastevere",
-                description = "Comida local en restaurante con reserva.",
-                location = "Trastevere, Roma",
-                dayLabel = "Jue 26",
+                title = "Lunch in Trastevere",
+                description = "Enjoy authentic Roman cuisine in the heart of the historic Trastevere district. Experience a curated local menu in a cozy, reserved setting away from the tourist crowds.",
+                location = "Trastevere, Rome",
+                dayLabel = "Mon 23",
                 time = "14:00",
                 category = ActivityCategory.FOOD,
-                costEur = 20
+                costEur = 20,
+                photo = R.drawable.photo_lunch,
+                photo_mapa = R.drawable.lunch_maps
             ),
             TripActivity(
                 id = "villa-borghese",
-                title = "Paseo por Villa Borghese",
-                description = "Ruta corta por jardines y miradores.",
-                location = "Villa Borghese, Roma",
-                dayLabel = "Mie 25",
+                title = "Villa Borghese Walk",
+                description = "A relaxing stroll through Rome's most elegant park. Discover lush gardens, stunning panoramic views of the city, and the hidden gems of this historic villa.",
+                location = "Villa Borghese, Rome",
+                dayLabel = "Tue 24",
                 time = "16:00",
                 category = ActivityCategory.NATURE,
-                costEur = 5
+                costEur = 5,
+                photo = R.drawable.photo_villa,
+                photo_mapa = R.drawable.villa_maps
             )
         )
     )
 
     val trips = listOf(
         featuredTrip,
-        featuredTrip.copy(id = "london-2026", city = "Londres", period = "10-04-2026 al 14-04-2026", budgetEur = 490),
-        featuredTrip.copy(id = "paris-2026", city = "París", period = "04-05-2026 al 08-05-2026", budgetEur = 410)
+        featuredTrip.copy(id = "london-2026", city = "London", period = "10-04-2026 al 14-04-2026", budgetEur = 490),
+        featuredTrip.copy(id = "paris-2026", city = "Paris", period = "04-05-2026 al 08-05-2026", budgetEur = 410)
     )
 
-    val galleryTrips = listOf("Londres", "París", "Roma")
+    val galleryTrips = listOf("Italia","Roma", "London", "Paris")
 
     val team = listOf(
-        TeamMember("AS", "Alba Senar", "Lead Developer - UI/UX")
+        TeamMember("AS", "Alba Senar Tejedor", "Developer")
     )
 
     val termsSections = listOf(
-        "Aceptacion de terminos" to "Al usar Discoverlib aceptas estas condiciones.",
-        "Privacidad y datos" to "Solo recopilamos datos necesarios para la experiencia local de la app.",
-        "Uso de la aplicacion" to "La informacion es orientativa y debe verificarse con proveedores oficiales.",
-        "Servicios de terceros" to "La app puede integrar servicios externos sujetos a sus propios terminos.",
-        "Modificaciones" to "Los terminos pueden actualizarse en futuras versiones de la aplicacion."
+        "Acceptance of terms" to "By using Discoverlib, you accept these terms and conditions.",
+        "Privacy and data" to "We only collect data necessary for the app's local experience.",
+        "Use of the application" to "The information provided is for guidance only and should be verified with official providers.",
+        "Third-party services" to "The app may integrate external services subject to their own terms.",
+        "Modifications" to "The terms may be updated in future versions of the application."
     )
 }

@@ -14,7 +14,9 @@ data class TripActivity(
     val dayLabel: String,
     val time: String,
     val category: ActivityCategory,
-    val costEur: Int
+    val costEur: Int,
+    val photo: Int,
+    val photo_mapa: Int
 )
 
 data class Trip(

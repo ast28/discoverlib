@@ -22,6 +22,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -49,14 +50,14 @@ import com.example.discoverlib.ui.theme.DiscoverlibTheme
 fun GalleryScreen(navController: NavController) {
     var expanded by remember { mutableStateOf(false) }
     var selectedTrip by remember { mutableStateOf(MockData.galleryTrips.first()) }
-    val hasPhotos = !selectedTrip.equals("Roma", ignoreCase = true)
+    val hasPhotos = !selectedTrip.equals("Roma", ignoreCase = true) && !selectedTrip.equals("London", ignoreCase = true) && !selectedTrip.equals("Paris", ignoreCase = true)
     val gallerySummary = if (hasPhotos) "9 photos - 234 MB" else "0 photos - 0 MB"
 
     DiscoverScaffold(navController = navController, selectedSection = MainSection.GALLERY) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp)
         ) {
@@ -125,7 +126,7 @@ fun GalleryScreen(navController: NavController) {
                         .weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("No photos found for Roma", color = Color.Gray)
+                    Text("No photos found", color = Color.Gray)
                 }
             }
 

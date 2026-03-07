@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -43,7 +44,7 @@ fun AboutScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState())
@@ -57,10 +58,10 @@ fun AboutScreen(navController: NavController) {
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
             )
-            Spacer(modifier = Modifier.height(12.dp))
-            Text("About", fontSize = 32.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(30.dp))
+            Text("About Us", fontSize = 32.sp, fontWeight = FontWeight.Bold)
             Text("Plan your adventures, your way.")
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(15.dp))
 
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -85,15 +86,14 @@ fun AboutScreen(navController: NavController) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text("Technical info", fontWeight = FontWeight.Bold)
-                    Text("Version 1.0.0")
-                    Text("Sprint 01")
+                    Text("Version 1.1.0")
                     Text("Android min API 26")
                     Text("Kotlin 2.0.21")
                     Text("License: MIT")
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             Button(
                 onClick = { navController.navigate(Routes.Terms) },
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.logo)),

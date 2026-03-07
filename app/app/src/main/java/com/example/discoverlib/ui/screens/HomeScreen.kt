@@ -20,6 +20,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -48,14 +49,14 @@ import com.example.discoverlib.ui.theme.DiscoverlibTheme
 
 @Composable
 fun HomeScreen(navController: NavController) {
-    val dayLabels = listOf("Lun 23", "Mar 24", "Mie 25", "Jue 26", "Vie 27")
+    val dayLabels = listOf("Mon 23", "Tue 24", "Wed 25", "Thu 26", "Fri 27")
     var selectedDayIndex by rememberSaveable { mutableIntStateOf(0) }
 
     DiscoverScaffold(navController = navController, selectedSection = MainSection.HOME) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState())
@@ -78,7 +79,9 @@ fun HomeScreen(navController: NavController) {
                 canGoNext = selectedDayIndex < dayLabels.lastIndex,
                 onPrevDay = { selectedDayIndex-- },
                 onNextDay = { selectedDayIndex++ },
-                onActivityClick = { navController.navigate(Routes.Activity) }
+                onActivityClick = { activityId ->
+                    navController.navigate("activity/$activityId/false")
+                }
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -96,7 +99,7 @@ private fun NextTripSummaryCard(
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(
             modifier = Modifier
@@ -106,12 +109,12 @@ private fun NextTripSummaryCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text("Proximo viaje", color = colorResource(id = R.color.logo), fontWeight = FontWeight.Bold)
+                Text("Next trip", color = colorResource(id = R.color.logo), fontWeight = FontWeight.Bold)
                 Text(trip.city, fontSize = 24.sp, fontWeight = FontWeight.Bold)
                 Text(trip.period, fontSize = 13.sp, color = Color.Gray)
             }
             Column(horizontalAlignment = Alignment.End) {
-                Text("${trip.nights} noches", fontWeight = FontWeight.Bold)
+                Text("${trip.nights} nights", fontWeight = FontWeight.Bold)
                 Text("${trip.budgetEur} EUR", fontWeight = FontWeight.Bold)
             }
         }
@@ -126,14 +129,14 @@ private fun DailyCalendarCard(
     canGoNext: Boolean,
     onPrevDay: () -> Unit,
     onNextDay: () -> Unit,
-    onActivityClick: () -> Unit
+    onActivityClick: (String) -> Unit
 ) {
     val hours = listOf("08:00", "10:00", "12:00", "14:00", "16:00", "18:00")
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(
@@ -145,7 +148,7 @@ private fun DailyCalendarCard(
                     Text("<", fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Calendario diario", fontWeight = FontWeight.Bold, color = colorResource(id = R.color.logo))
+                    Text("Daily Schedule", fontWeight = FontWeight.Bold, color = colorResource(id = R.color.logo))
                     Text("${trip.city} - $selectedDay", fontSize = 13.sp)
                 }
                 IconButton(onClick = onNextDay, enabled = canGoNext) {
@@ -174,12 +177,17 @@ private fun DailyCalendarCard(
                             .weight(1f)
                             .height(44.dp)
                             .border(1.dp, Color(0x22FF3D00), RoundedCornerShape(8.dp))
-                            .clickable(enabled = activity != null, onClick = onActivityClick)
+                            .clickable(
+                                enabled = activity != null,
+                                onClick = {
+                                    if (activity != null) onActivityClick(activity.id)
+                                }
+                            )
                             .padding(horizontal = 8.dp),
                         contentAlignment = Alignment.CenterStart
                     ) {
                         if (activity == null) {
-                            Text("Sin actividad", color = Color(0xFFB0B0B0), fontSize = 12.sp)
+                            Text("No activities", color = Color(0xFFB0B0B0), fontSize = 12.sp)
                         } else {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(

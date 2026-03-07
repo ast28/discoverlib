@@ -92,7 +92,7 @@ fun SplashScreen(navController: NavController) {
                     trackColor = Color(0xFFFFE2D8)
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                Text("v1.0.0 - Sprint 01", color = Color.Gray, fontSize = 12.sp)
+                Text("v1.1.0", color = Color.Gray, fontSize = 12.sp)
             }
         }
     }

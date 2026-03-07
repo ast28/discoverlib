@@ -1,6 +1,7 @@
 package com.example.discoverlib.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -30,17 +32,18 @@ import com.example.discoverlib.ui.components.MainSection
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
 
 @Composable
-fun TripDetailScreen(navController: NavController) {
-    val trip = MockData.featuredTrip
+fun TripDetailScreen(navController: NavController, cityName: String?) {
+    val trip = MockData.trips.find { it.city == cityName } ?: MockData.featuredTrip
 
     DiscoverScaffold(navController = navController, selectedSection = MainSection.TRIPS) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
+
         ) {
             Spacer(modifier = Modifier.height(20.dp))
             Text(trip.city, fontSize = 34.sp, fontWeight = FontWeight.Bold)
@@ -49,19 +52,16 @@ fun TripDetailScreen(navController: NavController) {
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 StatCard("${trip.nights}", "NIGHTS", Modifier.weight(1f))
-                StatCard("${trip.budgetEur} EUR", "BUDGET", Modifier.weight(1f))
+                StatCard("${trip.budgetEur} EUR", "PRICE", Modifier.weight(1f))
                 StatCard("${trip.activities.size}", "ACTIVITIES", Modifier.weight(1f))
             }
 
             Spacer(modifier = Modifier.height(14.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                listOf("Itinerary", "Gallery", "Budget", "Notes").forEachIndexed { index, tab ->
-                    Text(
-                        tab,
-                        fontWeight = if (index == 0) FontWeight.Bold else FontWeight.Normal,
-                        color = if (index == 0) Color(0xFFFF3D00) else Color.Gray
+                Text ("Itinerary",
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFFFF3D00)
                     )
-                }
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -71,7 +71,9 @@ fun TripDetailScreen(navController: NavController) {
             trip.activities.forEach { activity ->
                 Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp)) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(12.dp),
+                        modifier = Modifier.fillMaxWidth().padding(12.dp).clickable{
+                            navController.navigate("activity/${activity.id}/true")
+                        },
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column {
@@ -102,5 +104,5 @@ private fun StatCard(value: String, label: String, modifier: Modifier = Modifier
 @Preview(showBackground = true)
 @Composable
 fun TripDetailScreenPreview() {
-    DiscoverlibTheme { TripDetailScreen(rememberNavController()) }
+    DiscoverlibTheme { TripDetailScreen(rememberNavController(), "London") }
 }

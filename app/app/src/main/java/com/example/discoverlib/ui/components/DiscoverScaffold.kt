@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -89,23 +90,15 @@ fun DiscoverScaffold(
                         modifier = Modifier.size(20.dp)
                     )
                 }
-                IconButton(onClick = { navController.navigateSingleTop(Routes.Preferences) }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.settings),
-                        contentDescription = "Settings",
-                        tint = Color.Unspecified,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
             }
         },
         bottomBar = {
             Column(modifier = Modifier.fillMaxWidth()) {
-                HorizontalDivider(thickness = 1.dp, color = Color.Black.copy(alpha = 0.2f))
+                HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color.White)
+                        .background(MaterialTheme.colorScheme.surface)
                         .padding(vertical = 10.dp),
                     horizontalArrangement = Arrangement.SpaceAround,
                     verticalAlignment = Alignment.CenterVertically
@@ -144,7 +137,7 @@ fun DiscoverScaffold(
                             }
                             Text(
                                 text = item.label,
-                                color = if (isSelected) colorResource(id = R.color.logo) else Color.Black,
+                                color = if (isSelected) colorResource(id = R.color.logo) else MaterialTheme.colorScheme.onSurface,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold
                             )

@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -40,7 +41,7 @@ fun TripsScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp)
         ) {
@@ -53,8 +54,9 @@ fun TripsScreen(navController: NavController) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { navController.navigate(Routes.TripDetail) }
-                    ) {
+                            .clickable {
+                                navController.navigate("tripDetail/${trip.city}")
+                            }                    ) {
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(14.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -63,10 +65,10 @@ fun TripsScreen(navController: NavController) {
                             Column {
                                 Text(trip.city, fontSize = 28.sp, fontWeight = FontWeight.Bold)
                                 Text(trip.period)
-                                Text("Budget: ${trip.budgetEur} EUR")
+                                Text("Price: ${trip.budgetEur} EUR")
                             }
                             Button(
-                                onClick = { navController.navigate(Routes.TripDetail) },
+                                onClick = { navController.navigate("tripDetail/${trip.city}") },
                                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.logo))
                             ) {
                                 Text("View", color = Color.White)
