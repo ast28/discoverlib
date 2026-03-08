@@ -64,7 +64,11 @@ fun DiscoverScaffold(
                     .padding(horizontal = 8.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { navController.navigateSingleTop(Routes.Home) }) {
+                IconButton(onClick = { if (navController.currentBackStackEntry?.destination?.route != Routes.Home) {
+                    navController.navigate(Routes.Home) {
+                        launchSingleTop = true
+                    }
+                }}) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_home),
                         contentDescription = "Home",
@@ -79,10 +83,20 @@ fun DiscoverScaffold(
                     color = Color.White,
                     modifier = Modifier
                         .weight(1f)
-                        .clickable { navController.navigateSingleTop(Routes.Home) }
+                        .clickable { if (navController.currentBackStackEntry?.destination?.route != "home") {
+                            navController.navigate("home") {
+                                launchSingleTop = true
+                            }
+                        } }
                         .padding(top = 4.dp)
                 )
-                IconButton(onClick = { navController.navigateSingleTop(Routes.About) }) {
+                IconButton(onClick = {
+                    val currentRoute = navController.currentDestination?.route
+
+                    if (currentRoute != Routes.About) {
+                        navController.navigateSingleTop(Routes.About)
+                    }
+                }) {
                     Icon(
                         painter = painterResource(id = R.drawable.about_us),
                         contentDescription = "About",
@@ -126,7 +140,7 @@ fun DiscoverScaffold(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             BottomCircleNavButton(
                                 isSelected = isSelected,
-                                onClick = { item.route?.let { navController.navigateSingleTop(it) } }
+                                onClick = { if(!isSelected) item.route?.let { navController.navigateSingleTop(it) } }
                             ) {
                                 Icon(
                                     painter = painterResource(id = item.iconRes),

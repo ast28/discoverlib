@@ -112,7 +112,6 @@ fun PreferenceDropdown(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    // El Row pasa a ser el contenedor principal
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -127,8 +126,6 @@ fun PreferenceDropdown(
             Text(text = subtitle, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface)
         }
 
-        // EL TRUCO ESTÁ AQUÍ: Envolvemos solo el texto de la derecha en un Box
-        // y metemos el DropdownMenu dentro. Así se anclará a este punto exacto.
         Box(contentAlignment = Alignment.TopEnd) {
             Text(
                 text = options[selectedIndex],

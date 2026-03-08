@@ -10,7 +10,7 @@ object MockData {
     val featuredTrip = Trip(
         id = "roma-2026",
         city = "Roma",
-        period = "23-03-2026 al 28-03-2026",
+        period = "23-03-2026 to 28-03-2026",
         nights = 5,
         budgetEur = 257,
         activities = listOf(
@@ -55,8 +55,8 @@ object MockData {
 
     val trips = listOf(
         featuredTrip,
-        featuredTrip.copy(id = "london-2026", city = "London", period = "10-04-2026 al 14-04-2026", budgetEur = 490),
-        featuredTrip.copy(id = "paris-2026", city = "Paris", period = "04-05-2026 al 08-05-2026", budgetEur = 410)
+        featuredTrip.copy(id = "london-2026", city = "London", period = "10-04-2026 to 14-04-2026", budgetEur = 490),
+        featuredTrip.copy(id = "paris-2026", city = "Paris", period = "04-05-2026 to 08-05-2026", budgetEur = 410)
     )
 
     val galleryTrips = listOf("Italia","Roma", "London", "Paris")

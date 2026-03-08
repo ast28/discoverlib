@@ -71,14 +71,12 @@ fun ActivityScreen(navController: NavController, activityId: String?, showBackBu
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Volver atrás",
                             tint = Color.Black,
-                            // Reducimos el tamaño del icono para que se vea más sutil y profesional
                             modifier = Modifier.size(20.dp)
                         )
                     }
                 }
             }
 
-// El título queda justo debajo del Box
             Text(
                 text = activity.title,
                 fontSize = 32.sp,
