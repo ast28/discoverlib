@@ -58,7 +58,6 @@ data class TeamMember(
     val role: String
 )
 
-// --- NUEVAS CLASES AÑADIDAS PARA CUMPLIR CON EL DIAGRAMA UML ---
 
 data class Image(
     val id: String,
