@@ -11,6 +11,6 @@ object Routes {
     const val Terms = "terms"
 
     const val TripDetail = "tripDetail/{cityName}"
-    const val Activity = "activity/{activityId}/{showBack}"
+    const val Activity = "activity/{activityId}"
     const val DiscoverActivities = "discoverActivities/{city}"
 }

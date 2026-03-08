@@ -43,7 +43,7 @@ import com.example.discoverlib.ui.components.MainSection
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
 
 @Composable
-fun ActivityScreen(navController: NavController, activityId: String?, showBackButton: Boolean) {
+fun ActivityScreen(navController: NavController, activityId: String?) {
     val activity = MockData.featuredTrip.activities.find { it.id == activityId }
         ?: MockData.featuredTrip.activities.first()
 
@@ -63,18 +63,17 @@ fun ActivityScreen(navController: NavController, activityId: String?, showBackBu
                     .height(30.dp),
                 contentAlignment = androidx.compose.ui.Alignment.CenterStart
             ) {
-                if (showBackButton) {
-                    IconButton(
-                        onClick = { navController.popBackStack() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver atrás",
-                            tint = Color.Black,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
+                IconButton(
+                    onClick = { navController.popBackStack() }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Volver atrás",
+                        tint = Color.Black,
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
+
             }
 
             Text(
@@ -109,8 +108,8 @@ fun ActivityScreen(navController: NavController, activityId: String?, showBackBu
     }
 }
 
-@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
+@androidx.compose.ui.tooling.preview.Preview()
 @Composable
 fun ActivityScreenPreview() {
-    DiscoverlibTheme { ActivityScreen(rememberNavController(), "lunch", showBackButton = false ) }
+    DiscoverlibTheme { ActivityScreen(rememberNavController(), "lunch") }
 }

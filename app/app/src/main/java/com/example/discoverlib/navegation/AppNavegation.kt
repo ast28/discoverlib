@@ -36,13 +36,11 @@ fun AppNavigation(isDarkTheme: Boolean, onThemeChange: (Boolean) -> Unit) {
         composable(
             route = Routes.Activity,
             arguments = listOf(
-                navArgument("activityId") { type = NavType.StringType },
-                navArgument("showBack") { type = NavType.BoolType }
+                navArgument("activityId") { type = NavType.StringType }
             )
         ) { backStackEntry ->
             val activityId = backStackEntry.arguments?.getString("activityId")
-            val showBack = backStackEntry.arguments?.getBoolean("showBack") ?: false
-            ActivityScreen(navController, activityId, showBack)
+            ActivityScreen(navController, activityId)
         }
         composable(Routes.Gallery) { GalleryScreen(navController) }
         composable(Routes.Preferences) {

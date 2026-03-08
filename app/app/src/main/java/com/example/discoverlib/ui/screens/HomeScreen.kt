@@ -80,7 +80,7 @@ fun HomeScreen(navController: NavController) {
                 onPrevDay = { selectedDayIndex-- },
                 onNextDay = { selectedDayIndex++ },
                 onActivityClick = { activityId ->
-                    navController.navigate("activity/$activityId/false")
+                    navController.navigate("activity/$activityId")
                 }
             )
 

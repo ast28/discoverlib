@@ -12,15 +12,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,6 +59,24 @@ fun TripDetailScreen(navController: NavController, cityName: String?) {
 
                 ) {
                 Spacer(modifier = Modifier.height(20.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(30.dp),
+                    contentAlignment = androidx.compose.ui.Alignment.CenterStart
+                ) {
+                    IconButton(
+                        onClick = { navController.popBackStack() }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Volver atrás",
+                            tint = Color.Black,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                }
                 Text(trip.city, fontSize = 34.sp, fontWeight = FontWeight.Bold)
                 Text(trip.period)
                 Spacer(modifier = Modifier.height(12.dp))
@@ -86,7 +107,7 @@ fun TripDetailScreen(navController: NavController, cityName: String?) {
                     Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(10.dp)) {
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(12.dp).clickable {
-                                navController.navigate("activity/${activity.id}/true")
+                                navController.navigate("activity/${activity.id}")
                             },
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
