@@ -1,4 +1,4 @@
-package com.example.discoverlib.domain
+/*package com.example.discoverlib.domain
 
 enum class ActivityCategory {
     CULTURE,
@@ -25,7 +25,7 @@ data class Trip(
     val period: String,
     val nights: Int,
     val budgetEur: Int,
-    val activities: MutableList<TripActivity> // Cambiado a MutableList para poder añadir/quitar
+    val activities: List<TripActivity> // Cambiado a MutableList para poder añadir/quitar
 ) {
     fun spentBudget(): Int = activities.sumOf { it.costEur }
 
@@ -121,4 +121,4 @@ class Authentication {
     fun resetPassword(email: String) {
         // @TODO Logic to reset password
     }
-}
+}*/

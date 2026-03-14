@@ -1,4 +1,4 @@
-package com.example.discoverlib.data
+/*package com.example.discoverlib.data
 
 import com.example.discoverlib.R
 import com.example.discoverlib.domain.ActivityCategory
@@ -73,3 +73,4 @@ object MockData {
         "Modifications" to "The terms may be updated in future versions of the application."
     )
 }
+*/
