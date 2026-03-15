@@ -48,6 +48,7 @@ class TripRepositoryImpl @Inject constructor(
         return dataSource.deleteActivity(tripId, activityId)
     }
 
+
     override fun getUser(): User? {
         val name = sharedPrefs.username
         val dateOfBirth = sharedPrefs.dateOfBirth

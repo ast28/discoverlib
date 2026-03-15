@@ -6,13 +6,14 @@ import com.example.discoverlib.utils.LanguageChangeUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.getValue
+
 
 @Singleton // Hilt se asegura de que solo exista uno [cite: 1595]
 class SharedPrefsManager @Inject constructor(
     private val preferences: SharedPreferences,
     @ApplicationContext private val context: Context // [cite: 1596]
 ) {
-    // Utilidad para cambiar el idioma que tienes en tu PDF [cite: 1597]
     val languageChangeUtil by lazy { LanguageChangeUtil() }
 
     var username: String
@@ -24,13 +25,13 @@ class SharedPrefsManager @Inject constructor(
         set(value) = preferences.edit().putString("dob", value).apply()
 
     var darkTheme: Boolean
-        get() = preferences.getBoolean("dark_theme", false) // [cite: 1607]
-        set(value) = preferences.edit().putBoolean("dark_theme", value).apply() // [cite: 1609]
+        get() = preferences.getBoolean("dark_theme", false)
+        set(value) = preferences.edit().putBoolean("dark_theme", value).apply()
 
     var userLanguage: String
-        get() = preferences.getString("user_language", "en") ?: "en" // [cite: 1600]
+        get() = preferences.getString("user_language", "en") ?: "en"
         set(value) {
-            preferences.edit().putString("user_language", value).apply() // [cite: 1602]
-            languageChangeUtil.changeLanguage(context, value) // [cite: 1603]
+            preferences.edit().putString("user_language", value).apply()
+            languageChangeUtil.changeLanguage(context, value)
         }
 }
