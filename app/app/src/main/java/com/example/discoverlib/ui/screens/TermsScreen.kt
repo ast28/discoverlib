@@ -24,17 +24,43 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.discoverlib.R
-import com.example.discoverlib.data.MockData
 import com.example.discoverlib.navegation.Routes
 import com.example.discoverlib.ui.components.DiscoverScaffold
 import com.example.discoverlib.ui.components.MainSection
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
+import com.example.discoverlib.ui.viewmodels.TripViewModel
 
 @Composable
-fun TermsScreen(navController: NavController) {
+fun TermsScreen(
+    navController: NavController,
+    viewModel: TripViewModel = hiltViewModel()
+) {
+    val terms = listOf(
+        "Data Privacy" to "We respect your privacy. Your trip data is stored locally on your device.",
+        "Usage License" to "This app is provided as-is for personal trip planning purposes.",
+        "Content Accuracy" to "Users are responsible for verifying activity times and locations.",
+        "Third Party" to "Maps and icons are provided by external services under their own licenses."
+    )
+
+    TermsScreenContent(
+        navController = navController,
+        termsList = terms,
+        onAccept = { navController.navigate(Routes.Home) },
+        onDecline = { navController.navigate(Routes.Home) }
+    )
+}
+
+@Composable
+fun TermsScreenContent(
+    navController: NavController,
+    termsList: List<Pair<String, String>>,
+    onAccept: () -> Unit,
+    onDecline: () -> Unit
+) {
     DiscoverScaffold(navController = navController, selectedSection = MainSection.NONE) { paddingValues ->
         Column(
             modifier = Modifier
@@ -48,7 +74,7 @@ fun TermsScreen(navController: NavController) {
             Text("Terms & Conditions", fontSize = 32.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(12.dp))
 
-            MockData.termsSections.forEachIndexed { index, item ->
+            termsList.forEachIndexed { index, item ->
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text("${index + 1}. ${item.first}", fontWeight = FontWeight.Bold)
@@ -60,12 +86,12 @@ fun TermsScreen(navController: NavController) {
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Button(
-                    onClick = { navController.navigate(Routes.Home) },
+                    onClick = onDecline,
                     modifier = Modifier.weight(1f).height(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
                 ) { Text("Decline", color = MaterialTheme.colorScheme.onBackground) }
                 Button(
-                    onClick = { navController.navigate(Routes.Home) },
+                    onClick = onAccept,
                     modifier = Modifier.weight(1f).height(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.logo))
                 ) { Text("Accept", color = Color.White) }
@@ -78,5 +104,15 @@ fun TermsScreen(navController: NavController) {
 @Preview(showBackground = true)
 @Composable
 fun TermsScreenPreview() {
-    DiscoverlibTheme { TermsScreen(rememberNavController()) }
+    DiscoverlibTheme {
+        TermsScreenContent(
+            navController = rememberNavController(),
+            termsList = listOf(
+                "Section 1" to "Example of terms and conditions text for preview.",
+                "Section 2" to "Another section with more legal information."
+            ),
+            onAccept = {},
+            onDecline = {}
+        )
+    }
 }

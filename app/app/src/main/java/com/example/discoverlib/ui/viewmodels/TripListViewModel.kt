@@ -1,22 +1,40 @@
 package com.example.discoverlib.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.discoverlib.domain.TeamMember
 import com.example.discoverlib.domain.Trip
 import com.example.discoverlib.domain.TripActivity
 import com.example.discoverlib.domain.TripRepository
-import com.example.discoverlib.domain.User
 import com.example.discoverlib.domain.ValidationResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import java.time.LocalDate
 import javax.inject.Inject
 
+
 @HiltViewModel
-class UserViewModel @Inject constructor(
+class TripViewModel @Inject constructor(
     private val repository: TripRepository
 ) : ViewModel() {
 
+    val trips: StateFlow<List<Trip>> = repository.getTrips()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    fun getTeam(): List<TeamMember> {
+        return repository.getTeam()
+    }
+
+
+
     fun getSavedTrips(): List<Trip> {
-        return repository.getTrips()
+        return trips.value
     }
 
     fun getSavedOneTrip(tripId: String): Trip? {
@@ -24,11 +42,12 @@ class UserViewModel @Inject constructor(
     }
 
     fun saveNewTrip(trip: Trip): ValidationResult{
-        if (trip.title.isBlank() || trip.startDate.isAfter(trip.endDate)) {
-            return ValidationResult(
-                isSuccessful = false,
-                message = "Invalid data. Please check the title and dates."
-            )
+        if (trip.title.isBlank() || trip.title.length > 30 ) {
+            return ValidationResult(false, "Title max 30")
+        }
+
+        if (trip.startDate.isBefore(LocalDate.now()) || trip.startDate.isAfter(trip.endDate)) {
+            return ValidationResult(false, "Check dates: cannot start in the past or end before starting.")
         }
 
         val tripWithId = trip.copy(id = java.util.UUID.randomUUID().toString())
@@ -65,11 +84,11 @@ class UserViewModel @Inject constructor(
 
 
 
-    fun getSavedAtivities(trip: Trip): List<TripActivity> {
+    fun getSavedActivities(trip: Trip): List<TripActivity> {
         return repository.getActivities(trip)
     }
 
-    fun getSavedAtivity(tripId: String, activityId: String): TripActivity? {
+    fun getSavedActivity(tripId: String, activityId: String): TripActivity? {
         return repository.getOneActivity(tripId, activityId)
     }
 
@@ -80,6 +99,16 @@ class UserViewModel @Inject constructor(
                 isSuccessful = false,
                 message = "Invalid data. All fields are mandatory."
             )
+        }
+        val trip = repository.getOneTrip(tripId)
+        if (trip != null) {
+            if (activity.date.isBefore(trip.startDate) || activity.date.isAfter(trip.endDate)) {
+                return ValidationResult(false, "Activity date must be during the trip dates.")
+            }
+        }
+        val exists = trip?.activities?.any { it.title.lowercase() == activity.title.trim().lowercase() } ?: false
+        if (exists) {
+            return ValidationResult(false, "This activity already exists in your plan.")
         }
 
         val activityWithId = activity.copy(id = java.util.UUID.randomUUID().toString())
@@ -118,96 +147,5 @@ class UserViewModel @Inject constructor(
         } else {
             ValidationResult(false, "Internal error: Could not delete activity.")
         }
-    }
-
-
-
-
-
-    fun getSavedUsername(): String {
-        val user = repository.getUser()
-        if (user != null) { return user.username }
-        else { return "Not defined user name" }
-    }
-
-    fun saveNewUsername(newName: String): Boolean {
-        if (newName.isBlank()) {
-            return false
-        }
-        val currentUser = repository.getUser()
-        val updatedUser = if (currentUser != null) {
-            currentUser.copy(username = newName)
-        } else {
-            User(
-                username = newName,
-                dateOfBirth = LocalDate.now(),
-                darkMode = false,
-                language = "en"
-            )
-        }
-        repository.saveUser(updatedUser)
-        return true
-    }
-
-    fun getSavedDateOfBirth(): String {
-        val user = repository.getUser()
-        if (user != null) { return user.dateOfBirth.toString() }
-        else { return "Not defined date of birth" }
-    }
-
-    fun saveNewDateOfBirth(newDate: LocalDate): Boolean {
-        val currentUser = repository.getUser()
-        val updatedUser = if (currentUser != null) {
-            currentUser.copy(dateOfBirth = newDate)
-        } else {
-            User(
-                username = "",
-                dateOfBirth = newDate,
-                darkMode = false,
-                language = "en"
-            )
-        }
-        repository.saveUser(updatedUser)
-        return true
-    }
-
-    fun getDarkMode(): Boolean {
-        val user = repository.getUser()
-        return user?.darkMode ?: false
-    }
-
-    fun saveDarkMode(isDark: Boolean) {
-        val currentUser = repository.getUser()
-        val updatedUser = if (currentUser != null) {
-            currentUser.copy(darkMode = isDark)
-        } else {
-            User(
-                username = "",
-                dateOfBirth = LocalDate.now(),
-                darkMode = isDark,
-                language = "en"
-            )
-        }
-        repository.saveUser(updatedUser)
-    }
-
-    fun getLanguage(): String {
-        val user = repository.getUser()
-        return user?.language ?: "en"
-    }
-
-    fun saveLanguage(newLanguage: String) {
-        val currentUser = repository.getUser()
-        val updatedUser = if (currentUser != null) {
-            currentUser.copy(language = newLanguage)
-        } else {
-            User(
-                username = "",
-                dateOfBirth = LocalDate.now(),
-                darkMode = false,
-                language = newLanguage
-            )
-        }
-        repository.saveUser(updatedUser)
     }
 }

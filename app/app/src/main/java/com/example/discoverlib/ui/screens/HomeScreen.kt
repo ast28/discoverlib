@@ -23,10 +23,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,22 +37,60 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.discoverlib.R
-import com.example.discoverlib.data.MockData
 import com.example.discoverlib.domain.ActivityCategory
 import com.example.discoverlib.domain.Trip
+import com.example.discoverlib.domain.TripActivity
 import com.example.discoverlib.navegation.Routes
 import com.example.discoverlib.ui.components.DiscoverScaffold
 import com.example.discoverlib.ui.components.MainSection
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
+import com.example.discoverlib.ui.viewmodels.TripViewModel
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
-fun HomeScreen(navController: NavController) {
-    val dayLabels = listOf("Mon 23", "Tue 24", "Wed 25", "Thu 26", "Fri 27")
+fun HomeScreen(
+    navController: NavController,
+    viewModel: TripViewModel = hiltViewModel()
+) {
+    val trips by viewModel.trips.collectAsState()
+    val featuredTrip = trips.firstOrNull()
+
+    val dayLabels = listOf("lun 23", "mar 24", "mié 25", "jue 26", "vie 27")
     var selectedDayIndex by rememberSaveable { mutableIntStateOf(0) }
 
+    HomeScreenContent(
+        navController = navController,
+        featuredTrip = featuredTrip,
+        dayLabels = dayLabels,
+        selectedDayIndex = selectedDayIndex,
+        onPrevDay = { if (selectedDayIndex > 0) selectedDayIndex-- },
+        onNextDay = { if (selectedDayIndex < dayLabels.lastIndex) selectedDayIndex++ },
+        onTripClick = { 
+            featuredTrip?.let { 
+                navController.navigate("tripDetail/${it.title}") 
+            } ?: navController.navigate(Routes.Trips)
+        },
+        onActivityClick = { activityId -> navController.navigate("activity/$activityId") }
+    )
+}
+
+@Composable
+fun HomeScreenContent(
+    navController: NavController,
+    featuredTrip: Trip?,
+    dayLabels: List<String>,
+    selectedDayIndex: Int,
+    onPrevDay: () -> Unit,
+    onNextDay: () -> Unit,
+    onTripClick: () -> Unit,
+    onActivityClick: (String) -> Unit
+) {
     DiscoverScaffold(navController = navController, selectedSection = MainSection.HOME) { paddingValues ->
         Column(
             modifier = Modifier
@@ -65,24 +104,31 @@ fun HomeScreen(navController: NavController) {
             Text("Home", fontSize = 32.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(12.dp))
 
-            NextTripSummaryCard(
-                trip = MockData.featuredTrip,
-                onClick = { navController.navigate(Routes.TripDetail) }
-            )
+            if (featuredTrip != null) {
+                NextTripSummaryCard(
+                    trip = featuredTrip,
+                    onClick = onTripClick
+                )
 
-            Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(18.dp))
 
-            DailyCalendarCard(
-                trip = MockData.featuredTrip,
-                selectedDay = dayLabels[selectedDayIndex],
-                canGoPrev = selectedDayIndex > 0,
-                canGoNext = selectedDayIndex < dayLabels.lastIndex,
-                onPrevDay = { selectedDayIndex-- },
-                onNextDay = { selectedDayIndex++ },
-                onActivityClick = { activityId ->
-                    navController.navigate("activity/$activityId")
+                DailyCalendarCard(
+                    trip = featuredTrip,
+                    selectedDay = dayLabels[selectedDayIndex],
+                    canGoPrev = selectedDayIndex > 0,
+                    canGoNext = selectedDayIndex < dayLabels.lastIndex,
+                    onPrevDay = onPrevDay,
+                    onNextDay = onNextDay,
+                    onActivityClick = onActivityClick
+                )
+            } else {
+                Box(
+                    modifier = Modifier.fillMaxWidth().height(200.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("No upcoming trips found. Create one!", color = Color.Gray)
                 }
-            )
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
         }
@@ -96,7 +142,8 @@ private fun NextTripSummaryCard(
 ) {
     Card(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
@@ -109,11 +156,12 @@ private fun NextTripSummaryCard(
         ) {
             Column {
                 Text("Next trip", color = colorResource(id = R.color.logo), fontWeight = FontWeight.Bold)
-                Text(trip.city, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                Text(trip.period, fontSize = 13.sp, color = Color.Gray)
+                Text(trip.title, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text("${trip.startDate} - ${trip.endDate}", fontSize = 13.sp, color = Color.Gray)
             }
             Column(horizontalAlignment = Alignment.End) {
-                Text("${trip.nights} nights", fontWeight = FontWeight.Bold)
+                val nights = java.time.temporal.ChronoUnit.DAYS.between(trip.startDate, trip.endDate)
+                Text("$nights nights", fontWeight = FontWeight.Bold)
                 Text("${trip.budgetEur} EUR", fontWeight = FontWeight.Bold)
             }
         }
@@ -131,6 +179,8 @@ private fun DailyCalendarCard(
     onActivityClick: (String) -> Unit
 ) {
     val hours = listOf("08:00", "10:00", "12:00", "14:00", "16:00", "18:00")
+    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+    val dayFormatter = DateTimeFormatter.ofPattern("E dd", Locale("es", "ES"))
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -148,7 +198,7 @@ private fun DailyCalendarCard(
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Daily Schedule", fontWeight = FontWeight.Bold, color = colorResource(id = R.color.logo))
-                    Text("${trip.city} - $selectedDay", fontSize = 13.sp)
+                    Text("${trip.title} - $selectedDay", fontSize = 13.sp)
                 }
                 IconButton(onClick = onNextDay, enabled = canGoNext) {
                     Text(">", fontWeight = FontWeight.Bold, fontSize = 20.sp)
@@ -158,7 +208,12 @@ private fun DailyCalendarCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             hours.forEach { hour ->
-                val activity = trip.activities.firstOrNull { it.dayLabel == selectedDay && it.time == hour }
+                val activity = trip.activities.firstOrNull {
+                    val timeString = it.time.format(timeFormatter)
+                    val dateString = it.date.format(dayFormatter).replace(".", "")
+                    dateString.equals(selectedDay, ignoreCase = true) && timeString == hour
+                }
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -216,6 +271,24 @@ private fun iconForCategory(category: ActivityCategory): Int {
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    DiscoverlibTheme { HomeScreen(rememberNavController()) }
+    DiscoverlibTheme {
+        HomeScreenContent(
+            navController = rememberNavController(),
+            featuredTrip = Trip(
+                id = "1",
+                title = "Roma",
+                startDate = LocalDate.now(),
+                endDate = LocalDate.now().plusDays(4),
+                description = "Viaje a Roma",
+                budgetEur = 500,
+                activities = mutableListOf()
+            ),
+            dayLabels = listOf("lun 23", "mar 24", "mié 25", "jue 26", "vie 27"),
+            selectedDayIndex = 0,
+            onPrevDay = {},
+            onNextDay = {},
+            onTripClick = {},
+            onActivityClick = {}
+        )
+    }
 }
-

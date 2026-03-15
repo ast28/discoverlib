@@ -1,7 +1,11 @@
 package com.example.discoverlib.domain
 
+import kotlinx.coroutines.flow.Flow
+
 interface TripRepository {
-    fun getTrips(): List<Trip>
+    fun getTeam(): List<TeamMember>
+
+    fun getTrips(): Flow<List<Trip>>
     fun getOneTrip(tripId: String): Trip?
     fun addTrip(trip: Trip): Boolean
     fun editTrip(trip: Trip): Boolean

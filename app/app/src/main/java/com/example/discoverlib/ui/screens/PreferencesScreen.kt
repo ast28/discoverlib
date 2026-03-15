@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -20,12 +19,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -36,23 +33,53 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.discoverlib.R
 import com.example.discoverlib.ui.components.DiscoverScaffold
 import com.example.discoverlib.ui.components.MainSection
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
+import com.example.discoverlib.ui.viewmodels.TripViewModel
 
 @Composable
-fun PreferencesScreen(navController: NavController, isDarkTheme: Boolean, onThemeChange: (Boolean) -> Unit) {
-    val darkMode = remember { mutableStateOf(false) }
-    val reminders = remember { mutableStateOf(false) }
+fun PreferencesScreen(
+    navController: NavController,
+    isDarkTheme: Boolean,
+    onThemeChange: (Boolean) -> Unit,
+    viewModel: TripViewModel = hiltViewModel()
+) {
+    val languages = listOf("English", "Español", "Català")
+    var langIndex by remember { mutableIntStateOf(0) }
+    var reminders by remember { mutableStateOf(false) }
 
+    PreferencesScreenContent(
+        navController = navController,
+        isDarkTheme = isDarkTheme,
+        onThemeChange = onThemeChange,
+        languages = languages,
+        langIndex = langIndex,
+        onLangChange = { langIndex = it },
+        reminders = reminders,
+        onRemindersChange = { reminders = it }
+    )
+}
+
+@Composable
+fun PreferencesScreenContent(
+    navController: NavController,
+    isDarkTheme: Boolean,
+    onThemeChange: (Boolean) -> Unit,
+    languages: List<String>,
+    langIndex: Int,
+    onLangChange: (Int) -> Unit,
+    reminders: Boolean,
+    onRemindersChange: (Boolean) -> Unit
+) {
     DiscoverScaffold(navController = navController, selectedSection = MainSection.SETTINGS) { paddingValues ->
         Column(
             modifier = Modifier
@@ -66,10 +93,6 @@ fun PreferencesScreen(navController: NavController, isDarkTheme: Boolean, onThem
             Text("Preferences", fontSize = 34.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(16.dp))
 
-            val languages = listOf("English", "Español", "Català")
-            var langIndex by remember { mutableIntStateOf(0) }
-            var expanded by remember { mutableStateOf(false) }
-
             Spacer(modifier = Modifier.height(10.dp))
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -82,7 +105,7 @@ fun PreferencesScreen(navController: NavController, isDarkTheme: Boolean, onThem
                         subtitle = "Tap to choose a language",
                         options = languages,
                         selectedIndex = langIndex,
-                        onOptionSelected = { langIndex = it }
+                        onOptionSelected = onLangChange
                     )
                     PreferenceToggle(
                         title = "Dark theme",
@@ -93,8 +116,8 @@ fun PreferencesScreen(navController: NavController, isDarkTheme: Boolean, onThem
                     PreferenceToggle(
                         title = "Notifications",
                         subtitle = "Trip reminders and alerts",
-                        checked = reminders.value,
-                        onCheckedChange = { reminders.value = it }
+                        checked = reminders,
+                        onCheckedChange = onRemindersChange
                     )
                 }
             }
@@ -194,6 +217,16 @@ private fun PreferenceToggle(
 @Preview(showBackground = true)
 @Composable
 fun PreferencesScreenPreview() {
-    DiscoverlibTheme { PreferencesScreen(rememberNavController(),isDarkTheme = true,
-        onThemeChange = {}) }
+    DiscoverlibTheme {
+        PreferencesScreenContent(
+            navController = rememberNavController(),
+            isDarkTheme = true,
+            onThemeChange = {},
+            languages = listOf("English", "Español", "Català"),
+            langIndex = 0,
+            onLangChange = {},
+            reminders = false,
+            onRemindersChange = {}
+        )
+    }
 }

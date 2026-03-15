@@ -3,10 +3,12 @@ package com.example.discoverlib.data.repository
 import javax.inject.Inject
 import com.example.discoverlib.data.fakeDB.FakeTripDataSource
 import com.example.discoverlib.data.local.SharedPrefsManager
+import com.example.discoverlib.domain.TeamMember
 import com.example.discoverlib.domain.Trip
 import com.example.discoverlib.domain.TripActivity
 import com.example.discoverlib.domain.TripRepository
 import com.example.discoverlib.domain.User
+import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
 class TripRepositoryImpl @Inject constructor(
@@ -14,9 +16,15 @@ class TripRepositoryImpl @Inject constructor(
 ) : TripRepository {
     private val dataSource = FakeTripDataSource
 
+    override fun getTeam(): List<TeamMember> {
+        return listOf(
+            TeamMember("AS", "Alba Senar Tejedor", "Developer")
+        )
+    }
 
-    override fun getTrips(): List<Trip> {
-        return dataSource.getTrips()
+
+    override fun getTrips(): Flow<List<Trip>> {
+        return dataSource.getTripsFlow()
     }
     override fun getOneTrip(tripId: String): Trip? {
         return dataSource.getOneTrip(tripId)

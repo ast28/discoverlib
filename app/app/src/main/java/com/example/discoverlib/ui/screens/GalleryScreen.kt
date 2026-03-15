@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -25,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,21 +41,77 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.discoverlib.R
-import com.example.discoverlib.data.MockData
+import com.example.discoverlib.domain.Trip
 import com.example.discoverlib.ui.components.DiscoverScaffold
 import com.example.discoverlib.ui.components.MainSection
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
+import com.example.discoverlib.ui.viewmodels.TripViewModel
 
 @Composable
-fun GalleryScreen(navController: NavController) {
+fun GalleryScreen(
+    navController: NavController,
+    viewModel: TripViewModel = hiltViewModel()
+) {
+    val trips by viewModel.trips.collectAsState()
+    
     var expanded by remember { mutableStateOf(false) }
-    var selectedTrip by remember { mutableStateOf(MockData.galleryTrips.first()) }
-    val hasPhotos = !selectedTrip.equals("Roma", ignoreCase = true) && !selectedTrip.equals("London", ignoreCase = true) && !selectedTrip.equals("Paris", ignoreCase = true)
-    val gallerySummary = if (hasPhotos) "9 photos - 234 MB" else "0 photos - 0 MB"
+    var selectedTripId by remember(trips) { 
+        mutableStateOf(trips.firstOrNull()?.id ?: "") 
+    }
 
+    val selectedTrip = trips.find { it.id == selectedTripId }
+    
+    // Special logic for Rome: show 30 placeholders with R.drawable.photo to make it scrollable
+    val photos = when {
+        selectedTrip?.title?.equals("Rome", ignoreCase = true) == true || 
+        selectedTrip?.title?.equals("Roma", ignoreCase = true) == true -> {
+            List(30) { R.drawable.photo }
+        }
+        selectedTrip?.title?.equals("London", ignoreCase = true) == true ||
+        selectedTrip?.title?.equals("Paris", ignoreCase = true) == true -> {
+            emptyList()
+        }
+        else -> {
+            selectedTrip?.activities?.mapNotNull { it.photo } ?: emptyList()
+        }
+    }
+    
+    val gallerySummary = "${photos.size} photos - ${photos.size * 2.5} MB"
+
+    GalleryScreenContent(
+        navController = navController,
+        expanded = expanded,
+        selectedTripName = selectedTrip?.title ?: "No trips available",
+        photos = photos,
+        gallerySummary = gallerySummary,
+        trips = trips,
+        onExpandedChange = { expanded = it },
+        onTripSelected = {
+            selectedTripId = it.id
+            expanded = false
+        },
+        onAddPhotosClick = {},
+        onDeletePhotoClick = {}
+    )
+}
+
+@Composable
+fun GalleryScreenContent(
+    navController: NavController,
+    expanded: Boolean,
+    selectedTripName: String,
+    photos: List<Int>,
+    gallerySummary: String,
+    trips: List<Trip>,
+    onExpandedChange: (Boolean) -> Unit,
+    onTripSelected: (Trip) -> Unit,
+    onAddPhotosClick: () -> Unit,
+    onDeletePhotoClick: () -> Unit
+) {
     DiscoverScaffold(navController = navController, selectedSection = MainSection.GALLERY) { paddingValues ->
         Column(
             modifier = Modifier
@@ -63,28 +122,31 @@ fun GalleryScreen(navController: NavController) {
         ) {
             Spacer(modifier = Modifier.height(20.dp))
             Text("Gallery", fontSize = 34.sp, fontWeight = FontWeight.Bold)
-            Text(gallerySummary, fontSize = 14.sp)
+            Text(gallerySummary, fontSize = 14.sp, color = Color.Gray)
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Box {
-                    Text(
-                        text = "$selectedTrip ▼",
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.clickable { expanded = true }
-                    )
-                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                        MockData.galleryTrips.forEach { trip ->
+                    Row(
+                        modifier = Modifier.clickable { onExpandedChange(true) },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = selectedTripName,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+                    }
+                    DropdownMenu(expanded = expanded, onDismissRequest = { onExpandedChange(false) }) {
+                        trips.forEach { trip ->
                             DropdownMenuItem(
-                                text = { Text(trip) },
-                                onClick = {
-                                    selectedTrip = trip
-                                    expanded = false
-                                }
+                                text = { Text(trip.title) },
+                                onClick = { onTripSelected(trip) }
                             )
                         }
                     }
@@ -92,21 +154,30 @@ fun GalleryScreen(navController: NavController) {
             }
 
             Spacer(modifier = Modifier.height(10.dp))
-            if (hasPhotos) {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.weight(1f)) {
-                    items((1..9).toList()) {
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            repeat(3) {
+            
+            if (photos.isNotEmpty()) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp), 
+                    modifier = Modifier.weight(1f)
+                ) {
+                    val chunks = photos.chunked(3)
+                    items(chunks) { rowPhotos ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(), 
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            rowPhotos.forEach { photoRes ->
                                 Column(
                                     modifier = Modifier.weight(1f),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Image(
-                                        painter = painterResource(id = R.drawable.photos),
+                                        painter = painterResource(id = photoRes),
                                         contentDescription = "Photo",
-                                        modifier = Modifier.size(90.dp)
+                                        modifier = Modifier
+                                            .size(90.dp)
                                     )
-                                    IconButton(onClick = {}) {
+                                    IconButton(onClick = onDeletePhotoClick) {
                                         Icon(
                                             painter = painterResource(id = R.drawable.delete),
                                             contentDescription = "Delete photo",
@@ -115,6 +186,9 @@ fun GalleryScreen(navController: NavController) {
                                         )
                                     }
                                 }
+                            }
+                            repeat(3 - rowPhotos.size) {
+                                Spacer(modifier = Modifier.weight(1f))
                             }
                         }
                     }
@@ -131,7 +205,7 @@ fun GalleryScreen(navController: NavController) {
             }
 
             Button(
-                onClick = {},
+                onClick = onAddPhotosClick,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
@@ -146,5 +220,18 @@ fun GalleryScreen(navController: NavController) {
 @Preview(showBackground = true)
 @Composable
 fun GalleryPreview() {
-    DiscoverlibTheme { GalleryScreen(rememberNavController()) }
+    DiscoverlibTheme {
+        GalleryScreenContent(
+            navController = rememberNavController(),
+            expanded = false,
+            selectedTripName = "Roma",
+            photos = emptyList(),
+            gallerySummary = "0 photos - 0 MB",
+            trips = emptyList(),
+            onExpandedChange = {},
+            onTripSelected = {},
+            onAddPhotosClick = {},
+            onDeletePhotoClick = {}
+        )
+    }
 }

@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.sp
 import com.example.discoverlib.R
 import com.example.discoverlib.domain.ActivityCategory
 import com.example.discoverlib.domain.TripActivity
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun TripSchedule(
@@ -36,6 +38,9 @@ fun TripSchedule(
 ) {
     val dayColumns = listOf("Lun 23", "Mar 24", "Mie 25", "Jue 26", "Vie 27")
     val hours = listOf("08:00", "10:00", "12:00", "14:00", "16:00", "18:00")
+
+    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+    val dayFormatter = DateTimeFormatter.ofPattern("E dd", Locale("es", "ES"))
 
     Column(
         modifier = Modifier
@@ -73,7 +78,17 @@ fun TripSchedule(
                     textAlign = TextAlign.Center
                 )
                 dayColumns.forEach { day ->
-                    val activity = activities.firstOrNull { it.dayLabel == day && it.time == hour }
+
+                    val activity = activities.firstOrNull {
+                        val timeString = it.time.format(timeFormatter)
+
+                        val dateString = it.date.format(dayFormatter)
+                            .replace(".", "")
+                            .replaceFirstChar { char -> char.uppercase() }
+
+                        dateString == day && timeString == hour
+                    }
+
                     Box(
                         modifier = Modifier
                             .weight(1f)

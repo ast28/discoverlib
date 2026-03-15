@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.discoverlib.R
-import com.example.discoverlib.navegation.Routes
 import com.example.discoverlib.ui.components.DiscoverScaffold
 import com.example.discoverlib.ui.components.MainSection
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
@@ -51,6 +50,27 @@ fun DiscoverActivitiesScreen(navController: NavController, cityName: String = "R
         mockActivities.filter { it.category == selectedCategory }
     }
 
+    DiscoverActivitiesContent(
+        navController = navController,
+        cityName = cityName,
+        categories = categories,
+        selectedCategory = selectedCategory,
+        filteredActivities = filteredActivities,
+        onCategorySelected = { category -> selectedCategory = category },
+        onBackClick = { navController.popBackStack() }
+    )
+}
+
+@Composable
+fun DiscoverActivitiesContent(
+    navController: NavController,
+    cityName: String,
+    categories: List<String>,
+    selectedCategory: String,
+    filteredActivities: List<MockActivity>,
+    onCategorySelected: (String) -> Unit,
+    onBackClick: () -> Unit
+) {
     DiscoverScaffold(
         navController = navController,
         selectedSection = MainSection.TRIPS
@@ -67,7 +87,7 @@ fun DiscoverActivitiesScreen(navController: NavController, cityName: String = "R
                     .padding(horizontal = 16.dp, vertical = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { navController.popBackStack() }) {
+                IconButton(onClick = onBackClick) {
                     Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                 }
                 Spacer(modifier = Modifier.width(8.dp))
@@ -88,7 +108,7 @@ fun DiscoverActivitiesScreen(navController: NavController, cityName: String = "R
                     Surface(
                         shape = RoundedCornerShape(20.dp),
                         color = if (isSelected) colorResource(id = R.color.logo) else Color.LightGray.copy(alpha = 0.3f),
-                        modifier = Modifier.clickable { selectedCategory = category }
+                        modifier = Modifier.clickable { onCategorySelected(category) }
                     ) {
                         Text(
                             text = category,
@@ -109,7 +129,7 @@ fun DiscoverActivitiesScreen(navController: NavController, cityName: String = "R
             ) {
                 items(filteredActivities) { activity ->
                     ActivityCard(activity = activity) {
-                        // res de moment
+
                     }
                 }
             }
@@ -176,6 +196,14 @@ fun ActivityCard(activity: MockActivity, onClick: () -> Unit) {
 @Composable
 fun DiscoverActivitiesPreview() {
     DiscoverlibTheme {
-        DiscoverActivitiesScreen(rememberNavController())
+        DiscoverActivitiesContent(
+            navController = rememberNavController(),
+            cityName = "Roma",
+            categories = listOf("All", "Tours", "Museums", "Food", "Nature"),
+            selectedCategory = "All",
+            filteredActivities = mockActivities,
+            onCategorySelected = {},
+            onBackClick = {}
+        )
     }
 }

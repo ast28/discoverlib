@@ -12,8 +12,9 @@ import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
 import com.example.discoverlib.navegation.AppNavigation
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -25,7 +26,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val systemTheme = isSystemInDarkTheme()
-
             var isDarkTheme by remember { mutableStateOf(systemTheme) }
 
             DiscoverlibTheme(darkTheme = isDarkTheme) {
