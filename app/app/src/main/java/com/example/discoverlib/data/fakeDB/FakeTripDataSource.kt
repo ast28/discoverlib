@@ -10,7 +10,7 @@ import java.time.LocalTime
 object FakeTripDataSource {
     private val trips = mutableListOf<Trip>(
         Trip(
-            id = "0",
+            id = java.util.UUID.randomUUID().toString(),
             title = "Rome",
             startDate = LocalDate.of(2026, 3, 23),
             endDate = LocalDate.of(2026, 3, 28),
@@ -56,7 +56,7 @@ object FakeTripDataSource {
             )
         ),
         Trip(
-            id = "1",
+            id = java.util.UUID.randomUUID().toString(),
             title = "London",
             startDate = LocalDate.of(2026, 4, 10),
             endDate = LocalDate.of(2026, 4, 14),
@@ -65,7 +65,7 @@ object FakeTripDataSource {
             activities = mutableListOf()
         ),
         Trip(
-            id = "2",
+            id = java.util.UUID.randomUUID().toString(),
             title = "Paris",
             startDate = LocalDate.of(2026, 5, 4),
             endDate = LocalDate.of(2026, 5, 8),

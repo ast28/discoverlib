@@ -32,14 +32,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.discoverlib.R
-import com.example.discoverlib.data.MockData
+import com.example.discoverlib.domain.TeamMember
 import com.example.discoverlib.navegation.Routes
 import com.example.discoverlib.ui.components.DiscoverScaffold
 import com.example.discoverlib.ui.components.MainSection
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
 
 @Composable
-fun AboutScreen(navController: NavController) {
+fun AboutScreen(navController: NavController, teamMember: TeamMember? = null) {
     DiscoverScaffold(navController = navController, selectedSection = MainSection.NONE) { paddingValues ->
         Column(
             modifier = Modifier
@@ -66,7 +66,7 @@ fun AboutScreen(navController: NavController) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Team", fontWeight = FontWeight.Bold)
-                    MockData.team.forEach { member ->
+                    teamMember.team.forEach { member ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = member.initials,

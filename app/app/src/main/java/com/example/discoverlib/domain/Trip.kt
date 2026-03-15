@@ -49,3 +49,9 @@ data class TeamMember(
 )
 
 
+data class ValidationResult(
+    val isSuccessful: Boolean,
+    val message: String
+)
+
+
