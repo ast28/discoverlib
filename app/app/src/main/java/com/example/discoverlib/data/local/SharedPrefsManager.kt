@@ -9,10 +9,10 @@ import javax.inject.Singleton
 import kotlin.getValue
 
 
-@Singleton // Hilt se asegura de que solo exista uno [cite: 1595]
+@Singleton
 class SharedPrefsManager @Inject constructor(
     private val preferences: SharedPreferences,
-    @ApplicationContext private val context: Context // [cite: 1596]
+    @ApplicationContext private val context: Context
 ) {
     val languageChangeUtil by lazy { LanguageChangeUtil() }
 

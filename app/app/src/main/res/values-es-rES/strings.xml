@@ -1,7 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">DiscoverLib</string>
+
+    <string name="nav_home">Inicio</string>
+    <string name="nav_trips">Viajes</string>
+    <string name="nav_gallery">Galería</string>
+    <string name="nav_settings">Ajustes</string>
+    <string name="nav_about">Sobre la app</string>
+
+
+    <string name="profile_default_name">Viajero</string>
+    <string name="profile_edit_title">Editar Perfil</string>
     <string name="settings_title">Ajustes</string>
-    <string name="dark_mode">Modo Oscuro</string>
+    <string name="settings_profile_title">Perfil</string>
+    <string name="settings_app_title">Ajustes de la app</string>
+    <string name="settings_username">Nombre de usuario</string>
+    <string name="settings_username_subtitle">Toca para cambiar tu nombre</string>
+    <string name="settings_dob">Fecha de nacimiento</string>
+    <string name="settings_dob_subtitle">Toca para cambiar tu fecha de nacimiento</string>
     <string name="language">Idioma</string>
+    <string name="language_subtitle">Toca para elegir un idioma</string>
+    <string name="dark_mode">Modo Oscuro</string>
+    <string name="dark_mode_subtitle">Activa el modo oscuro de la app</string>
+    <string name="notifications_title">Notificaciones</string>
+    <string name="notifications_subtitle">Recordatorios y alertas de viajes</string>
+    <string name="dialog_edit_username">Editar Nombre</string>
+    <string name="dialog_edit_dob">Editar Fecha de Nacimiento</string>
+    <string name="dialog_dob_format">AAAA-MM-DD</string>
+
+    <string name="about_title">Sobre nosotros</string>
+    <string name="about_subtitle">Planea tus aventuras, a tu manera.</string>
+    <string name="about_team">Equipo</string>
+    <string name="about_tech_info">Información técnica</string>
+    <string name="about_version">Versión 1.1.0</string>
+    <string name="about_api">Android min API 26</string>
+    <string name="about_kotlin">Kotlin 2.0.21</string>
+    <string name="about_license">Licencia: MIT</string>
+    <string name="about_terms">Términos y Condiciones</string>
+
+    <string name="activity_not_found">Actividad no encontrada</string>
+    <string name="activity_error_subtitle">Por favor, inténtalo más tarde.</string>
+    <string name="activity_go_back">Volver</string>
+    <string name="activity_price">Precio:</string>
+    <string name="activity_location">Ubicación:</string>
+    <string name="activity_photos_title">Fotos y Mapa</string>
+    <string name="activity_photos_unavailable">Fotos no disponibles</string>
+    <string name="activity_map_unavailable">Mapa no disponible</string>
+
+    <string name="discover_title">Descubrir %s</string>
+    <string name="discover_trip_not_found">Viaje no encontrado</string>
+    <string name="discover_add_btn">Añadir</string>
+    <string name="form_new_custom">Nueva actividad</string>
+    <string name="form_schedule">Programar actividad</string>
+    <string name="form_title">Título</string>
+    <string name="form_location">Ubicación</string>
+    <string name="form_category">Categoría (Cultura, Comida, Naturaleza)</string>
+    <string name="form_description">Descripción</string>
+    <string name="form_date">Fecha (AAAA-MM-DD)</string>
+    <string name="form_time">Hora (HH:MM)</string>
+    <string name="form_date_error">Debe ser entre %1$s y %2$s</string>
+    <string name="form_cost">Coste (EUR)</string>
+    <string name="form_save">Guardar</string>
+    <string name="form_cancel">Cancelar</string>
+
+    <string name="gallery_title">Galería</string>
+    <string name="gallery_summary">%1$d fotos - %2$s MB</string>
+    <string name="gallery_no_trips">No hay viajes disponibles</string>
+    <string name="gallery_no_photos">No se encontraron fotos</string>
+    <string name="gallery_delete_desc">Eliminar foto</string>
+    <string name="gallery_add_btn">Añadir fotos</string>
+
+    <string name="home_title">Inicio</string>
+    <string name="home_no_trips">No hay próximos viajes. ¡Crea uno!</string>
+    <string name="home_next_trip">Próximo viaje</string>
+    <string name="home_nights">%1$d noches</string>
+    <string name="home_daily_schedule">Horario diario</string>
+    <string name="home_no_activities">Sin actividades</string>
+
+    <string name="splash_subtitle">Planea tus aventuras, a tu manera</string>
+
+    <string name="terms_title">Términos y Condiciones</string>
+    <string name="terms_accept">Aceptar</string>
+    <string name="terms_decline">Rechazar</string>
+    <string name="terms_item_1_title">Privacidad de Datos</string>
+    <string name="terms_item_1_desc">Respetamos tu privacidad. Los datos de tus viajes se guardan localmente en tu dispositivo.</string>
+    <string name="terms_item_2_title">Licencia de Uso</string>
+    <string name="terms_item_2_desc">Esta app se proporciona tal cual para propósitos de planificación personal de viajes.</string>
+    <string name="terms_item_3_title">Precisión del Contenido</string>
+    <string name="terms_item_3_desc">Los usuarios son responsables de verificar los horarios y ubicaciones de las actividades.</string>
+    <string name="terms_item_4_title">Terceros</string>
+    <string name="terms_item_4_desc">Los mapas e iconos son proporcionados por servicios externos bajo sus propias licencias.</string>
+
+    <string name="trip_detail_not_found">Viaje no encontrado</string>
+    <string name="trip_detail_back">Volver</string>
+    <string name="trip_detail_nights">NOCHES</string>
+    <string name="trip_detail_price">PRECIO</string>
+    <string name="trip_detail_activities">ACTIVIDADES</string>
+    <string name="trip_detail_itinerary">Itinerario</string>
+    <string name="trip_detail_add_btn">Añadir actividad</string>
+
+    <string name="trips_title">Viajes</string>
+    <string name="trips_budget_prefix">Presupuesto:</string>
+    <string name="trips_options_desc">Opciones</string>
+    <string name="trips_edit_action">Editar</string>
+    <string name="trips_delete_action">Eliminar</string>
+    <string name="dialog_delete_trip_title">Eliminar Viaje</string>
+    <string name="dialog_delete_trip_desc">¿Estás seguro de que quieres eliminar \'%s\'? Esta acción no se puede deshacer.</string>
+    <string name="dialog_cancel_btn">Cancelar</string>
+    <string name="dialog_delete_btn">Eliminar</string>
+    <string name="form_trip_new_title">Nuevo Viaje</string>
+    <string name="form_trip_edit_title">Editar Viaje</string>
+    <string name="form_trip_city">Ciudad / Título</string>
+    <string name="form_trip_budget">Presupuesto (EUR)</string>
+    <string name="form_trip_start_date">Fecha de inicio (AAAA-MM-DD)</string>
+    <string name="form_trip_end_date">Fecha de fin (AAAA-MM-DD)</string>
+    <string name="form_trip_date_error">La fecha de fin debe ser posterior a la de inicio</string>
+    <string name="form_trip_conflict_error">Las fechas seleccionadas excluyen actividades existentes. Por favor, muévelas o elimínalas primero.</string>
+    <string name="form_trip_save_btn">Guardar</string>
+
 </resources>

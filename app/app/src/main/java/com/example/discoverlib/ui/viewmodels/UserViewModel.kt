@@ -4,12 +4,14 @@ import androidx.lifecycle.ViewModel
 import com.example.discoverlib.domain.TripRepository
 import com.example.discoverlib.domain.User
 import dagger.hilt.android.lifecycle.HiltViewModel
+import com.example.discoverlib.data.local.SharedPrefsManager
 import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
-    private val repository: TripRepository
+    private val repository: TripRepository,
+    private val sharedPrefs: SharedPrefsManager
 ) : ViewModel() {
 
     fun getSavedUsername(): String {
@@ -84,8 +86,7 @@ class UserViewModel @Inject constructor(
     }
 
     fun getLanguage(): String {
-        val user = repository.getUser()
-        return user?.language ?: "en"
+        return sharedPrefs.userLanguage
     }
 
     fun saveLanguage(newLanguage: String) {
@@ -101,5 +102,6 @@ class UserViewModel @Inject constructor(
             )
         }
         repository.saveUser(updatedUser)
+        sharedPrefs.userLanguage = newLanguage
     }
 }

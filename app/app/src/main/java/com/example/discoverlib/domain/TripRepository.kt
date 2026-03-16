@@ -4,6 +4,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface TripRepository {
     fun getTeam(): List<TeamMember>
+    fun getSuggestedActivities(): List<MockActivity>
+
 
     fun getTrips(): Flow<List<Trip>>
     fun getOneTrip(tripId: String): Trip?
@@ -11,7 +13,6 @@ interface TripRepository {
     fun editTrip(trip: Trip): Boolean
     fun deleteTrip(tripId: String): Boolean
 
-    fun getActivities(trip: Trip): List<TripActivity>
     fun getOneActivity(tripId: String, activityId: String): TripActivity?
     fun addActivity(tripId: String, activity: TripActivity): Boolean
     fun editActivity(tripId: String, activity: TripActivity): Boolean

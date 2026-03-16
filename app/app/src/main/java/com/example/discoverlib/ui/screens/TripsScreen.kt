@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -91,8 +92,8 @@ fun TripsScreen(
     if (tripToDelete != null) {
         AlertDialog(
             onDismissRequest = { tripToDelete = null },
-            title = { Text("Delete Trip", fontWeight = FontWeight.Bold) },
-            text = { Text("Are you sure you want to delete '${tripToDelete?.title}'? This action cannot be undone.") },
+            title = { Text(stringResource(id = R.string.dialog_delete_trip_title), fontWeight = FontWeight.Bold) },
+            text = { Text(stringResource(id = R.string.dialog_delete_trip_desc, tripToDelete?.title ?: "")) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -100,13 +101,13 @@ fun TripsScreen(
                         tripToDelete = null
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
-                ) { Text("Delete", color = Color.White) }
+                ) { Text(stringResource(id = R.string.dialog_delete_btn), color = Color.White) }
             },
             dismissButton = {
                 TextButton(
                     onClick = { tripToDelete = null },
                     colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.logo))
-                ) { Text("Cancel", fontWeight = FontWeight.Bold) }
+                ) { Text(stringResource(id = R.string.dialog_cancel_btn), fontWeight = FontWeight.Bold) }
             }
         )
     }
@@ -128,7 +129,7 @@ fun TripsScreenContent(
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
             Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
                 Spacer(modifier = Modifier.height(20.dp))
-                Text("Trips", fontSize = 34.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(id = R.string.trips_title), fontSize = 34.sp, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(12.dp))
 
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -136,7 +137,7 @@ fun TripsScreenContent(
                         var showMenu by remember { mutableStateOf(false) }
                         Card(
                             modifier = Modifier.fillMaxWidth().clickable {
-                                navController.navigate("tripDetail/${trip.title}")
+                                navController.navigate("tripDetail/${trip.id}")
                             }
                         ) {
                             Row(
@@ -147,20 +148,20 @@ fun TripsScreenContent(
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(trip.title, fontSize = 26.sp, fontWeight = FontWeight.Bold)
                                     Text("${trip.startDate} - ${trip.endDate}", color = Color.Gray)
-                                    Text("Budget: ${trip.budgetEur} EUR", fontWeight = FontWeight.Medium)
+                                    Text("${stringResource(id = R.string.trips_budget_prefix)} ${trip.budgetEur} EUR", fontWeight = FontWeight.Medium)
                                 }
                                 Box {
                                     IconButton(onClick = { showMenu = true }) {
-                                        Icon(Icons.Default.MoreVert, contentDescription = "Options")
+                                        Icon(Icons.Default.MoreVert, contentDescription = stringResource(id = R.string.trips_options_desc))
                                     }
                                     DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                                         DropdownMenuItem(
-                                            text = { Text("Edit") },
+                                            text = { Text(stringResource(id = R.string.trips_edit_action)) },
                                             leadingIcon = { Icon(Icons.Default.Edit, null) },
                                             onClick = { showMenu = false; onEditClick(trip) }
                                         )
                                         DropdownMenuItem(
-                                            text = { Text("Delete", color = Color.Red) },
+                                            text = { Text(stringResource(id = R.string.trips_delete_action), color = Color.Red) },
                                             leadingIcon = { Icon(Icons.Default.Delete, null, tint = Color.Red) },
                                             onClick = { showMenu = false; onDeleteClick(trip) }
                                         )
@@ -219,20 +220,26 @@ fun TripFormDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (initialTrip == null) "New Trip" else "Edit Trip", fontWeight = FontWeight.Bold) },
+        title = {
+            Text(
+                if (initialTrip == null) stringResource(id = R.string.form_trip_new_title)
+                else stringResource(id = R.string.form_trip_edit_title),
+                fontWeight = FontWeight.Bold
+            )
+        },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = title,
                     onValueChange = { title = it },
-                    label = { Text("City / Title") },
+                    label = { Text(stringResource(id = R.string.form_trip_city)) },
                     isError = isTitleError,
                     singleLine = true
                 )
                 OutlinedTextField(
                     value = budget,
                     onValueChange = { budget = it },
-                    label = { Text("Budget (EUR)") },
+                    label = { Text(stringResource(id = R.string.form_trip_budget)) },
                     isError = isBudgetError,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true
@@ -240,20 +247,20 @@ fun TripFormDialog(
                 OutlinedTextField(
                     value = startText,
                     onValueChange = { startText = it },
-                    label = { Text("Start Date (YYYY-MM-DD)") },
+                    label = { Text(stringResource(id = R.string.form_trip_start_date)) },
                     isError = isDateParseError,
                     singleLine = true
                 )
                 OutlinedTextField(
                     value = endText,
                     onValueChange = { endText = it },
-                    label = { Text("End Date (YYYY-MM-DD)") },
+                    label = { Text(stringResource(id = R.string.form_trip_end_date)) },
                     isError = isDateParseError || isDateRangeError,
                     singleLine = true
                 )
 
                 if (isDateRangeError) {
-                    Text("End date must be after start date", color = Color.Red, fontSize = 12.sp)
+                    Text(stringResource(id = R.string.form_trip_date_error), color = Color.Red, fontSize = 12.sp)
                 }
 
                 if (activityConflict) {
@@ -262,7 +269,7 @@ fun TripFormDialog(
                         modifier = Modifier.padding(top = 8.dp)
                     ) {
                         Text(
-                            text = "Selected dates exclude existing activities. Please move or delete them first.",
+                            text = stringResource(id = R.string.form_trip_conflict_error),
                             color = Color.Red,
                             fontSize = 12.sp,
                             modifier = Modifier.padding(8.dp),
@@ -277,13 +284,13 @@ fun TripFormDialog(
                 onClick = { if (startDate != null && endDate != null) onConfirm(title, budget, startDate, endDate) },
                 enabled = !isTitleError && !isBudgetError && !isDateParseError && !isDateRangeError && !activityConflict,
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.logo))
-            ) { Text("Save", color = Color.White) }
+            ) { Text(stringResource(id = R.string.form_trip_save_btn), color = Color.White) }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismiss,
                 colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.logo))
-            ) { Text("Cancel", fontWeight = FontWeight.Bold) }
+            ) { Text(stringResource(id = R.string.dialog_cancel_btn), fontWeight = FontWeight.Bold) }
         }
     )
 }

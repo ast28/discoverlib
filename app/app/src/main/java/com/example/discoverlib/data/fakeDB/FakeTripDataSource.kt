@@ -5,6 +5,7 @@ import com.example.discoverlib.domain.ActivityCategory
 import com.example.discoverlib.domain.TeamMember
 import com.example.discoverlib.domain.Trip
 import com.example.discoverlib.domain.TripActivity
+import com.example.discoverlib.domain.MockActivity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -81,6 +82,19 @@ object FakeTripDataSource {
         )
     )
 
+    private val _suggestedActivities = MutableStateFlow<List<MockActivity>>(listOf(
+        MockActivity(java.util.UUID.randomUUID().toString(), "Rome Colosseum Tour", "Guided tour of the iconic Colosseum, Roman Forum, and Palatine Hill.", "Piazza del Colosseo, 1", "Tours", 35, 4.8),
+        MockActivity(java.util.UUID.randomUUID().toString(), "Vatican Museums & Sistine Chapel", "Skip the line ticket to explore the vast art collection of the Vatican.", "Vatican City", "Museums", 40, 4.9),
+        MockActivity(java.util.UUID.randomUUID().toString(), "Trattoria da Enzo al 29", "Traditional Roman dinner with authentic local specialties like carbonara.", "Via dei Vascellari, 29", "Food", 25, 4.7),
+        MockActivity(java.util.UUID.randomUUID().toString(), "Villa Borghese Bike Rental", "Relaxing bike ride through Rome's biggest and most beautiful public park.", "Piazzale del Museo Borghese", "Nature", 15, 4.5),
+        MockActivity(java.util.UUID.randomUUID().toString(), "Pasta Making Class", "Learn to make fresh pasta from scratch with a professional local chef.", "Via Nazionale, 42", "Food", 55, 4.9),
+        MockActivity(java.util.UUID.randomUUID().toString(), "Pantheon Guided Visit", "Audio guide for the best-preserved monument of ancient Rome.", "Piazza della Rotonda", "Tours", 10, 4.6)
+    ))
+
+    fun getSuggestedActivities(): List<MockActivity> {
+        return _suggestedActivities.value
+    }
+
     fun getTripsFlow(): Flow<List<Trip>> {
         return _trips.asStateFlow()
     }
@@ -121,10 +135,6 @@ object FakeTripDataSource {
             _trips.value = currentList
         }
         return removed
-    }
-
-    fun getActivities(trip: Trip): List<TripActivity> {
-        return trip.activities
     }
 
     fun getOneActivity(tripId: String, activityId: String): TripActivity? {

@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -33,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -59,10 +61,17 @@ fun HomeScreen(
     viewModel: TripViewModel = hiltViewModel()
 ) {
     val trips by viewModel.trips.collectAsState()
-    val featuredTrip = trips.firstOrNull()
+
+    val featuredTrip = remember(trips) {
+        val today = LocalDate.now()
+        trips
+            .filter { !it.endDate.isBefore(today) }
+            .minByOrNull { it.startDate }
+    }
+
+    var selectedDayIndex by rememberSaveable { mutableIntStateOf(0) }
 
     val dayLabels = listOf("lun 23", "mar 24", "mié 25", "jue 26", "vie 27")
-    var selectedDayIndex by rememberSaveable { mutableIntStateOf(0) }
 
     HomeScreenContent(
         navController = navController,
@@ -71,12 +80,16 @@ fun HomeScreen(
         selectedDayIndex = selectedDayIndex,
         onPrevDay = { if (selectedDayIndex > 0) selectedDayIndex-- },
         onNextDay = { if (selectedDayIndex < dayLabels.lastIndex) selectedDayIndex++ },
-        onTripClick = { 
-            featuredTrip?.let { 
-                navController.navigate("tripDetail/${it.title}") 
+        onTripClick = {
+            featuredTrip?.let {
+                navController.navigate("tripDetail/${it.id}")
             } ?: navController.navigate(Routes.Trips)
         },
-        onActivityClick = { activityId -> navController.navigate("activity/$activityId") }
+        onActivityClick = { activityId ->
+            featuredTrip?.let {
+                navController.navigate("activity/${it.id}/$activityId")
+            }
+        }
     )
 }
 
@@ -101,7 +114,7 @@ fun HomeScreenContent(
                 .verticalScroll(rememberScrollState())
         ) {
             Spacer(modifier = Modifier.height(20.dp))
-            Text("Home", fontSize = 32.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(id = R.string.home_title), fontSize = 32.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(12.dp))
 
             if (featuredTrip != null) {
@@ -126,7 +139,7 @@ fun HomeScreenContent(
                     modifier = Modifier.fillMaxWidth().height(200.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("No upcoming trips found. Create one!", color = Color.Gray)
+                    Text(stringResource(id = R.string.home_no_trips), color = Color.Gray)
                 }
             }
 
@@ -155,13 +168,13 @@ private fun NextTripSummaryCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text("Next trip", color = colorResource(id = R.color.logo), fontWeight = FontWeight.Bold)
+                Text(stringResource(id = R.string.home_next_trip), color = colorResource(id = R.color.logo), fontWeight = FontWeight.Bold)
                 Text(trip.title, fontSize = 24.sp, fontWeight = FontWeight.Bold)
                 Text("${trip.startDate} - ${trip.endDate}", fontSize = 13.sp, color = Color.Gray)
             }
             Column(horizontalAlignment = Alignment.End) {
                 val nights = java.time.temporal.ChronoUnit.DAYS.between(trip.startDate, trip.endDate)
-                Text("$nights nights", fontWeight = FontWeight.Bold)
+                Text(stringResource(id = R.string.home_nights, nights), fontWeight = FontWeight.Bold)
                 Text("${trip.budgetEur} EUR", fontWeight = FontWeight.Bold)
             }
         }
@@ -180,6 +193,7 @@ private fun DailyCalendarCard(
 ) {
     val hours = listOf("08:00", "10:00", "12:00", "14:00", "16:00", "18:00")
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+
     val dayFormatter = DateTimeFormatter.ofPattern("E dd", Locale("es", "ES"))
 
     Card(
@@ -197,7 +211,7 @@ private fun DailyCalendarCard(
                     Text("<", fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Daily Schedule", fontWeight = FontWeight.Bold, color = colorResource(id = R.color.logo))
+                    Text(stringResource(id = R.string.home_daily_schedule), fontWeight = FontWeight.Bold, color = colorResource(id = R.color.logo))
                     Text("${trip.title} - $selectedDay", fontSize = 13.sp)
                 }
                 IconButton(onClick = onNextDay, enabled = canGoNext) {
@@ -241,7 +255,7 @@ private fun DailyCalendarCard(
                         contentAlignment = Alignment.CenterStart
                     ) {
                         if (activity == null) {
-                            Text("No activities", color = Color(0xFFB0B0B0), fontSize = 12.sp)
+                            Text(stringResource(id = R.string.home_no_activities), color = Color(0xFFB0B0B0), fontSize = 12.sp)
                         } else {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(

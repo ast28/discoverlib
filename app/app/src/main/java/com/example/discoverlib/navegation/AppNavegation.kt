@@ -28,10 +28,10 @@ fun AppNavigation(isDarkTheme: Boolean, onThemeChange: (Boolean) -> Unit) {
         composable(Routes.Trips) { TripsScreen(navController) }
         composable(
             route = Routes.TripDetail,
-            arguments = listOf(navArgument("cityName") { type = NavType.StringType })
+            arguments = listOf(navArgument("tripId") { type = NavType.StringType })
         ) { backStackEntry ->
-            val cityName = backStackEntry.arguments?.getString("cityName")
-            TripDetailScreen(navController, cityName)
+            val tripId = backStackEntry.arguments?.getString("tripId")
+            TripDetailScreen(navController, tripId)
         }
         composable(
             route = Routes.Activity,
@@ -39,8 +39,9 @@ fun AppNavigation(isDarkTheme: Boolean, onThemeChange: (Boolean) -> Unit) {
                 navArgument("activityId") { type = NavType.StringType }
             )
         ) { backStackEntry ->
+            val tripId = backStackEntry.arguments?.getString("tripId")
             val activityId = backStackEntry.arguments?.getString("activityId")
-            ActivityScreen(navController, activityId)
+            ActivityScreen(navController, tripId, activityId)
         }
         composable(Routes.Gallery) { GalleryScreen(navController) }
         composable(Routes.Preferences) {
@@ -52,12 +53,11 @@ fun AppNavigation(isDarkTheme: Boolean, onThemeChange: (Boolean) -> Unit) {
         }
         composable(Routes.About) { AboutScreen(navController) }
         composable(Routes.Terms) { TermsScreen(navController) }
-        composable(Routes.DiscoverActivities) { backStackEntry ->
-            val city = backStackEntry.arguments?.getString("city") ?: "Roma"
-            DiscoverActivitiesScreen(
-                navController = navController,
-                cityName = city
-            )
+        composable(Routes.DiscoverActivities,
+            arguments = listOf(navArgument("tripId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val tripId = backStackEntry.arguments?.getString("tripId") ?: ""
+            DiscoverActivitiesScreen(navController = navController, tripId = tripId)
         }
     }
 }

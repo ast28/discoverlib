@@ -10,7 +10,7 @@ object Routes {
     const val About = "about"
     const val Terms = "terms"
 
-    const val TripDetail = "tripDetail/{cityName}"
-    const val Activity = "activity/{activityId}"
-    const val DiscoverActivities = "discoverActivities/{city}"
+    const val TripDetail = "tripDetail/{tripId}"
+    const val Activity = "activity/{tripId}/{activityId}"
+    const val DiscoverActivities = "discoverActivities/{tripId}"
 }

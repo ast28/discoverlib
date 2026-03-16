@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,10 +41,10 @@ fun TermsScreen(
     viewModel: TripViewModel = hiltViewModel()
 ) {
     val terms = listOf(
-        "Data Privacy" to "We respect your privacy. Your trip data is stored locally on your device.",
-        "Usage License" to "This app is provided as-is for personal trip planning purposes.",
-        "Content Accuracy" to "Users are responsible for verifying activity times and locations.",
-        "Third Party" to "Maps and icons are provided by external services under their own licenses."
+        stringResource(id = R.string.terms_item_1_title) to stringResource(id = R.string.terms_item_1_desc),
+        stringResource(id = R.string.terms_item_2_title) to stringResource(id = R.string.terms_item_2_desc),
+        stringResource(id = R.string.terms_item_3_title) to stringResource(id = R.string.terms_item_3_desc),
+        stringResource(id = R.string.terms_item_4_title) to stringResource(id = R.string.terms_item_4_desc)
     )
 
     TermsScreenContent(
@@ -71,7 +72,7 @@ fun TermsScreenContent(
                 .verticalScroll(rememberScrollState())
         ) {
             Spacer(modifier = Modifier.height(20.dp))
-            Text("Terms & Conditions", fontSize = 32.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(id = R.string.terms_title), fontSize = 32.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(12.dp))
 
             termsList.forEachIndexed { index, item ->
@@ -89,12 +90,12 @@ fun TermsScreenContent(
                     onClick = onDecline,
                     modifier = Modifier.weight(1f).height(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
-                ) { Text("Decline", color = MaterialTheme.colorScheme.onBackground) }
+                ) { Text(stringResource(id = R.string.terms_decline), color = MaterialTheme.colorScheme.onBackground) }
                 Button(
                     onClick = onAccept,
                     modifier = Modifier.weight(1f).height(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.logo))
-                ) { Text("Accept", color = Color.White) }
+                ) { Text(stringResource(id = R.string.terms_accept), color = Color.White) }
             }
             Spacer(modifier = Modifier.height(12.dp))
         }

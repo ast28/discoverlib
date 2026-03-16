@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -71,13 +72,13 @@ fun DiscoverScaffold(
                 }}) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_home),
-                        contentDescription = "Home",
+                        contentDescription = stringResource(id = R.string.nav_home),
                         tint = Color.Unspecified,
                         modifier = Modifier.size(20.dp)
                     )
                 }
                 Text(
-                    text = "Discoverlib",
+                    text = stringResource(id = R.string.app_name),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -99,7 +100,7 @@ fun DiscoverScaffold(
                 }) {
                     Icon(
                         painter = painterResource(id = R.drawable.about_us),
-                        contentDescription = "About",
+                        contentDescription = stringResource(id = R.string.nav_about),
                         tint = Color.Unspecified,
                         modifier = Modifier.size(20.dp)
                     )
@@ -118,20 +119,10 @@ fun DiscoverScaffold(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val items = listOf(
-                        BottomItem("Home", R.drawable.ic_home, Routes.Home, MainSection.HOME),
-                        BottomItem(
-                            "Trips",
-                            R.drawable.ic_trips,
-                            Routes.Trips,
-                            MainSection.TRIPS
-                        ),
-                        BottomItem(
-                            "Gallery",
-                            R.drawable.ic_gallery,
-                            Routes.Gallery,
-                            MainSection.GALLERY
-                        ),
-                        BottomItem("Settings", R.drawable.ic_settings, Routes.Preferences, MainSection.SETTINGS)
+                        BottomItem(stringResource(id = R.string.nav_home), R.drawable.ic_home, Routes.Home, MainSection.HOME),
+                        BottomItem(stringResource(id = R.string.nav_trips), R.drawable.ic_trips, Routes.Trips, MainSection.TRIPS),
+                        BottomItem(stringResource(id = R.string.nav_gallery), R.drawable.ic_gallery, Routes.Gallery, MainSection.GALLERY),
+                        BottomItem(stringResource(id = R.string.nav_settings), R.drawable.ic_settings, Routes.Preferences, MainSection.SETTINGS)
                     )
 
                     items.forEach { item ->

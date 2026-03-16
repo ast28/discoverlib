@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,23 +38,22 @@ import java.util.Locale
 @Composable
 fun TripDetailScreen(
     navController: NavController,
-    cityName: String?,
+    tripId: String?,
     viewModel: TripViewModel = hiltViewModel()
 ) {
-    val trip = viewModel.getSavedTrips().find { it.title == cityName }
-        ?: viewModel.getSavedTrips().firstOrNull()
+    val trip = viewModel.getSavedOneTrip(tripId?: "")
 
     if (trip != null) {
         TripDetailContent(
             navController = navController,
             trip = trip,
             onBackClick = { navController.popBackStack() },
-            onAddActivityClick = { navController.navigate("discoverActivities/${trip.title}") },
-            onActivityClick = { activityId -> navController.navigate("activity/$activityId") }
+            onAddActivityClick = { navController.navigate("discoverActivities/${trip.id}") },
+            onActivityClick = { activityId -> navController.navigate("activity/$tripId/$activityId") }
         )
     } else {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Trip not found")
+            Text(stringResource(id = R.string.trip_detail_not_found))
         }
     }
 }
@@ -90,7 +90,7 @@ fun TripDetailContent(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(id = R.string.trip_detail_back),
                             tint = Color.Black,
                             modifier = Modifier.size(20.dp)
                         )
@@ -103,13 +103,17 @@ fun TripDetailContent(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     val nights = java.time.temporal.ChronoUnit.DAYS.between(trip.startDate, trip.endDate)
-                    StatCard("$nights", "NIGHTS", Modifier.weight(1f))
-                    StatCard("${trip.budgetEur} EUR", "PRICE", Modifier.weight(1f))
-                    StatCard("${trip.activities.size}", "ACTIVITIES", Modifier.weight(1f))
+                    StatCard("$nights", stringResource(id = R.string.trip_detail_nights), Modifier.weight(1f))
+                    StatCard("${trip.budgetEur} EUR", stringResource(id = R.string.trip_detail_price), Modifier.weight(1f))
+                    StatCard("${trip.activities.size}", stringResource(id = R.string.trip_detail_activities), Modifier.weight(1f))
                 }
 
                 Spacer(modifier = Modifier.height(14.dp))
-                Text("Itinerary", fontWeight = FontWeight.Bold, color = Color(0xFFFF3D00))
+                Text(
+                    text = stringResource(id = R.string.trip_detail_itinerary),
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFFFF3D00)
+                )
 
                 Spacer(modifier = Modifier.height(10.dp))
                 HorizontalDivider()
@@ -148,7 +152,11 @@ fun TripDetailContent(
                     .align(Alignment.BottomEnd)
                     .padding(16.dp)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.White)
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(id = R.string.trip_detail_add_btn),
+                    tint = Color.White
+                )
             }
         }
     }

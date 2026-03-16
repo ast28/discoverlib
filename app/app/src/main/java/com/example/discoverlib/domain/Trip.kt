@@ -27,12 +27,22 @@ data class TripActivity(
     var title: String,
     var description: String,
     var location: String,
-    var date: LocalDate,   // local date
-    var time: LocalTime,   // local time
+    var date: LocalDate,
+    var time: LocalTime,
     var category: ActivityCategory,
     var costEur: Int,
     var photo: Int,
     var photo_maps: Int
+)
+
+data class MockActivity(
+    val id: String,
+    val title: String,
+    val description: String,
+    val location: String,
+    val category: String,
+    val priceEur: Int,
+    val rating: Double
 )
 
 enum class ActivityCategory {

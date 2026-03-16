@@ -2,6 +2,7 @@ package com.example.discoverlib.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.discoverlib.domain.MockActivity
 import com.example.discoverlib.domain.TeamMember
 import com.example.discoverlib.domain.Trip
 import com.example.discoverlib.domain.TripActivity
@@ -31,11 +32,12 @@ class TripViewModel @Inject constructor(
         return repository.getTeam()
     }
 
-
-
-    fun getSavedTrips(): List<Trip> {
-        return trips.value
+    fun getSuggestedActivities(): List<MockActivity> {
+        return repository.getSuggestedActivities()
     }
+
+
+
 
     fun getSavedOneTrip(tripId: String): Trip? {
         return repository.getOneTrip(tripId)
@@ -84,9 +86,6 @@ class TripViewModel @Inject constructor(
 
 
 
-    fun getSavedActivities(trip: Trip): List<TripActivity> {
-        return repository.getActivities(trip)
-    }
 
     fun getSavedActivity(tripId: String, activityId: String): TripActivity? {
         return repository.getOneActivity(tripId, activityId)

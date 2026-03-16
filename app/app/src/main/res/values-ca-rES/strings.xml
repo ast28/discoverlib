@@ -1,7 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">DiscoverLib</string>
-    <string name="settings_title">Ajustes</string>
-    <string name="dark_mode">Modo Oscuro</string>
+
+    <string name="nav_home">Inici</string>
+    <string name="nav_trips">Viatges</string>
+    <string name="nav_gallery">Galeria</string>
+    <string name="nav_settings">Ajustos</string>
+    <string name="nav_about">Sobre l\'app</string>
+
+
+    <string name="profile_default_name">Viatger</string>
+    <string name="profile_edit_title">Editar Perfil</string>
+    <string name="settings_title">Preferències</string>
+    <string name="settings_profile_title">Perfil</string>
+    <string name="settings_app_title">Ajustaments de l\'app</string>
+    <string name="settings_username">Nom d\'usuari</string>
+    <string name="settings_username_subtitle">Toca per canviar el teu nom</string>
+    <string name="settings_dob">Data de naixement</string>
+    <string name="settings_dob_subtitle">Toca per canviar la teva data de naixement</string>
     <string name="language">Idioma</string>
+    <string name="language_subtitle">Toca per triar un idioma</string>
+    <string name="dark_mode">Mode fosc</string>
+    <string name="dark_mode_subtitle">Activa el mode fosc de l\'app</string>
+    <string name="notifications_title">Notificacions</string>
+    <string name="notifications_subtitle">Recordatoris i alertes de viatges</string>
+    <string name="dialog_edit_username">Editar Nom</string>
+    <string name="dialog_edit_dob">Editar Data de Naixement</string>
+    <string name="dialog_dob_format">AAAA-MM-DD</string>
+
+    <string name="about_title">Sobre nosaltres</string>
+    <string name="about_subtitle">Planeja les teves aventures, a la teva manera.</string>
+    <string name="about_team">Equip</string>
+    <string name="about_tech_info">Informació tècnica</string>
+    <string name="about_version">Versió 1.1.0</string>
+    <string name="about_api">Android min API 26</string>
+    <string name="about_kotlin">Kotlin 2.0.21</string>
+    <string name="about_license">Llicència: MIT</string>
+    <string name="about_terms">Termes i Condicions</string>
+
+    <string name="activity_not_found">Activitat no trobada</string>
+    <string name="activity_error_subtitle">Si us plau, torna-ho a provar més tard.</string>
+    <string name="activity_go_back">Tornar</string>
+    <string name="activity_price">Preu:</string>
+    <string name="activity_location">Ubicació:</string>
+    <string name="activity_photos_title">Fotos i Mapa</string>
+    <string name="activity_photos_unavailable">Fotos no disponibles</string>
+    <string name="activity_map_unavailable">Mapa no disponible</string>
+
+    <string name="discover_title">Descobrir %s</string>
+    <string name="discover_trip_not_found">Viatge no trobat</string>
+    <string name="discover_add_btn">Afegir</string>
+    <string name="form_new_custom">Nova activitat</string>
+    <string name="form_schedule">Programar activitat</string>
+    <string name="form_title">Títol</string>
+    <string name="form_location">Ubicació</string>
+    <string name="form_category">Categoria (Cultura, Menjar, Natura)</string>
+    <string name="form_description">Descripció</string>
+    <string name="form_date">Data (AAAA-MM-DD)</string>
+    <string name="form_time">Hora (HH:MM)</string>
+    <string name="form_date_error">Ha de ser entre %1$s i %2$s</string>
+    <string name="form_cost">Cost (EUR)</string>
+    <string name="form_save">Desar</string>
+    <string name="form_cancel">Cancel·lar</string>
+
+    <string name="gallery_title">Galeria</string>
+    <string name="gallery_summary">%1$d fotos - %2$s MB</string>
+    <string name="gallery_no_trips">No hi ha viatges disponibles</string>
+    <string name="gallery_no_photos">No s\'han trobat fotos</string>
+    <string name="gallery_delete_desc">Eliminar foto</string>
+    <string name="gallery_add_btn">Afegir fotos</string>
+
+    <string name="home_title">Inici</string>
+    <string name="home_no_trips">No hi ha propers viatges. Crea\'n un!</string> <string name="home_next_trip">Proper viatge</string>
+    <string name="home_nights">%1$d nits</string>
+    <string name="home_daily_schedule">Horari diari</string>
+    <string name="home_no_activities">Sense activitats</string>
+
+    <string name="splash_subtitle">Planeja les teves aventures, a la teva manera</string>
+
+    <string name="terms_title">Termes i Condicions</string>
+    <string name="terms_accept">Acceptar</string>
+    <string name="terms_decline">Rebutjar</string>
+    <string name="terms_item_1_title">Privadesa de Dades</string>
+    <string name="terms_item_1_desc">Respectem la teva privadesa. Les dades dels teus viatges s\'emmagatzemen localment al teu dispositiu.</string> <string name="terms_item_2_title">Llicència d\'Ús</string> <string name="terms_item_2_desc">Aquesta app es proporciona tal qual per a propòsits de planificació personal de viatges.</string>
+    <string name="terms_item_3_title">Precisió del Contingut</string>
+    <string name="terms_item_3_desc">Els usuaris són responsables de verificar els horaris i ubicacions de les activitats.</string>
+    <string name="terms_item_4_title">Tercers</string>
+    <string name="terms_item_4_desc">Els mapes i icones són proporcionats per serveis externs sota les seves pròpies llicències.</string>
+
+    <string name="trip_detail_not_found">Viatge no trobat</string>
+    <string name="trip_detail_back">Tornar</string>
+    <string name="trip_detail_nights">NITS</string>
+    <string name="trip_detail_price">PREU</string>
+    <string name="trip_detail_activities">ACTIVITATS</string>
+    <string name="trip_detail_itinerary">Itinerari</string>
+    <string name="trip_detail_add_btn">Afegir activitat</string>
+
+    <string name="trips_title">Viatges</string>
+    <string name="trips_budget_prefix">Pressupost:</string>
+    <string name="trips_options_desc">Opcions</string>
+    <string name="trips_edit_action">Editar</string>
+    <string name="trips_delete_action">Eliminar</string>
+    <string name="dialog_delete_trip_title">Eliminar Viatge</string>
+    <string name="dialog_delete_trip_desc">Estàs segur que vols eliminar \'%s\'? Aquesta acció no es pot desfer.</string>
+    <string name="dialog_cancel_btn">Cancel·lar</string>
+    <string name="dialog_delete_btn">Eliminar</string>
+    <string name="form_trip_new_title">Nou Viatge</string>
+    <string name="form_trip_edit_title">Editar Viatge</string>
+    <string name="form_trip_city">Ciutat / Títol</string>
+    <string name="form_trip_budget">Pressupost (EUR)</string>
+    <string name="form_trip_start_date">Data d\'inici (AAAA-MM-DD)</string> <string name="form_trip_end_date">Data de fi (AAAA-MM-DD)</string>
+    <string name="form_trip_date_error">La data de fi ha de ser posterior a la d\'inici</string> <string name="form_trip_conflict_error">Les dates seleccionades exclouen activitats existents. Si us plau, mou-les o elimina-les primer.</string>
+    <string name="form_trip_save_btn">Desar</string>
+
+
 </resources>

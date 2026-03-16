@@ -1,6 +1,117 @@
 <resources>
     <string name="app_name">Discoverlib</string>
+
+    <string name="nav_home">Home</string>
+    <string name="nav_trips">Trips</string>
+    <string name="nav_gallery">Gallery</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_about">About</string>
+
+    <string name="profile_default_name">Traveler</string>
+    <string name="profile_edit_title">Edit Profile</string>
     <string name="settings_title">Settings</string>
-    <string name="dark_mode">Dark Mode</string>
+    <string name="settings_profile_title">Profile</string>
+    <string name="settings_app_title">App Settings</string>
+    <string name="settings_username">Username</string>
+    <string name="settings_username_subtitle">Tap to change your username</string>
+    <string name="settings_dob">Date of Birth</string>
+    <string name="settings_dob_subtitle">Tap to change your birth date</string>
     <string name="language">Language</string>
+    <string name="language_subtitle">Tap to choose a language</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="dark_mode_subtitle">Enable the app\'s dark mode</string>
+    <string name="notifications_title">Notifications</string>
+    <string name="notifications_subtitle">Trip reminders and alerts</string>
+    <string name="dialog_edit_username">Edit Username</string>
+    <string name="dialog_edit_dob">Edit Date of Birth</string>
+    <string name="dialog_dob_format">YYYY-MM-DD</string>
+
+    <string name="about_title">About Us</string>
+    <string name="about_subtitle">Plan your adventures, your way.</string>
+    <string name="about_team">Team</string>
+    <string name="about_tech_info">Technical info</string>
+    <string name="about_version">Version 1.1.0</string>
+    <string name="about_api">Android min API 26</string>
+    <string name="about_kotlin">Kotlin 2.0.21</string>
+    <string name="about_license">License: MIT</string>
+    <string name="about_terms">Terms &amp; Conditions</string>
+
+    <string name="activity_not_found">Activity not found</string>
+    <string name="activity_error_subtitle">Please try again later.</string>
+    <string name="activity_go_back">Go back</string>
+    <string name="activity_price">Price:</string>
+    <string name="activity_location">Location:</string>
+    <string name="activity_photos_title">Photos &amp; Location</string>
+    <string name="activity_photos_unavailable">Photos not available</string>
+    <string name="activity_map_unavailable">Map not available</string>
+
+    <string name="discover_title">Discover %s</string>
+    <string name="discover_trip_not_found">Trip not found</string>
+    <string name="discover_add_btn">Add</string>
+    <string name="form_new_custom">New Custom Activity</string>
+    <string name="form_schedule">Schedule Activity</string>
+    <string name="form_title">Title</string>
+    <string name="form_location">Location</string>
+    <string name="form_category">Category (Culture, Food, Nature)</string>
+    <string name="form_description">Description</string>
+    <string name="form_date">Date (YYYY-MM-DD)</string>
+    <string name="form_time">Time (HH:MM)</string>
+    <string name="form_date_error">Must be between %1$s and %2$s</string>
+    <string name="form_cost">Cost (EUR)</string>
+    <string name="form_save">Save</string>
+    <string name="form_cancel">Cancel</string>
+
+    <string name="gallery_title">Gallery</string>
+    <string name="gallery_summary">%1$d photos - %2$s MB</string>
+    <string name="gallery_no_trips">No trips available</string>
+    <string name="gallery_no_photos">No photos found</string>
+    <string name="gallery_delete_desc">Delete photo</string>
+    <string name="gallery_add_btn">Add photos</string>
+
+    <string name="home_title">Home</string>
+    <string name="home_no_trips">No upcoming trips found. Create one!</string>
+    <string name="home_next_trip">Next trip</string>
+    <string name="home_nights">%1$d nights</string>
+    <string name="home_daily_schedule">Daily Schedule</string>
+    <string name="home_no_activities">No activities</string>
+
+    <string name="splash_subtitle">Plan your adventures, your way</string>
+
+    <string name="terms_title">Terms &amp; Conditions</string> <string name="terms_accept">Accept</string>
+    <string name="terms_decline">Decline</string>
+    <string name="terms_item_1_title">Data Privacy</string>
+    <string name="terms_item_1_desc">We respect your privacy. Your trip data is stored locally on your device.</string>
+    <string name="terms_item_2_title">Usage License</string>
+    <string name="terms_item_2_desc">This app is provided as-is for personal trip planning purposes.</string>
+    <string name="terms_item_3_title">Content Accuracy</string>
+    <string name="terms_item_3_desc">Users are responsible for verifying activity times and locations.</string>
+    <string name="terms_item_4_title">Third Party</string>
+    <string name="terms_item_4_desc">Maps and icons are provided by external services under their own licenses.</string>
+
+    <string name="trip_detail_not_found">Trip not found</string>
+    <string name="trip_detail_back">Back</string>
+    <string name="trip_detail_nights">NIGHTS</string>
+    <string name="trip_detail_price">PRICE</string>
+    <string name="trip_detail_activities">ACTIVITIES</string>
+    <string name="trip_detail_itinerary">Itinerary</string>
+    <string name="trip_detail_add_btn">Add activity</string>
+
+    <string name="trips_title">Trips</string>
+    <string name="trips_budget_prefix">Budget:</string>
+    <string name="trips_options_desc">Options</string>
+    <string name="trips_edit_action">Edit</string>
+    <string name="trips_delete_action">Delete</string>
+    <string name="dialog_delete_trip_title">Delete Trip</string>
+    <string name="dialog_delete_trip_desc">Are you sure you want to delete \'%s\'? This action cannot be undone.</string>
+    <string name="dialog_cancel_btn">Cancel</string>
+    <string name="dialog_delete_btn">Delete</string>
+    <string name="form_trip_new_title">New Trip</string>
+    <string name="form_trip_edit_title">Edit Trip</string>
+    <string name="form_trip_city">City / Title</string>
+    <string name="form_trip_budget">Budget (EUR)</string>
+    <string name="form_trip_start_date">Start Date (YYYY-MM-DD)</string>
+    <string name="form_trip_end_date">End Date (YYYY-MM-DD)</string>
+    <string name="form_trip_date_error">End date must be after start date</string>
+    <string name="form_trip_conflict_error">Selected dates exclude existing activities. Please move or delete them first.</string>
+    <string name="form_trip_save_btn">Save</string>
 </resources>

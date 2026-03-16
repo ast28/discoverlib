@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -75,13 +76,16 @@ fun SplashScreen(navController: NavController) {
                         .clip(RoundedCornerShape(18.dp))
                 )
                 Spacer(modifier = Modifier.height(14.dp))
+
                 Text("Discoverlib", fontWeight = FontWeight.Bold, fontSize = 30.sp)
+
                 Text(
-                    "Plan your adventures, your way",
+                    text = stringResource(id = R.string.splash_subtitle),
                     color = Color.Gray,
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center
                 )
+
                 Spacer(modifier = Modifier.height(20.dp))
                 LinearProgressIndicator(
                     modifier = Modifier
@@ -92,7 +96,7 @@ fun SplashScreen(navController: NavController) {
                     trackColor = Color(0xFFFFE2D8)
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                Text("v1.1.0", color = Color.Gray, fontSize = 12.sp)
+                Text("v2.0.0", color = Color.Gray, fontSize = 12.sp)
             }
         }
     }

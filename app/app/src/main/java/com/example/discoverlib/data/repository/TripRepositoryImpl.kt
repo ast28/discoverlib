@@ -3,6 +3,7 @@ package com.example.discoverlib.data.repository
 import javax.inject.Inject
 import com.example.discoverlib.data.fakeDB.FakeTripDataSource
 import com.example.discoverlib.data.local.SharedPrefsManager
+import com.example.discoverlib.domain.MockActivity
 import com.example.discoverlib.domain.TeamMember
 import com.example.discoverlib.domain.Trip
 import com.example.discoverlib.domain.TripActivity
@@ -20,6 +21,10 @@ class TripRepositoryImpl @Inject constructor(
         return listOf(
             TeamMember("AS", "Alba Senar Tejedor", "Developer")
         )
+    }
+
+    override fun getSuggestedActivities(): List<MockActivity> {
+        return dataSource.getSuggestedActivities()
     }
 
 
@@ -40,9 +45,6 @@ class TripRepositoryImpl @Inject constructor(
     }
 
 
-    override fun getActivities(trip: Trip): List<TripActivity> {
-        return dataSource.getActivities(trip)
-    }
     override fun getOneActivity(tripId: String, activityId: String): TripActivity? {
         return dataSource.getOneActivity(tripId, activityId)
     }
@@ -76,7 +78,7 @@ class TripRepositoryImpl @Inject constructor(
     }
     override fun saveUser(user: User): Boolean {
         sharedPrefs.username = user.username
-        sharedPrefs.dateOfBirth = user.dateOfBirth.toString() // Passar-lo a text
+        sharedPrefs.dateOfBirth = user.dateOfBirth.toString()
         sharedPrefs.darkTheme = user.darkMode
         sharedPrefs.userLanguage = user.language
 

@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,13 +66,15 @@ fun AboutScreenContent(
                     .clip(RoundedCornerShape(12.dp))
             )
             Spacer(modifier = Modifier.height(30.dp))
-            Text("About Us", fontSize = 32.sp, fontWeight = FontWeight.Bold)
-            Text("Plan your adventures, your way.")
+
+            Text(stringResource(id = R.string.about_title), fontSize = 32.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(id = R.string.about_subtitle))
+
             Spacer(modifier = Modifier.height(15.dp))
 
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Team", fontWeight = FontWeight.Bold)
+                    Text(stringResource(id = R.string.about_team), fontWeight = FontWeight.Bold)
 
                     teamList.forEach { member ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -92,11 +95,11 @@ fun AboutScreenContent(
             Spacer(modifier = Modifier.height(10.dp))
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text("Technical info", fontWeight = FontWeight.Bold)
-                    Text("Version 1.1.0")
-                    Text("Android min API 26")
-                    Text("Kotlin 2.0.21")
-                    Text("License: MIT")
+                    Text(stringResource(id = R.string.about_tech_info), fontWeight = FontWeight.Bold)
+                    Text(stringResource(id = R.string.about_version))
+                    Text(stringResource(id = R.string.about_api))
+                    Text(stringResource(id = R.string.about_kotlin))
+                    Text(stringResource(id = R.string.about_license))
                 }
             }
 
@@ -106,7 +109,7 @@ fun AboutScreenContent(
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.logo)),
                 modifier = Modifier.fillMaxWidth().height(50.dp)
             ) {
-                Text("Terms & Conditions", color = Color.White)
+                Text(stringResource(id = R.string.about_terms), color = Color.White)
             }
             Spacer(modifier = Modifier.height(12.dp))
         }

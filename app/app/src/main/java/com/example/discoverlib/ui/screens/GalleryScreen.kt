@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -57,35 +58,35 @@ fun GalleryScreen(
     viewModel: TripViewModel = hiltViewModel()
 ) {
     val trips by viewModel.trips.collectAsState()
-    
+
     var expanded by remember { mutableStateOf(false) }
-    var selectedTripId by remember(trips) { 
-        mutableStateOf(trips.firstOrNull()?.id ?: "") 
+    var selectedTripId by remember(trips) {
+        mutableStateOf(trips.firstOrNull()?.id ?: "")
     }
 
     val selectedTrip = trips.find { it.id == selectedTripId }
-    
-    // Special logic for Rome: show 30 placeholders with R.drawable.photo to make it scrollable
+
     val photos = when {
-        selectedTrip?.title?.equals("Rome", ignoreCase = true) == true || 
-        selectedTrip?.title?.equals("Roma", ignoreCase = true) == true -> {
+        selectedTrip?.title?.equals("Rome", ignoreCase = true) == true ||
+                selectedTrip?.title?.equals("Roma", ignoreCase = true) == true -> {
             List(30) { R.drawable.photo }
         }
         selectedTrip?.title?.equals("London", ignoreCase = true) == true ||
-        selectedTrip?.title?.equals("Paris", ignoreCase = true) == true -> {
+                selectedTrip?.title?.equals("Paris", ignoreCase = true) == true -> {
             emptyList()
         }
         else -> {
             selectedTrip?.activities?.mapNotNull { it.photo } ?: emptyList()
         }
     }
-    
-    val gallerySummary = "${photos.size} photos - ${photos.size * 2.5} MB"
+
+    val sizeMb = (photos.size * 2.5).toString()
+    val gallerySummary = stringResource(id = R.string.gallery_summary, photos.size, sizeMb)
 
     GalleryScreenContent(
         navController = navController,
         expanded = expanded,
-        selectedTripName = selectedTrip?.title ?: "No trips available",
+        selectedTripName = selectedTrip?.title ?: stringResource(id = R.string.gallery_no_trips),
         photos = photos,
         gallerySummary = gallerySummary,
         trips = trips,
@@ -121,7 +122,7 @@ fun GalleryScreenContent(
                 .padding(horizontal = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(20.dp))
-            Text("Gallery", fontSize = 34.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(id = R.string.gallery_title), fontSize = 34.sp, fontWeight = FontWeight.Bold)
             Text(gallerySummary, fontSize = 14.sp, color = Color.Gray)
 
             Row(
@@ -154,16 +155,16 @@ fun GalleryScreenContent(
             }
 
             Spacer(modifier = Modifier.height(10.dp))
-            
+
             if (photos.isNotEmpty()) {
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp), 
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.weight(1f)
                 ) {
                     val chunks = photos.chunked(3)
                     items(chunks) { rowPhotos ->
                         Row(
-                            modifier = Modifier.fillMaxWidth(), 
+                            modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             rowPhotos.forEach { photoRes ->
@@ -180,7 +181,7 @@ fun GalleryScreenContent(
                                     IconButton(onClick = onDeletePhotoClick) {
                                         Icon(
                                             painter = painterResource(id = R.drawable.delete),
-                                            contentDescription = "Delete photo",
+                                            contentDescription = stringResource(id = R.string.gallery_delete_desc),
                                             tint = Color.Unspecified,
                                             modifier = Modifier.size(20.dp)
                                         )
@@ -200,7 +201,7 @@ fun GalleryScreenContent(
                         .weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("No photos found", color = Color.Gray)
+                    Text(stringResource(id = R.string.gallery_no_photos), color = Color.Gray)
                 }
             }
 
@@ -211,7 +212,7 @@ fun GalleryScreenContent(
                     .height(52.dp),
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.logo))
-            ) { Text("Add photos", color = Color.White) }
+            ) { Text(stringResource(id = R.string.gallery_add_btn), color = Color.White) }
             Spacer(modifier = Modifier.height(10.dp))
         }
     }
