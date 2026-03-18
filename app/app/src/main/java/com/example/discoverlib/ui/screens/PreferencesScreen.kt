@@ -37,6 +37,8 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+//AQUIII
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -70,20 +72,22 @@ fun PreferencesScreen(
     onThemeChange: (Boolean) -> Unit,
     userViewModel: UserViewModel = hiltViewModel()
 ) {
+    val user by userViewModel.currentUser.collectAsState()
+
     val languagesDisplay = listOf("English", "Español", "Català")
     val languageCodes = listOf("en", "es", "ca")
 
-    val currentLangCode = remember { userViewModel.getLanguage() }
+    val currentLangCode = user?.language ?: "en"
 
-    var langIndex by remember {
+    var langIndex by remember(currentLangCode) {
         val index = languageCodes.indexOf(currentLangCode)
         mutableIntStateOf(if (index >= 0) index else 0)
     }
 
     var reminders by remember { mutableStateOf(false) }
 
-    var username by remember { mutableStateOf(userViewModel.getSavedUsername()) }
-    var dob by remember { mutableStateOf(userViewModel.getSavedDateOfBirth()) }
+    val username = user?.username?.ifBlank { "Not defined" } ?: "Not defined"
+    val dob = user?.dateOfBirth?.toString() ?: "Not defined"
 
     var showProfileDialog by remember { mutableStateOf(false) }
 
@@ -103,26 +107,29 @@ fun PreferencesScreen(
         },
         reminders = reminders,
         onRemindersChange = { reminders = it },
+        //AQUIII
         username = username,
+        //AQUIII
         dob = dob,
         onEditProfileClick = { showProfileDialog = true }
     )
 
     if (showProfileDialog) {
         EditProfileDialog(
+            //AQUIII
             initialName = username,
+            //AQUIII
             initialDob = dob,
             onDismiss = { showProfileDialog = false },
             onConfirm = { newName, newDob ->
                 if (newName.isNotBlank()) {
                     userViewModel.saveNewUsername(newName)
-                    username = newName
+                    //AQUIII (Se ha quitado la asignación manual a variables locales)
                 }
                 try {
                     val parsedDate = LocalDate.parse(newDob)
-                    if (userViewModel.saveNewDateOfBirth(parsedDate)) {
-                        dob = newDob
-                    }
+                    userViewModel.saveNewDateOfBirth(parsedDate)
+                    //AQUIII (Se ha quitado la asignación manual a variables locales)
                 } catch (e: Exception) { }
                 showProfileDialog = false
             }
@@ -306,12 +313,11 @@ fun EditProfileDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
-                OutlinedTextField(
-                    value = dobText,
-                    onValueChange = { dobText = it },
-                    label = { Text(stringResource(id = R.string.settings_dob)) },
-                    placeholder = { Text(stringResource(id = R.string.dialog_dob_format)) },
-                    singleLine = true,
+
+                com.example.discoverlib.ui.components.DatePickerField(
+                    label = stringResource(id = R.string.settings_dob),
+                    selectedDate = dobText,
+                    onDateSelected = { dobText = it },
                     modifier = Modifier.fillMaxWidth()
                 )
             }

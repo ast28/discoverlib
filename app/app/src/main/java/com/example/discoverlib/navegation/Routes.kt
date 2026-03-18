@@ -12,5 +12,4 @@ object Routes {
 
     const val TripDetail = "tripDetail/{tripId}"
     const val Activity = "activity/{tripId}/{activityId}"
-    const val DiscoverActivities = "discoverActivities/{tripId}"
 }

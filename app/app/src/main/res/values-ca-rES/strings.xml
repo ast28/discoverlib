@@ -47,6 +47,14 @@
     <string name="activity_photos_unavailable">Fotos no disponibles</string>
     <string name="activity_map_unavailable">Mapa no disponible</string>
 
+    <string name="cat_all">Tot</string>
+    <string name="cat_transport">Transport</string>
+    <string name="cat_tours">Tours</string>
+    <string name="cat_culture">Cultura</string>
+    <string name="cat_food">Menjar</string>
+    <string name="cat_nature">Natura</string>
+    <string name="trip_detail_no_activities">No hi ha activitats en aquesta categoria.</string>
+
     <string name="discover_title">Descobrir %s</string>
     <string name="discover_trip_not_found">Viatge no trobat</string>
     <string name="discover_add_btn">Afegir</string>
@@ -62,6 +70,7 @@
     <string name="form_cost">Cost (EUR)</string>
     <string name="form_save">Desar</string>
     <string name="form_cancel">Cancel·lar</string>
+    <string name="form_trip_past_error">No pots crear un viatge en el passat</string>
 
     <string name="gallery_title">Galeria</string>
     <string name="gallery_summary">%1$d fotos - %2$s MB</string>

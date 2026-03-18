@@ -124,5 +124,7 @@ private fun iconForCategory(category: ActivityCategory): Int {
         ActivityCategory.CULTURE -> R.drawable.monument
         ActivityCategory.FOOD -> R.drawable.restaurant
         ActivityCategory.NATURE -> R.drawable.forest
+        ActivityCategory.TRANSPORT -> R.drawable.transport
+        ActivityCategory.TOURS -> R.drawable.tour
     }
 }

@@ -101,7 +101,6 @@ fun ActivityScreenContent(
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Back",
-                        tint = Color.Black,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -171,7 +170,7 @@ fun ActivityPhotosSection(activity: TripActivity) {
                 contentScale = ContentScale.Crop
             )
         } else {
-            ProfessionalPhotoPlaceholder(
+            PhotoPlaceholder(
                 icon = Icons.Default.Image,
                 text = stringResource(id = R.string.activity_photos_unavailable),
                 modifier = Modifier.weight(1f)
@@ -189,7 +188,7 @@ fun ActivityPhotosSection(activity: TripActivity) {
                 contentScale = ContentScale.Crop
             )
         } else {
-            ProfessionalPhotoPlaceholder(
+            PhotoPlaceholder(
                 icon = Icons.Default.Map,
                 text = stringResource(id = R.string.activity_map_unavailable),
                 modifier = Modifier.weight(1f)
@@ -199,7 +198,7 @@ fun ActivityPhotosSection(activity: TripActivity) {
 }
 
 @Composable
-private fun ProfessionalPhotoPlaceholder(
+private fun PhotoPlaceholder(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     text: String,
     modifier: Modifier = Modifier

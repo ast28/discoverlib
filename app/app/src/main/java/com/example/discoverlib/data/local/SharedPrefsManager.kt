@@ -25,8 +25,8 @@ class SharedPrefsManager @Inject constructor(
         set(value) = preferences.edit().putString("dob", value).apply()
 
     var darkTheme: Boolean
-        get() = preferences.getBoolean("dark_theme", false)
-        set(value) = preferences.edit().putBoolean("dark_theme", value).apply()
+        get() = preferences.getBoolean("dark_theme_key", false)
+        set(value) = preferences.edit().putBoolean("dark_theme_key", value).apply()
 
     var userLanguage: String
         get() = preferences.getString("user_language", "en") ?: "en"

@@ -5,13 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
 import com.example.discoverlib.navegation.AppNavigation
+import com.example.discoverlib.ui.viewmodels.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -25,13 +25,18 @@ class MainActivity : ComponentActivity() {
         splashScreen.setKeepOnScreenCondition { false }
 
         setContent {
-            val systemTheme = isSystemInDarkTheme()
-            var isDarkTheme by remember { mutableStateOf(systemTheme) }
+            val userViewModel: UserViewModel = hiltViewModel()
+
+            val user by userViewModel.currentUser.collectAsState()
+
+            val isDarkTheme = user?.darkMode ?: isSystemInDarkTheme()
 
             DiscoverlibTheme(darkTheme = isDarkTheme) {
                 AppNavigation(
                     isDarkTheme = isDarkTheme,
-                    onThemeChange = { isDarkTheme = it }
+                    onThemeChange = { nuevoTema ->
+                        userViewModel.saveDarkMode(nuevoTema)
+                    }
                 )
             }
         }

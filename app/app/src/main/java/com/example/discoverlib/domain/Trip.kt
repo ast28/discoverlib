@@ -46,6 +46,8 @@ data class MockActivity(
 )
 
 enum class ActivityCategory {
+    TRANSPORT,
+    TOURS,
     CULTURE,
     FOOD,
     NATURE

@@ -1,11 +1,9 @@
 package com.example.discoverlib.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -19,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,6 +27,7 @@ import com.example.discoverlib.R
 import com.example.discoverlib.domain.Trip
 import com.example.discoverlib.ui.components.DiscoverScaffold
 import com.example.discoverlib.ui.components.MainSection
+import com.example.discoverlib.ui.components.TripFormDialog
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
 import com.example.discoverlib.ui.viewmodels.TripViewModel
 import java.time.LocalDate
@@ -45,9 +43,12 @@ fun TripsScreen(
 
     val tripsList by viewModel.trips.collectAsState()
 
+    // --- NUEVO: Ordenamos los viajes por fecha de inicio ---
+    val sortedTrips = tripsList.sortedBy { it.startDate }
+
     TripsScreenContent(
         navController = navController,
-        tripsList = tripsList,
+        tripsList = sortedTrips, // Le pasamos la lista ya ordenada
         showDialog = showDialog,
         tripToEdit = tripToEdit,
         onAddClick = {
@@ -63,11 +64,10 @@ fun TripsScreen(
             showDialog = false
             tripToEdit = null
         },
-        onConfirmTrip = { title, budget, start, end ->
+        onConfirmTrip = { title, start, end ->
             if (tripToEdit != null) {
                 val updated = tripToEdit!!.copy(
                     title = title,
-                    budgetEur = budget.toIntOrNull() ?: 0,
                     startDate = start,
                     endDate = end
                 )
@@ -79,7 +79,7 @@ fun TripsScreen(
                     startDate = start,
                     endDate = end,
                     description = "Trip to $title",
-                    budgetEur = budget.toIntOrNull() ?: 0,
+                    budgetEur = 0,
                     activities = mutableListOf()
                 )
                 viewModel.saveNewTrip(newTrip)
@@ -123,7 +123,7 @@ fun TripsScreenContent(
     onEditClick: (Trip) -> Unit,
     onDeleteClick: (Trip) -> Unit,
     onDismissDialog: () -> Unit,
-    onConfirmTrip: (String, String, LocalDate, LocalDate) -> Unit
+    onConfirmTrip: (String, LocalDate, LocalDate) -> Unit
 ) {
     DiscoverScaffold(navController = navController, selectedSection = MainSection.TRIPS) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
@@ -148,7 +148,9 @@ fun TripsScreenContent(
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(trip.title, fontSize = 26.sp, fontWeight = FontWeight.Bold)
                                     Text("${trip.startDate} - ${trip.endDate}", color = Color.Gray)
-                                    Text("${stringResource(id = R.string.trips_budget_prefix)} ${trip.budgetEur} EUR", fontWeight = FontWeight.Medium)
+
+                                    val totalCost = trip.activities.sumOf { it.costEur }
+                                    Text("${stringResource(id = R.string.trips_budget_prefix)} $totalCost EUR", fontWeight = FontWeight.Medium)
                                 }
                                 Box {
                                     IconButton(onClick = { showMenu = true }) {
@@ -190,111 +192,6 @@ fun TripsScreenContent(
     }
 }
 
-@Composable
-fun TripFormDialog(
-    initialTrip: Trip?,
-    onDismiss: () -> Unit,
-    onConfirm: (String, String, LocalDate, LocalDate) -> Unit
-) {
-    var title by remember { mutableStateOf(initialTrip?.title ?: "") }
-    var budget by remember { mutableStateOf(initialTrip?.budgetEur?.toString() ?: "") }
-    var startText by remember { mutableStateOf(initialTrip?.startDate?.toString() ?: LocalDate.now().toString()) }
-    var endText by remember { mutableStateOf(initialTrip?.endDate?.toString() ?: LocalDate.now().plusDays(3).toString()) }
-
-    val startDate = try { LocalDate.parse(startText) } catch (e: Exception) { null }
-    val endDate = try { LocalDate.parse(endText) } catch (e: Exception) { null }
-
-    val isTitleError = title.isBlank()
-    val isBudgetError = budget.toIntOrNull() == null
-    val isDateParseError = startDate == null || endDate == null
-    val isDateRangeError = if (!isDateParseError) endDate!!.isBefore(startDate) else false
-
-    val earliestActivity = initialTrip?.activities?.minOfOrNull { it.date }
-    val latestActivity = initialTrip?.activities?.maxOfOrNull { it.date }
-
-    val activityConflict = if (initialTrip != null && initialTrip.activities.isNotEmpty() && !isDateParseError) {
-        val startConflict = earliestActivity != null && startDate!!.isAfter(earliestActivity)
-        val endConflict = latestActivity != null && endDate!!.isBefore(latestActivity)
-        startConflict || endConflict
-    } else false
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                if (initialTrip == null) stringResource(id = R.string.form_trip_new_title)
-                else stringResource(id = R.string.form_trip_edit_title),
-                fontWeight = FontWeight.Bold
-            )
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    label = { Text(stringResource(id = R.string.form_trip_city)) },
-                    isError = isTitleError,
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    value = budget,
-                    onValueChange = { budget = it },
-                    label = { Text(stringResource(id = R.string.form_trip_budget)) },
-                    isError = isBudgetError,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    value = startText,
-                    onValueChange = { startText = it },
-                    label = { Text(stringResource(id = R.string.form_trip_start_date)) },
-                    isError = isDateParseError,
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    value = endText,
-                    onValueChange = { endText = it },
-                    label = { Text(stringResource(id = R.string.form_trip_end_date)) },
-                    isError = isDateParseError || isDateRangeError,
-                    singleLine = true
-                )
-
-                if (isDateRangeError) {
-                    Text(stringResource(id = R.string.form_trip_date_error), color = Color.Red, fontSize = 12.sp)
-                }
-
-                if (activityConflict) {
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFEBEE)),
-                        modifier = Modifier.padding(top = 8.dp)
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.form_trip_conflict_error),
-                            color = Color.Red,
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(8.dp),
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = { if (startDate != null && endDate != null) onConfirm(title, budget, startDate, endDate) },
-                enabled = !isTitleError && !isBudgetError && !isDateParseError && !isDateRangeError && !activityConflict,
-                colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.logo))
-            ) { Text(stringResource(id = R.string.form_trip_save_btn), color = Color.White) }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = onDismiss,
-                colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.logo))
-            ) { Text(stringResource(id = R.string.dialog_cancel_btn), fontWeight = FontWeight.Bold) }
-        }
-    )
-}
-
 @Preview(showBackground = true)
 @Composable
 fun TripsScreenPreview() {
@@ -308,7 +205,7 @@ fun TripsScreenPreview() {
             onEditClick = {},
             onDeleteClick = {},
             onDismissDialog = {},
-            onConfirmTrip = { _, _, _, _ -> }
+            onConfirmTrip = { _, _, _ -> }
         )
     }
 }

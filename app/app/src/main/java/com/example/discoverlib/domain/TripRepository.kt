@@ -20,4 +20,6 @@ interface TripRepository {
 
     fun getUser(): User?
     fun saveUser(user: User): Boolean
+    fun updateDarkMode(isDark: Boolean)
+    fun isDarkMode(): Boolean
 }

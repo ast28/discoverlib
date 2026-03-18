@@ -11,7 +11,6 @@ import com.example.discoverlib.ui.screens.GalleryScreen
 import com.example.discoverlib.ui.screens.HomeScreen
 import com.example.discoverlib.ui.screens.SplashScreen
 import com.example.discoverlib.ui.screens.ActivityScreen
-import com.example.discoverlib.ui.screens.DiscoverActivitiesScreen
 import com.example.discoverlib.ui.screens.PreferencesScreen
 import com.example.discoverlib.ui.screens.TermsScreen
 import com.example.discoverlib.ui.screens.TripsScreen
@@ -53,11 +52,5 @@ fun AppNavigation(isDarkTheme: Boolean, onThemeChange: (Boolean) -> Unit) {
         }
         composable(Routes.About) { AboutScreen(navController) }
         composable(Routes.Terms) { TermsScreen(navController) }
-        composable(Routes.DiscoverActivities,
-            arguments = listOf(navArgument("tripId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val tripId = backStackEntry.arguments?.getString("tripId") ?: ""
-            DiscoverActivitiesScreen(navController = navController, tripId = tripId)
-        }
     }
 }

@@ -5,6 +5,9 @@ import com.example.discoverlib.domain.TripRepository
 import com.example.discoverlib.domain.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import com.example.discoverlib.data.local.SharedPrefsManager
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -13,6 +16,9 @@ class UserViewModel @Inject constructor(
     private val repository: TripRepository,
     private val sharedPrefs: SharedPrefsManager
 ) : ViewModel() {
+
+    private val _currentUser = MutableStateFlow(repository.getUser())
+    val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
 
     fun getSavedUsername(): String {
         val user = repository.getUser()
@@ -37,6 +43,7 @@ class UserViewModel @Inject constructor(
             )
         }
         repository.saveUser(updatedUser)
+        _currentUser.value = updatedUser
         return true
     }
 
@@ -62,6 +69,7 @@ class UserViewModel @Inject constructor(
             )
         }
         repository.saveUser(updatedUser)
+        _currentUser.value = updatedUser
         return true
     }
 
@@ -83,6 +91,7 @@ class UserViewModel @Inject constructor(
             )
         }
         repository.saveUser(updatedUser)
+        _currentUser.value = updatedUser
     }
 
     fun getLanguage(): String {
@@ -103,5 +112,6 @@ class UserViewModel @Inject constructor(
         }
         repository.saveUser(updatedUser)
         sharedPrefs.userLanguage = newLanguage
+        _currentUser.value = updatedUser
     }
 }

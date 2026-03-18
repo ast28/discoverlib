@@ -61,17 +61,19 @@ class TripRepositoryImpl @Inject constructor(
 
     override fun getUser(): User? {
         val name = sharedPrefs.username
-        val dateOfBirth = sharedPrefs.dateOfBirth
+        val dateOfBirthStr = sharedPrefs.dateOfBirth
         val isDark = sharedPrefs.darkTheme
         val lang = sharedPrefs.userLanguage
 
-        if (name.isEmpty() || dateOfBirth.isEmpty()) {
-            return null
+        val parsedDate = try {
+            LocalDate.parse(dateOfBirthStr)
+        } catch (e: Exception) {
+            LocalDate.now()
         }
 
         return User(
             username = name,
-            dateOfBirth = LocalDate.parse(dateOfBirth),
+            dateOfBirth = parsedDate,
             darkMode = isDark,
             language = lang
         )
@@ -83,5 +85,13 @@ class TripRepositoryImpl @Inject constructor(
         sharedPrefs.userLanguage = user.language
 
         return true
+    }
+
+    override fun updateDarkMode(isDark: Boolean) {
+        sharedPrefs.darkTheme = isDark
+    }
+
+    override fun isDarkMode(): Boolean {
+        return sharedPrefs.darkTheme
     }
 }
