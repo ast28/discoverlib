@@ -1,5 +1,6 @@
 package com.example.discoverlib.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,6 +28,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,12 +54,18 @@ import com.example.discoverlib.ui.components.MainSection
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
 import com.example.discoverlib.ui.viewmodels.TripViewModel
 
+private const val TAG = "GalleryScreen"
+
 @Composable
 fun GalleryScreen(
     navController: NavController,
     viewModel: TripViewModel = hiltViewModel()
 ) {
     val trips by viewModel.trips.collectAsState()
+
+    LaunchedEffect(Unit) {
+        Log.d(TAG, "GalleryScreen initialized")
+    }
 
     var expanded by remember { mutableStateOf(false) }
     var selectedTripId by remember(trips) {
@@ -90,13 +98,21 @@ fun GalleryScreen(
         photos = photos,
         gallerySummary = gallerySummary,
         trips = trips,
-        onExpandedChange = { expanded = it },
+        onExpandedChange = { 
+            Log.d(TAG, "Trip selector expanded: $it")
+            expanded = it 
+        },
         onTripSelected = {
+            Log.d(TAG, "Trip selected for gallery: ${it.id} (${it.title})")
             selectedTripId = it.id
             expanded = false
         },
-        onAddPhotosClick = {},
-        onDeletePhotoClick = {}
+        onAddPhotosClick = {
+            Log.d(TAG, "Add photos button clicked")
+        },
+        onDeletePhotoClick = {
+            Log.d(TAG, "Delete photo clicked")
+        }
     )
 }
 

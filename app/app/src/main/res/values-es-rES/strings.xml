@@ -22,17 +22,17 @@
     <string name="language_subtitle">Toca para elegir un idioma</string>
     <string name="dark_mode">Modo Oscuro</string>
     <string name="dark_mode_subtitle">Activa el modo oscuro de la app</string>
-    <string name="notifications_title">Notificaciones</string>
-    <string name="notifications_subtitle">Recordatorios y alertas de viajes</string>
     <string name="dialog_edit_username">Editar Nombre</string>
     <string name="dialog_edit_dob">Editar Fecha de Nacimiento</string>
     <string name="dialog_dob_format">AAAA-MM-DD</string>
+    <string name="settings_age_error">Debes tener al menos 18 para utilizar la app.</string>
+
 
     <string name="about_title">Sobre nosotros</string>
     <string name="about_subtitle">Planea tus aventuras, a tu manera.</string>
     <string name="about_team">Equipo</string>
     <string name="about_tech_info">Información técnica</string>
-    <string name="about_version">Versión 1.1.0</string>
+    <string name="about_version">Versión 2.1.0</string>
     <string name="about_api">Android min API 26</string>
     <string name="about_kotlin">Kotlin 2.0.21</string>
     <string name="about_license">Licencia: MIT</string>
@@ -46,6 +46,7 @@
     <string name="activity_photos_title">Fotos y Mapa</string>
     <string name="activity_photos_unavailable">Fotos no disponibles</string>
     <string name="activity_map_unavailable">Mapa no disponible</string>
+    <string name="form_conflict_error">Ya tienes una actividad a esta misma hora.</string>
 
     <string name="cat_all">Todo</string>
     <string name="cat_transport">Transporte</string>
@@ -71,6 +72,10 @@
     <string name="form_save">Guardar</string>
     <string name="form_cancel">Cancelar</string>
     <string name="form_trip_past_error">No puedes crear un viaje en el pasado</string>
+    <string name="form_error_title_empty">El título no puede estar vacío</string>
+    <string name="form_error_location_empty">La ubicación no puede estar vacía</string>
+    <string name="form_error_cost_empty">El coste debe ser un número válido</string>
+    <string name="form_trip_title_empty">La ciudad / título no puede estar vacía</string>
 
     <string name="gallery_title">Galería</string>
     <string name="gallery_summary">%1$d fotos - %2$s MB</string>
@@ -121,10 +126,10 @@
     <string name="form_trip_edit_title">Editar Viaje</string>
     <string name="form_trip_city">Ciudad / Título</string>
     <string name="form_trip_budget">Presupuesto (EUR)</string>
-    <string name="form_trip_start_date">Fecha de inicio (AAAA-MM-DD)</string>
-    <string name="form_trip_end_date">Fecha de fin (AAAA-MM-DD)</string>
+    <string name="form_trip_start_end_date">Fechas de inicio y de fin (AAAA-MM-DD)</string>
     <string name="form_trip_date_error">La fecha de fin debe ser posterior a la de inicio</string>
     <string name="form_trip_conflict_error">Las fechas seleccionadas excluyen actividades existentes. Por favor, muévelas o elimínalas primero.</string>
     <string name="form_trip_save_btn">Guardar</string>
+    <string name="form_trip_duplicate_error">Ja tens un viatge idéntic en aquestes dates.</string>
 
 </resources>

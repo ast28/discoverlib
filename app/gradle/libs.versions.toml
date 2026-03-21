@@ -18,6 +18,10 @@ foundationLayout = "1.10.3"
 foundationLayoutVersion = "1.10.4"
 hilt = "2.55"
 appcompat = "1.6.1"
+junitJunit = "4.12"
+junitJupiter = "6.0.0"
+sheetsComposeDialogs = "1.3.0"
+mockito = "5.23.0"
 
 [libraries]
 androidx-appcompat-v171 = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
@@ -46,6 +50,11 @@ androidx-foundation-layout = { group = "androidx.compose.foundation", name = "fo
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+junit-junit = { group = "junit", name = "junit", version.ref = "junitJunit" }
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
+sheets-compose-dialogs-core = { group = "com.maxkeppeler.sheets-compose-dialogs", name = "core", version.ref = "sheetsComposeDialogs" }
+sheets-compose-dialogs-calendar = { group = "com.maxkeppeler.sheets-compose-dialogs", name = "calendar", version.ref = "sheetsComposeDialogs" }
+mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

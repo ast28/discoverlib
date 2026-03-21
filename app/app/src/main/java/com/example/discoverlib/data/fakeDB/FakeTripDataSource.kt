@@ -30,7 +30,7 @@ object FakeTripDataSource {
                         location = "Piazza del Colosseo, 1, Rome",
                         date = LocalDate.of(2026, 3, 23),
                         time = LocalTime.of(10, 0),
-                        category = ActivityCategory.CULTURE,
+                        category = ActivityCategory.TOURS,
                         costEur = 10,
                         photo = R.drawable.photo_roma,
                         photo_maps = R.drawable.roma_maps

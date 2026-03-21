@@ -1,5 +1,6 @@
 package com.example.discoverlib.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.discoverlib.domain.TripRepository
 import com.example.discoverlib.domain.User
@@ -10,6 +11,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.time.LocalDate
 import javax.inject.Inject
+
+private const val TAG = "UserViewModel"
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
@@ -22,13 +25,15 @@ class UserViewModel @Inject constructor(
 
     fun getSavedUsername(): String {
         val user = repository.getUser()
-        if (user != null) { return user.username }
-        else { return "Not defined user name" }
+        return if (user != null) { user.username }
+        else { "Not defined user name" }
     }
 
     fun saveNewUsername(newName: String): Boolean {
+        Log.d(TAG, "Simulating username change: $newName")
         val cleanedName = newName.trim()
         if (cleanedName.isBlank() || cleanedName.length < 3 || cleanedName.length > 20) {
+            Log.e(TAG, "Validation failed: Username must be between 3 and 20 characters and not blank.")
             return false
         }
         val currentUser = repository.getUser()
@@ -42,19 +47,26 @@ class UserViewModel @Inject constructor(
                 language = "en"
             )
         }
-        repository.saveUser(updatedUser)
-        _currentUser.value = updatedUser
-        return true
+        val success = repository.saveUser(updatedUser)
+        if (success) {
+            Log.i(TAG, "Username updated successfully in repository")
+            _currentUser.value = updatedUser
+        } else {
+            Log.e(TAG, "Failed to save username in repository")
+        }
+        return success
     }
 
     fun getSavedDateOfBirth(): String {
         val user = repository.getUser()
-        if (user != null) { return user.dateOfBirth.toString() }
-        else { return "Not defined date of birth" }
+        return if (user != null) { user.dateOfBirth.toString() }
+        else { "Not defined date of birth" }
     }
 
     fun saveNewDateOfBirth(newDate: LocalDate): Boolean {
+        Log.d(TAG, "Simulating DOB change: $newDate")
         if (newDate.isAfter(LocalDate.now())) {
+            Log.e(TAG, "Validation failed: Date of birth cannot be in the future.")
             return false
         }
         val currentUser = repository.getUser()
@@ -68,9 +80,14 @@ class UserViewModel @Inject constructor(
                 language = "en"
             )
         }
-        repository.saveUser(updatedUser)
-        _currentUser.value = updatedUser
-        return true
+        val success = repository.saveUser(updatedUser)
+        if (success) {
+            Log.i(TAG, "Date of birth updated successfully")
+            _currentUser.value = updatedUser
+        } else {
+            Log.e(TAG, "Failed to save date of birth")
+        }
+        return success
     }
 
     fun getDarkMode(): Boolean {
@@ -79,6 +96,7 @@ class UserViewModel @Inject constructor(
     }
 
     fun saveDarkMode(isDark: Boolean) {
+        Log.d(TAG, "Simulating dark mode toggle: $isDark")
         val currentUser = repository.getUser()
         val updatedUser = if (currentUser != null) {
             currentUser.copy(darkMode = isDark)
@@ -91,6 +109,7 @@ class UserViewModel @Inject constructor(
             )
         }
         repository.saveUser(updatedUser)
+        Log.i(TAG, "Dark mode preference saved")
         _currentUser.value = updatedUser
     }
 
@@ -99,6 +118,7 @@ class UserViewModel @Inject constructor(
     }
 
     fun saveLanguage(newLanguage: String) {
+        Log.d(TAG, "Simulating language change: $newLanguage")
         val currentUser = repository.getUser()
         val updatedUser = if (currentUser != null) {
             currentUser.copy(language = newLanguage)
@@ -112,6 +132,7 @@ class UserViewModel @Inject constructor(
         }
         repository.saveUser(updatedUser)
         sharedPrefs.userLanguage = newLanguage
+        Log.i(TAG, "Language preference saved: $newLanguage")
         _currentUser.value = updatedUser
     }
 }

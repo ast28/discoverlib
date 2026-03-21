@@ -22,17 +22,17 @@
     <string name="language_subtitle">Toca per triar un idioma</string>
     <string name="dark_mode">Mode fosc</string>
     <string name="dark_mode_subtitle">Activa el mode fosc de l\'app</string>
-    <string name="notifications_title">Notificacions</string>
-    <string name="notifications_subtitle">Recordatoris i alertes de viatges</string>
     <string name="dialog_edit_username">Editar Nom</string>
     <string name="dialog_edit_dob">Editar Data de Naixement</string>
     <string name="dialog_dob_format">AAAA-MM-DD</string>
+    <string name="settings_age_error">Has de tenir mínim 18 per utilitzar la app.</string>
+
 
     <string name="about_title">Sobre nosaltres</string>
     <string name="about_subtitle">Planeja les teves aventures, a la teva manera.</string>
     <string name="about_team">Equip</string>
     <string name="about_tech_info">Informació tècnica</string>
-    <string name="about_version">Versió 1.1.0</string>
+    <string name="about_version">Versió 2.1.0</string>
     <string name="about_api">Android min API 26</string>
     <string name="about_kotlin">Kotlin 2.0.21</string>
     <string name="about_license">Llicència: MIT</string>
@@ -71,6 +71,11 @@
     <string name="form_save">Desar</string>
     <string name="form_cancel">Cancel·lar</string>
     <string name="form_trip_past_error">No pots crear un viatge en el passat</string>
+    <string name="form_conflict_error">Ja tens una activitat a aquesta mateixa hora.</string>
+    <string name="form_error_title_empty">El títol no pot estar buit</string>
+    <string name="form_error_location_empty">La ubicació no pot estar buida</string>
+    <string name="form_error_cost_empty">El cost ha de ser un número vàlid</string>
+    <string name="form_trip_title_empty">La ciutat / títol no pot estar buida</string>
 
     <string name="gallery_title">Galeria</string>
     <string name="gallery_summary">%1$d fotos - %2$s MB</string>
@@ -118,9 +123,10 @@
     <string name="form_trip_edit_title">Editar Viatge</string>
     <string name="form_trip_city">Ciutat / Títol</string>
     <string name="form_trip_budget">Pressupost (EUR)</string>
-    <string name="form_trip_start_date">Data d\'inici (AAAA-MM-DD)</string> <string name="form_trip_end_date">Data de fi (AAAA-MM-DD)</string>
+    <string name="form_trip_start_end_date">Dates d\'inici i de fi (AAAA-MM-DD)</string>
     <string name="form_trip_date_error">La data de fi ha de ser posterior a la d\'inici</string> <string name="form_trip_conflict_error">Les dates seleccionades exclouen activitats existents. Si us plau, mou-les o elimina-les primer.</string>
     <string name="form_trip_save_btn">Desar</string>
+    <string name="form_trip_duplicate_error">Ya tienes un viaje idéntico en estas fechas.</string>
 
 
 </resources>

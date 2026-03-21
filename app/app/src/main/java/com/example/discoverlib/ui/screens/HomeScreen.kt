@@ -1,5 +1,6 @@
 package com.example.discoverlib.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,12 +55,18 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+private const val TAG = "HomeScreen"
+
 @Composable
 fun HomeScreen(
     navController: NavController,
     viewModel: TripViewModel = hiltViewModel()
 ) {
     val trips by viewModel.trips.collectAsState()
+
+    LaunchedEffect(Unit) {
+        Log.d(TAG, "HomeScreen initialized")
+    }
 
     // Buscamos el próximo viaje
     val featuredTrip = remember(trips) {
@@ -84,17 +92,28 @@ fun HomeScreen(
         selectedDate = selectedDate,
         canGoPrev = canGoPrev,
         canGoNext = canGoNext,
-        onPrevDay = { selectedDate = selectedDate.minusDays(1) },
-        onNextDay = { selectedDate = selectedDate.plusDays(1) },
+        onPrevDay = { 
+            Log.d(TAG, "Previous day clicked. New date: ${selectedDate.minusDays(1)}")
+            selectedDate = selectedDate.minusDays(1) 
+        },
+        onNextDay = { 
+            Log.d(TAG, "Next day clicked. New date: ${selectedDate.plusDays(1)}")
+            selectedDate = selectedDate.plusDays(1) 
+        },
         onTripClick = {
             featuredTrip?.let {
+                Log.d(TAG, "Trip summary card clicked. Navigating to TripDetail: ${it.id}")
                 navController.navigate("tripDetail/${it.id}")
-            } ?: navController.navigate(Routes.Trips)
+            } ?: run {
+                Log.d(TAG, "No featured trip. Navigating to Trips screen")
+                navController.navigate(Routes.Trips)
+            }
         },
         onActivityClick = { activityId ->
             featuredTrip?.let {
+                Log.d(TAG, "Activity clicked: $activityId. Navigating to ActivityScreen")
                 navController.navigate("activity/${it.id}/$activityId")
-            }
+            } ?: Log.e(TAG, "Unexpected state: Activity clicked but no featured trip found")
         }
     )
 }
@@ -203,13 +222,14 @@ private fun DailyCalendarCard(
     val dayFormatter = DateTimeFormatter.ofPattern("E dd", Locale("es", "ES"))
     val formattedDay = selectedDate.format(dayFormatter).replace(".", "")
 
-    // LÓGICA DE HORAS HÍBRIDA
     val defaultHours = listOf("08:00", "10:00", "12:00", "14:00", "16:00", "18:00")
     val dayActivities = trip.activities.filter { it.date == selectedDate }
     val activityHours = dayActivities.map { it.time.format(timeFormatter) }
 
-    // Combinamos, quitamos duplicados y ordenamos de menor a mayor
     val displayHours = (defaultHours + activityHours).distinct().sorted()
+
+    val arrowColor = MaterialTheme.colorScheme.onSurface
+    val disabledArrowColor = Color.Gray
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -223,14 +243,14 @@ private fun DailyCalendarCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onPrevDay, enabled = canGoPrev) {
-                    Text("<", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = if (canGoPrev) Color.Black else Color.LightGray)
+                    Text("<", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = if (canGoPrev) arrowColor else disabledArrowColor)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(stringResource(id = R.string.home_daily_schedule), fontWeight = FontWeight.Bold, color = colorResource(id = R.color.logo))
                     Text("${trip.title} - $formattedDay", fontSize = 13.sp)
                 }
                 IconButton(onClick = onNextDay, enabled = canGoNext) {
-                    Text(">", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = if (canGoNext) Color.Black else Color.LightGray)
+                    Text(">", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = if (canGoNext) arrowColor else disabledArrowColor)
                 }
             }
 

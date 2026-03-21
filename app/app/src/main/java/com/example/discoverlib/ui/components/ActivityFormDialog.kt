@@ -9,8 +9,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -24,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -52,6 +51,10 @@ fun ActivityFormDialog(
     var description by remember { mutableStateOf(initialActivity?.description ?: "") }
     var cost by remember { mutableStateOf(initialActivity?.costEur?.toString() ?: "") }
 
+    var titleTouched by remember { mutableStateOf(false) }
+    var locationTouched by remember { mutableStateOf(false) }
+    var costTouched by remember { mutableStateOf(false) }
+
     var expanded by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf(initialActivity?.category ?: ActivityCategory.CULTURE) }
 
@@ -69,17 +72,21 @@ fun ActivityFormDialog(
     val parsedDate = try { LocalDate.parse(dateText) } catch (e: Exception) { null }
     val parsedTime = try { LocalTime.parse(timeText) } catch (e: Exception) { null }
 
-    val isTitleError = title.isBlank()
-    val isCostError = cost.toIntOrNull() == null
-    val isLocationError = location.isBlank()
+    val isTitleInvalid = title.isBlank()
+    val isCostInvalid = cost.toIntOrNull() == null
+    val isLocationInvalid = location.isBlank()
     val isDateError = parsedDate == null || parsedDate.isBefore(tripStartDate) || parsedDate.isAfter(tripEndDate)
     val isTimeError = parsedTime == null
+
+    val isTitleError = isTitleInvalid && titleTouched
+    val isLocationError = isLocationInvalid && locationTouched
+    val isCostError = isCostInvalid && costTouched
 
     val isConflictError = if (parsedDate != null && parsedTime != null) {
         existingActivities.any { it.date == parsedDate && it.time == parsedTime && it.id != initialActivity?.id }
     } else false
 
-    val isFormValid = !isTitleError && !isCostError && !isLocationError && !isDateError && !isTimeError && !isConflictError
+    val isFormValid = !isTitleInvalid && !isCostInvalid && !isLocationInvalid && !isDateError && !isTimeError && !isConflictError
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -97,16 +104,31 @@ fun ActivityFormDialog(
                     label = { Text(stringResource(id = R.string.form_title)) },
                     isError = isTitleError,
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged { focusState ->
+                            if (!focusState.isFocused) titleTouched = true
+                        }
                 )
+                if (isTitleError) {
+                    Text(stringResource(id = R.string.form_error_title_empty), color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+                }
+
                 OutlinedTextField(
                     value = location,
                     onValueChange = { location = it },
                     label = { Text(stringResource(id = R.string.form_location)) },
                     isError = isLocationError,
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged { focusState ->
+                            if (!focusState.isFocused) locationTouched = true
+                        }
                 )
+                if (isLocationError) {
+                    Text(stringResource(id = R.string.form_error_location_empty), color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+                }
 
                 ExposedDropdownMenuBox(
                     expanded = expanded,
@@ -146,13 +168,14 @@ fun ActivityFormDialog(
                     maxLines = 3,
                     modifier = Modifier.fillMaxWidth()
                 )
+
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     DatePickerField(
                         label = stringResource(id = R.string.form_date),
                         selectedDate = dateText,
                         onDateSelected = { dateText = it },
                         isError = isDateError || isConflictError,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1.8f)
                     )
                     OutlinedTextField(
                         value = timeText,
@@ -168,20 +191,18 @@ fun ActivityFormDialog(
                     Text(
                         stringResource(id = R.string.form_date_error, tripStartDate.toString(), tripEndDate.toString()),
                         color = Color.Red,
-                        fontSize = 12.sp
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 4.dp)
                     )
                 }
 
                 if (isConflictError) {
-                    Card(colors = CardDefaults.cardColors(containerColor = Color(0xFFFFEBEE))) {
-                        Text(
-                            text = "Ya tienes una actividad a esta misma hora.",
-                            color = Color.Red,
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(8.dp),
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
+                    Text(
+                        text = stringResource(id = R.string.form_conflict_error),
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 4.dp)
+                    )
                 }
 
                 OutlinedTextField(
@@ -191,8 +212,15 @@ fun ActivityFormDialog(
                     isError = isCostError,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onFocusChanged { focusState ->
+                            if (!focusState.isFocused) costTouched = true
+                        }
                 )
+                if (isCostError) {
+                    Text(stringResource(id = R.string.form_error_cost_empty), color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+                }
             }
         },
         confirmButton = {

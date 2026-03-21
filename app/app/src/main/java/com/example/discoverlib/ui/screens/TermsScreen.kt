@@ -1,5 +1,6 @@
 package com.example.discoverlib.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -35,11 +37,17 @@ import com.example.discoverlib.ui.components.MainSection
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
 import com.example.discoverlib.ui.viewmodels.TripViewModel
 
+private const val TAG = "TermsScreen"
+
 @Composable
 fun TermsScreen(
     navController: NavController,
     viewModel: TripViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(Unit) {
+        Log.d(TAG, "TermsScreen initialized")
+    }
+
     val terms = listOf(
         stringResource(id = R.string.terms_item_1_title) to stringResource(id = R.string.terms_item_1_desc),
         stringResource(id = R.string.terms_item_2_title) to stringResource(id = R.string.terms_item_2_desc),
@@ -50,8 +58,14 @@ fun TermsScreen(
     TermsScreenContent(
         navController = navController,
         termsList = terms,
-        onAccept = { navController.navigate(Routes.Home) },
-        onDecline = { navController.navigate(Routes.Home) }
+        onAccept = { 
+            Log.d(TAG, "Terms accepted")
+            navController.navigate(Routes.Home) 
+        },
+        onDecline = { 
+            Log.d(TAG, "Terms declined")
+            navController.navigate(Routes.Home) 
+        }
     )
 }
 

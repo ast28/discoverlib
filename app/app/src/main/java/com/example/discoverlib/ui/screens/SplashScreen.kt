@@ -1,5 +1,6 @@
 package com.example.discoverlib.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -38,10 +39,14 @@ import com.example.discoverlib.navegation.Routes
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
 import kotlinx.coroutines.delay
 
+private const val TAG = "SplashScreen"
+
 @Composable
 fun SplashScreen(navController: NavController) {
     LaunchedEffect(Unit) {
+        Log.d(TAG, "SplashScreen initialized. Starting delay...")
         delay(1800)
+        Log.d(TAG, "Splash delay finished. Navigating to Home.")
         navController.navigate(Routes.Home) {
             popUpTo(Routes.Splash) { inclusive = true }
         }
@@ -96,7 +101,7 @@ fun SplashScreen(navController: NavController) {
                     trackColor = Color(0xFFFFE2D8)
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                Text("v2.0.0", color = Color.Gray, fontSize = 12.sp)
+                Text("v2.1.0", color = Color.Gray, fontSize = 12.sp)
             }
         }
     }

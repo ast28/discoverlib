@@ -1,5 +1,6 @@
 package com.example.discoverlib.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,6 +33,8 @@ import com.example.discoverlib.ui.theme.DiscoverlibTheme
 import com.example.discoverlib.ui.viewmodels.TripViewModel
 import java.time.LocalDate
 
+private const val TAG = "TripsScreen"
+
 @Composable
 fun TripsScreen(
     navController: NavController,
@@ -43,36 +46,49 @@ fun TripsScreen(
 
     val tripsList by viewModel.trips.collectAsState()
 
-    // --- NUEVO: Ordenamos los viajes por fecha de inicio ---
+    LaunchedEffect(Unit) {
+        Log.d(TAG, "TripsScreen initialized")
+    }
+
     val sortedTrips = tripsList.sortedBy { it.startDate }
 
     TripsScreenContent(
         navController = navController,
-        tripsList = sortedTrips, // Le pasamos la lista ya ordenada
+        tripsList = sortedTrips,
         showDialog = showDialog,
         tripToEdit = tripToEdit,
         onAddClick = {
+            Log.d(TAG, "Add trip button clicked")
             tripToEdit = null
             showDialog = true
         },
         onEditClick = { trip ->
+            Log.d(TAG, "Edit trip clicked for: ${trip.id}")
             tripToEdit = trip
             showDialog = true
         },
-        onDeleteClick = { trip -> tripToDelete = trip },
+        onDeleteClick = { trip -> 
+            Log.d(TAG, "Delete trip clicked for: ${trip.id}")
+            tripToDelete = trip 
+        },
         onDismissDialog = {
+            Log.d(TAG, "Trip form dialog dismissed")
             showDialog = false
             tripToEdit = null
         },
         onConfirmTrip = { title, start, end ->
             if (tripToEdit != null) {
+                Log.d(TAG, "Confirming trip edit for: ${tripToEdit!!.id}")
                 val updated = tripToEdit!!.copy(
                     title = title,
                     startDate = start,
                     endDate = end
                 )
-                viewModel.saveEditedTrip(updated)
+                val result = viewModel.saveEditedTrip(updated)
+                if (result.isSuccessful) Log.i(TAG, "Trip edited successfully")
+                else Log.e(TAG, "Error editing trip: ${result.message}")
             } else {
+                Log.d(TAG, "Confirming new trip creation: $title")
                 val newTrip = Trip(
                     id = java.util.UUID.randomUUID().toString(),
                     title = title,
@@ -82,7 +98,9 @@ fun TripsScreen(
                     budgetEur = 0,
                     activities = mutableListOf()
                 )
-                viewModel.saveNewTrip(newTrip)
+                val result = viewModel.saveNewTrip(newTrip)
+                if (result.isSuccessful) Log.i(TAG, "Trip created successfully")
+                else Log.e(TAG, "Error creating trip: ${result.message}")
             }
             showDialog = false
             tripToEdit = null
@@ -97,7 +115,10 @@ fun TripsScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.saveDeletedTrip(tripToDelete!!.id)
+                        Log.d(TAG, "Confirming deletion of trip: ${tripToDelete!!.id}")
+                        val success = viewModel.saveDeletedTrip(tripToDelete!!.id)
+                        if (success) Log.i(TAG, "Trip deleted successfully")
+                        else Log.e(TAG, "Error: Trip not found during deletion")
                         tripToDelete = null
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
@@ -105,7 +126,10 @@ fun TripsScreen(
             },
             dismissButton = {
                 TextButton(
-                    onClick = { tripToDelete = null },
+                    onClick = { 
+                        Log.d(TAG, "Deletion canceled")
+                        tripToDelete = null 
+                    },
                     colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.logo))
                 ) { Text(stringResource(id = R.string.dialog_cancel_btn), fontWeight = FontWeight.Bold) }
             }
@@ -137,6 +161,7 @@ fun TripsScreenContent(
                         var showMenu by remember { mutableStateOf(false) }
                         Card(
                             modifier = Modifier.fillMaxWidth().clickable {
+                                Log.d(TAG, "Navigating to TripDetail: ${trip.id}")
                                 navController.navigate("tripDetail/${trip.id}")
                             }
                         ) {
@@ -153,7 +178,10 @@ fun TripsScreenContent(
                                     Text("${stringResource(id = R.string.trips_budget_prefix)} $totalCost EUR", fontWeight = FontWeight.Medium)
                                 }
                                 Box {
-                                    IconButton(onClick = { showMenu = true }) {
+                                    IconButton(onClick = { 
+                                        Log.d(TAG, "Options menu opened for trip: ${trip.id}")
+                                        showMenu = true 
+                                    }) {
                                         Icon(Icons.Default.MoreVert, contentDescription = stringResource(id = R.string.trips_options_desc))
                                     }
                                     DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
@@ -185,6 +213,7 @@ fun TripsScreenContent(
                 TripFormDialog(
                     initialTrip = tripToEdit,
                     onDismiss = onDismissDialog,
+                    existingTrips = tripsList,
                     onConfirm = onConfirmTrip
                 )
             }

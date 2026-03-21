@@ -1,5 +1,6 @@
 package com.example.discoverlib.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,14 +32,23 @@ import com.example.discoverlib.ui.components.MainSection
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
 import com.example.discoverlib.ui.viewmodels.TripViewModel
 
+private const val TAG = "AboutScreen"
+
 @Composable
 fun AboutScreen(navController: NavController, viewModel: TripViewModel = hiltViewModel()) {
     val teamMembers = viewModel.getTeam()
 
+    LaunchedEffect(Unit) {
+        Log.d(TAG, "AboutScreen initialized")
+    }
+
     AboutScreenContent(
         navController = navController,
         teamList = teamMembers,
-        onTermsClick = { navController.navigate(Routes.Terms) }
+        onTermsClick = { 
+            Log.d(TAG, "Terms and Conditions button clicked")
+            navController.navigate(Routes.Terms) 
+        }
     )
 }
 

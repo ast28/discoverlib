@@ -1,5 +1,6 @@
 package com.example.discoverlib.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -37,7 +38,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-//AQUIII
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -65,6 +66,8 @@ import com.example.discoverlib.ui.theme.DiscoverlibTheme
 import com.example.discoverlib.ui.viewmodels.UserViewModel
 import java.time.LocalDate
 
+private const val TAG = "PreferencesScreen"
+
 @Composable
 fun PreferencesScreen(
     navController: NavController,
@@ -73,6 +76,10 @@ fun PreferencesScreen(
     userViewModel: UserViewModel = hiltViewModel()
 ) {
     val user by userViewModel.currentUser.collectAsState()
+
+    LaunchedEffect(Unit) {
+        Log.d(TAG, "PreferencesScreen initialized")
+    }
 
     val languagesDisplay = listOf("English", "Español", "Català")
     val languageCodes = listOf("en", "es", "ca")
@@ -95,42 +102,50 @@ fun PreferencesScreen(
         navController = navController,
         isDarkTheme = isDarkTheme,
         onThemeChange = { newDarkTheme ->
+            Log.d(TAG, "Theme change requested: darkTheme=$newDarkTheme")
             userViewModel.saveDarkMode(newDarkTheme)
             onThemeChange(newDarkTheme)
         },
         languages = languagesDisplay,
         langIndex = langIndex,
         onLangChange = { newIndex ->
-            langIndex = newIndex
             val selectedCode = languageCodes[newIndex]
+            Log.d(TAG, "Language change requested: $selectedCode")
+            langIndex = newIndex
             userViewModel.saveLanguage(selectedCode)
         },
         reminders = reminders,
-        onRemindersChange = { reminders = it },
-        //AQUIII
+        onRemindersChange = { 
+            Log.d(TAG, "Reminders toggled: $it")
+            reminders = it 
+        },
         username = username,
-        //AQUIII
         dob = dob,
-        onEditProfileClick = { showProfileDialog = true }
+        onEditProfileClick = { 
+            Log.d(TAG, "Edit profile button clicked")
+            showProfileDialog = true 
+        }
     )
 
     if (showProfileDialog) {
         EditProfileDialog(
-            //AQUIII
             initialName = username,
-            //AQUIII
             initialDob = dob,
-            onDismiss = { showProfileDialog = false },
+            onDismiss = { 
+                Log.d(TAG, "Edit profile dialog dismissed")
+                showProfileDialog = false 
+            },
             onConfirm = { newName, newDob ->
+                Log.d(TAG, "Confirming profile edit: name=$newName, dob=$newDob")
                 if (newName.isNotBlank()) {
                     userViewModel.saveNewUsername(newName)
-                    //AQUIII (Se ha quitado la asignación manual a variables locales)
                 }
                 try {
                     val parsedDate = LocalDate.parse(newDob)
                     userViewModel.saveNewDateOfBirth(parsedDate)
-                    //AQUIII (Se ha quitado la asignación manual a variables locales)
-                } catch (e: Exception) { }
+                } catch (e: Exception) { 
+                    Log.e(TAG, "Error parsing date of birth: $newDob")
+                }
                 showProfileDialog = false
             }
         )
@@ -204,13 +219,6 @@ fun PreferencesScreenContent(
                         subtitle = stringResource(id = R.string.dark_mode_subtitle),
                         checked = isDarkTheme,
                         onCheckedChange = onThemeChange
-                    )
-
-                    PreferenceToggle(
-                        title = stringResource(id = R.string.notifications_title),
-                        subtitle = stringResource(id = R.string.notifications_subtitle),
-                        checked = reminders,
-                        onCheckedChange = onRemindersChange
                     )
                 }
             }
@@ -301,6 +309,13 @@ fun EditProfileDialog(
     var nameText by remember { mutableStateOf(if (initialName.contains("Not defined")) "" else initialName) }
     var dobText by remember { mutableStateOf(if (initialDob.contains("Not defined")) "" else initialDob) }
 
+    val parsedDate = try { LocalDate.parse(dobText) } catch (e: Exception) { null }
+    val minAgeDate = LocalDate.now().minusYears(18)
+
+    val isAgeError = parsedDate != null && parsedDate.isAfter(minAgeDate)
+
+    val isFormValid = nameText.isNotBlank() && parsedDate != null && !isAgeError
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(id = R.string.profile_edit_title), fontWeight = FontWeight.Bold) },
@@ -318,13 +333,24 @@ fun EditProfileDialog(
                     label = stringResource(id = R.string.settings_dob),
                     selectedDate = dobText,
                     onDateSelected = { dobText = it },
+                    isError = isAgeError,
                     modifier = Modifier.fillMaxWidth()
                 )
+
+                if (isAgeError) {
+                    Text(
+                        text = stringResource(id = R.string.settings_age_error),
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 4.dp, top = 2.dp)
+                    )
+                }
             }
         },
         confirmButton = {
             Button(
                 onClick = { onConfirm(nameText, dobText) },
+                enabled = isFormValid,
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.logo))
             ) { Text("Save", color = Color.White) }
         },
@@ -336,7 +362,6 @@ fun EditProfileDialog(
         }
     )
 }
-
 @Composable
 fun PreferenceDropdown(
     title: String,
