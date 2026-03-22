@@ -58,13 +58,13 @@ fun TermsScreen(
     TermsScreenContent(
         navController = navController,
         termsList = terms,
-        onAccept = { 
+        onAccept = {
             Log.d(TAG, "Terms accepted")
-            navController.navigate(Routes.Home) 
+            navController.navigate(Routes.Home)
         },
-        onDecline = { 
+        onDecline = {
             Log.d(TAG, "Terms declined")
-            navController.navigate(Routes.Home) 
+            navController.navigate(Routes.Home)
         }
     )
 }

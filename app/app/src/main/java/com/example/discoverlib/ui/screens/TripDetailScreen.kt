@@ -18,6 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,14 +36,16 @@ import com.example.discoverlib.R
 import com.example.discoverlib.domain.ActivityCategory
 import com.example.discoverlib.domain.Trip
 import com.example.discoverlib.domain.TripActivity
+import com.example.discoverlib.domain.ValidationResult
 import com.example.discoverlib.ui.components.ActivityFormDialog
 import com.example.discoverlib.ui.components.DiscoverScaffold
 import com.example.discoverlib.ui.components.MainSection
+import com.example.discoverlib.ui.toDisplayDate
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
 import com.example.discoverlib.ui.viewmodels.TripViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 import java.util.UUID
 
 @Composable
@@ -81,11 +84,14 @@ fun TripDetailContent(
     trip: Trip,
     onBackClick: () -> Unit,
     onActivityClick: (String) -> Unit,
-    onSaveActivity: (TripActivity) -> Unit,
-    onDeleteActivity: (String) -> Unit
+    onSaveActivity: (TripActivity) -> ValidationResult,
+    onDeleteActivity: (String) -> ValidationResult
 ) {
-    val dayFormatter = DateTimeFormatter.ofPattern("E dd", Locale("es", "ES"))
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+    val activityAddedMessage = stringResource(id = R.string.snackbar_activity_added)
+    val activityDeletedMessage = stringResource(id = R.string.snackbar_activity_deleted)
 
     val catAll = stringResource(id = R.string.cat_all)
     val catTransport = stringResource(id = R.string.cat_transport)
@@ -116,7 +122,11 @@ fun TripDetailContent(
         }
     }).sortedWith(compareBy({ it.date }, { it.time }))
 
-    DiscoverScaffold(navController = navController, selectedSection = MainSection.TRIPS) { paddingValues ->
+    DiscoverScaffold(
+        navController = navController,
+        selectedSection = MainSection.TRIPS,
+        snackbarHostState = snackbarHostState
+    ) { paddingValues ->
         Box(modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
@@ -150,7 +160,7 @@ fun TripDetailContent(
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
                 Text(
-                    text = "${trip.startDate} - ${trip.endDate}",
+                    text = "${trip.startDate.toDisplayDate()} - ${trip.endDate.toDisplayDate()}",
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
                 Spacer(modifier = Modifier.height(12.dp))
@@ -228,7 +238,7 @@ fun TripDetailContent(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
-                                    val dateLabel = activity.date.format(dayFormatter).replace(".", "")
+                                    val dateLabel = activity.date.toDisplayDate()
                                     val timeLabel = activity.time.format(timeFormatter)
                                     Text("$dateLabel - $timeLabel", color = Color.Gray, fontSize = 13.sp)
                                     Text(activity.title, fontWeight = FontWeight.Bold)
@@ -299,9 +309,12 @@ fun TripDetailContent(
                         photo_maps = R.drawable.logo_color
                     )
 
-                    onSaveActivity(newActivity)
-                    showAddDialog = false
-                    selectedCategory = catAll
+                    val result = onSaveActivity(newActivity)
+                    if (result.isSuccessful) {
+                        coroutineScope.launch { snackbarHostState.showSnackbar(activityAddedMessage) }
+                        showAddDialog = false
+                        selectedCategory = catAll
+                    }
                 }
             )
         }
@@ -318,7 +331,10 @@ fun TripDetailContent(
                 confirmButton = {
                     Button(
                         onClick = {
-                            onDeleteActivity(activity.id)
+                            val result = onDeleteActivity(activity.id)
+                            if (result.isSuccessful) {
+                                coroutineScope.launch { snackbarHostState.showSnackbar(activityDeletedMessage) }
+                            }
                             activityToDelete = null
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A4A4A))
@@ -366,8 +382,8 @@ fun TripDetailScreenPreview() {
             ),
             onBackClick = {},
             onActivityClick = {},
-            onSaveActivity = {},
-            onDeleteActivity = {}
+            onSaveActivity = { ValidationResult(true, "") },
+            onDeleteActivity = { ValidationResult(true, "") }
         )
     }
 }

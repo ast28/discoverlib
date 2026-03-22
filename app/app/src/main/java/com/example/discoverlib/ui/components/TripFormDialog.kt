@@ -16,7 +16,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -35,7 +34,7 @@ fun TripFormDialog(
     onConfirm: (String, LocalDate, LocalDate) -> Unit
 ) {
     var title by remember { mutableStateOf(initialTrip?.title ?: "") }
-    var titleTouched by remember { mutableStateOf(false) }
+    var showValidationErrors by remember { mutableStateOf(false) }
 
     var startText by remember { mutableStateOf(initialTrip?.startDate?.toString() ?: LocalDate.now().toString()) }
     var endText by remember { mutableStateOf(initialTrip?.endDate?.toString() ?: LocalDate.now().plusDays(3).toString()) }
@@ -44,7 +43,7 @@ fun TripFormDialog(
     val endDate = try { LocalDate.parse(endText) } catch (e: Exception) { null }
 
     val isTitleInvalid = title.isBlank()
-    val isTitleError = isTitleInvalid && titleTouched
+    val isTitleError = showValidationErrors && isTitleInvalid
 
     val isDateParseError = startDate == null || endDate == null
 
@@ -86,13 +85,9 @@ fun TripFormDialog(
                     value = title,
                     onValueChange = { title = it },
                     label = { Text(stringResource(id = R.string.form_trip_city)) },
-                    isError = isTitleError || isDuplicateError,
+                    isError = isTitleError || (showValidationErrors && isDuplicateError),
                     singleLine = true,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .onFocusChanged { focusState ->
-                            if (!focusState.isFocused) titleTouched = true
-                        }
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 if (isTitleError) {
@@ -103,7 +98,7 @@ fun TripFormDialog(
                     label = "Start",
                     selectedDate = startText,
                     onDateSelected = { startText = it },
-                    isError = isDateParseError || isPastDateError || isOrderError || isDuplicateError,
+                    isError = showValidationErrors && (isDateParseError || isPastDateError || isOrderError || isDuplicateError),
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -111,19 +106,19 @@ fun TripFormDialog(
                     label = "End",
                     selectedDate = endText,
                     onDateSelected = { endText = it },
-                    isError = isDateParseError || isOrderError || isDuplicateError,
+                    isError = showValidationErrors && (isDateParseError || isOrderError || isDuplicateError),
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                if (isPastDateError) {
+                if (showValidationErrors && isPastDateError) {
                     Text(stringResource(id = R.string.form_trip_past_error), color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
                 }
 
-                if (isOrderError) {
+                if (showValidationErrors && isOrderError) {
                     Text(stringResource(id = R.string.form_trip_date_error), color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
                 }
 
-                if (isDuplicateError) {
+                if (showValidationErrors && isDuplicateError) {
                     Text(
                         text = stringResource(id = R.string.form_trip_duplicate_error),
                         color = Color.Red,
@@ -132,7 +127,7 @@ fun TripFormDialog(
                     )
                 }
 
-                if (activityConflict) {
+                if (showValidationErrors && activityConflict) {
                     Text(
                         text = stringResource(id = R.string.form_trip_conflict_error),
                         color = Color.Red,
@@ -144,8 +139,12 @@ fun TripFormDialog(
         },
         confirmButton = {
             Button(
-                onClick = { if (startDate != null && endDate != null) onConfirm(title, startDate, endDate) },
-                enabled = !isTitleInvalid && !isDateParseError && !activityConflict && !isPastDateError && !isDuplicateError && !isOrderError,
+                onClick = {
+                    showValidationErrors = true
+                    if (!isTitleInvalid && !isDateParseError && !activityConflict && !isPastDateError && !isDuplicateError && !isOrderError) {
+                        onConfirm(title, startDate!!, endDate!!)
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.logo))
             ) { Text(stringResource(id = R.string.form_trip_save_btn), color = Color.White) }
         },

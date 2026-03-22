@@ -17,12 +17,15 @@
     <string name="settings_dob">Date of Birth</string>
     <string name="settings_dob_subtitle">Tap to change your birth date</string>
     <string name="language">Language</string>
+    <string name="language_name_english">English</string>
+    <string name="language_name_spanish">Spanish</string>
+    <string name="language_name_catalan">Catalan</string>
     <string name="language_subtitle">Tap to choose a language</string>
     <string name="dark_mode">Dark Mode</string>
     <string name="dark_mode_subtitle">Enable the app\'s dark mode</string>
     <string name="dialog_edit_username">Edit Username</string>
     <string name="dialog_edit_dob">Edit Date of Birth</string>
-    <string name="dialog_dob_format">YYYY-MM-DD</string>
+    <string name="dialog_dob_format">DD/MM/YYYY</string>
     <string name="settings_age_error">You must be at least 18 years old to use the app.</string>
 
     <string name="about_title">About Us</string>
@@ -61,7 +64,7 @@
     <string name="form_location">Location</string>
     <string name="form_category">Category (Culture, Food, Nature)</string>
     <string name="form_description">Description</string>
-    <string name="form_date">Date (YYYY-MM-DD)</string>
+    <string name="form_date">Date (DD/MM/YYYY)</string>
     <string name="form_time">Time (HH:MM)</string>
     <string name="form_date_error">Must be between %1$s and %2$s</string>
     <string name="form_cost">Cost (EUR)</string>
@@ -122,9 +125,19 @@
     <string name="form_trip_edit_title">Edit Trip</string>
     <string name="form_trip_city">City / Title</string>
     <string name="form_trip_budget">Price (EUR)</string>
-    <string name="form_trip_start_end_date">Start and End Dates (YYYY-MM-DD)</string>
+    <string name="form_trip_start_end_date">Start and End Dates (DD/MM/YYYY)</string>
     <string name="form_trip_date_error">End date must be after start date</string>
     <string name="form_trip_conflict_error">Selected dates exclude existing activities. Please move or delete them first.</string>
     <string name="form_trip_save_btn">Save</string>
     <string name="form_trip_duplicate_error">You already have an identical trip on these dates.</string>
+    <string name="snackbar_profile_updated">Profile updated successfully.</string>
+    <string name="snackbar_language_changed">Language changed to %1$s.</string>
+    <string name="snackbar_dark_mode_enabled">Dark mode activated.</string>
+    <string name="snackbar_dark_mode_disabled">Light mode activated.</string>
+    <string name="snackbar_trip_added">Trip added successfully.</string>
+    <string name="snackbar_trip_updated">Trip updated successfully.</string>
+    <string name="snackbar_trip_deleted">Trip deleted successfully.</string>
+    <string name="snackbar_activity_added">Activity added successfully.</string>
+    <string name="snackbar_activity_updated">Activity updated successfully.</string>
+    <string name="snackbar_activity_deleted">Activity deleted successfully.</string>
 </resources>

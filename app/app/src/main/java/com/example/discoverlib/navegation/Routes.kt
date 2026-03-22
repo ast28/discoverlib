@@ -1,7 +1,6 @@
 package com.example.discoverlib.navegation
 
 object Routes {
-    // Rutas simples
     const val Splash = "splash"
     const val Home = "home"
     const val Trips = "trips"

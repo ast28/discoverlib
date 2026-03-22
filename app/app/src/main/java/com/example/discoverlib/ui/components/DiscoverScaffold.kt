@@ -17,6 +17,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -54,9 +56,13 @@ enum class MainSection {
 fun DiscoverScaffold(
     navController: NavController,
     selectedSection: MainSection,
+    snackbarHostState: SnackbarHostState? = null,
     content: @Composable (innerPadding: androidx.compose.foundation.layout.PaddingValues) -> Unit
 ) {
     Scaffold(
+        snackbarHost = {
+            snackbarHostState?.let { SnackbarHost(hostState = it) }
+        },
         topBar = {
             Row(
                 modifier = Modifier

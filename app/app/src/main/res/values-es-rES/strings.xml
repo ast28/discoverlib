@@ -19,12 +19,15 @@
     <string name="settings_dob">Fecha de nacimiento</string>
     <string name="settings_dob_subtitle">Toca para cambiar tu fecha de nacimiento</string>
     <string name="language">Idioma</string>
+    <string name="language_name_english">Inglés</string>
+    <string name="language_name_spanish">Español</string>
+    <string name="language_name_catalan">Catalán</string>
     <string name="language_subtitle">Toca para elegir un idioma</string>
     <string name="dark_mode">Modo Oscuro</string>
     <string name="dark_mode_subtitle">Activa el modo oscuro de la app</string>
     <string name="dialog_edit_username">Editar Nombre</string>
     <string name="dialog_edit_dob">Editar Fecha de Nacimiento</string>
-    <string name="dialog_dob_format">AAAA-MM-DD</string>
+    <string name="dialog_dob_format">DD/MM/AAAA</string>
     <string name="settings_age_error">Debes tener al menos 18 para utilizar la app.</string>
 
 
@@ -65,7 +68,7 @@
     <string name="form_location">Ubicación</string>
     <string name="form_category">Categoría (Cultura, Comida, Naturaleza)</string>
     <string name="form_description">Descripción</string>
-    <string name="form_date">Fecha (AAAA-MM-DD)</string>
+    <string name="form_date">Fecha (DD/MM/AAAA)</string>
     <string name="form_time">Hora (HH:MM)</string>
     <string name="form_date_error">Debe ser entre %1$s y %2$s</string>
     <string name="form_cost">Coste (EUR)</string>
@@ -126,10 +129,20 @@
     <string name="form_trip_edit_title">Editar Viaje</string>
     <string name="form_trip_city">Ciudad / Título</string>
     <string name="form_trip_budget">Precio (EUR)</string>
-    <string name="form_trip_start_end_date">Fechas de inicio y de fin (AAAA-MM-DD)</string>
+    <string name="form_trip_start_end_date">Fechas de inicio y de fin (DD/MM/AAAA)</string>
     <string name="form_trip_date_error">La fecha de fin debe ser posterior a la de inicio</string>
     <string name="form_trip_conflict_error">Las fechas seleccionadas excluyen actividades existentes. Por favor, muévelas o elimínalas primero.</string>
     <string name="form_trip_save_btn">Guardar</string>
     <string name="form_trip_duplicate_error">Ja tens un viatge idéntic en aquestes dates.</string>
+    <string name="snackbar_profile_updated">Perfil actualizado correctamente.</string>
+    <string name="snackbar_language_changed">Idioma cambiado a %1$s.</string>
+    <string name="snackbar_dark_mode_enabled">Modo oscuro activado.</string>
+    <string name="snackbar_dark_mode_disabled">Modo claro activado.</string>
+    <string name="snackbar_trip_added">Viaje añadido correctamente.</string>
+    <string name="snackbar_trip_updated">Viaje actualizado correctamente.</string>
+    <string name="snackbar_trip_deleted">Viaje eliminado correctamente.</string>
+    <string name="snackbar_activity_added">Actividad añadida correctamente.</string>
+    <string name="snackbar_activity_updated">Actividad actualizada correctamente.</string>
+    <string name="snackbar_activity_deleted">Actividad eliminada correctamente.</string>
 
 </resources>

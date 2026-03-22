@@ -13,6 +13,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.example.discoverlib.ui.parseAppDateOrNull
+import com.example.discoverlib.ui.toDisplayDate
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
@@ -31,7 +33,10 @@ fun DatePickerField(
     val calendarState = rememberUseCaseState()
 
     val parsedDate = remember(selectedDate) {
-        try { LocalDate.parse(selectedDate) } catch (e: Exception) { LocalDate.now() }
+        parseAppDateOrNull(selectedDate) ?: LocalDate.now()
+    }
+    val displayDate = remember(selectedDate) {
+        parseAppDateOrNull(selectedDate)?.toDisplayDate() ?: selectedDate
     }
 
     CalendarDialog(
@@ -50,7 +55,7 @@ fun DatePickerField(
 
     Box(modifier = modifier.clickable { calendarState.show() }) {
         OutlinedTextField(
-            value = selectedDate,
+            value = displayDate,
             onValueChange = {},
             label = { Text(label) },
             readOnly = true,

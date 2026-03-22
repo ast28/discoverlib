@@ -37,11 +37,13 @@ import androidx.navigation.compose.rememberNavController
 import com.example.discoverlib.R
 import com.example.discoverlib.domain.ActivityCategory
 import com.example.discoverlib.domain.TripActivity
+import com.example.discoverlib.domain.ValidationResult
 import com.example.discoverlib.ui.components.ActivityFormDialog
 import com.example.discoverlib.ui.components.DiscoverScaffold
 import com.example.discoverlib.ui.components.MainSection
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
 import com.example.discoverlib.ui.viewmodels.TripViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -112,13 +114,17 @@ fun ActivityScreenContent(
     tripStartDate: LocalDate,
     tripEndDate: LocalDate,
     onBackClick: () -> Unit,
-    onSaveEdit: (TripActivity) -> Unit
+    onSaveEdit: (TripActivity) -> ValidationResult
 ) {
     var showEditDialog by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+    val activityUpdatedMessage = stringResource(id = R.string.snackbar_activity_updated)
 
     DiscoverScaffold(
         navController = navController,
-        selectedSection = MainSection.TRIPS
+        selectedSection = MainSection.TRIPS,
+        snackbarHostState = snackbarHostState
     ) { paddingValues ->
         Box(modifier = Modifier
             .fillMaxSize()
@@ -200,11 +206,14 @@ fun ActivityScreenContent(
                 onDismiss = { showEditDialog = false },
                 existingActivities = emptyList(),
                 onConfirm = { title, location, description, date, time, costEur, category ->
-                    onSaveEdit(activity.copy(
+                    val result = onSaveEdit(activity.copy(
                         title = title, location = location, description = description,
                         date = date, time = time, costEur = costEur, category = category
                     ))
-                    showEditDialog = false
+                    if (result.isSuccessful) {
+                        coroutineScope.launch { snackbarHostState.showSnackbar(activityUpdatedMessage) }
+                        showEditDialog = false
+                    }
                 }
             )
         }

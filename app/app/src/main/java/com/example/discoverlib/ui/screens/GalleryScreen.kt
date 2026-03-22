@@ -98,9 +98,9 @@ fun GalleryScreen(
         photos = photos,
         gallerySummary = gallerySummary,
         trips = trips,
-        onExpandedChange = { 
+        onExpandedChange = {
             Log.d(TAG, "Trip selector expanded: $it")
-            expanded = it 
+            expanded = it
         },
         onTripSelected = {
             Log.d(TAG, "Trip selected for gallery: ${it.id} (${it.title})")

@@ -19,12 +19,15 @@
     <string name="settings_dob">Data de naixement</string>
     <string name="settings_dob_subtitle">Toca per canviar la teva data de naixement</string>
     <string name="language">Idioma</string>
+    <string name="language_name_english">Anglès</string>
+    <string name="language_name_spanish">Espanyol</string>
+    <string name="language_name_catalan">Català</string>
     <string name="language_subtitle">Toca per triar un idioma</string>
     <string name="dark_mode">Mode fosc</string>
     <string name="dark_mode_subtitle">Activa el mode fosc de l\'app</string>
     <string name="dialog_edit_username">Editar Nom</string>
     <string name="dialog_edit_dob">Editar Data de Naixement</string>
-    <string name="dialog_dob_format">AAAA-MM-DD</string>
+    <string name="dialog_dob_format">DD/MM/AAAA</string>
     <string name="settings_age_error">Has de tenir mínim 18 per utilitzar la app.</string>
 
 
@@ -64,7 +67,7 @@
     <string name="form_location">Ubicació</string>
     <string name="form_category">Categoria (Cultura, Menjar, Natura)</string>
     <string name="form_description">Descripció</string>
-    <string name="form_date">Data (AAAA-MM-DD)</string>
+    <string name="form_date">Data (DD/MM/AAAA)</string>
     <string name="form_time">Hora (HH:MM)</string>
     <string name="form_date_error">Ha de ser entre %1$s i %2$s</string>
     <string name="form_cost">Cost (EUR)</string>
@@ -123,10 +126,20 @@
     <string name="form_trip_edit_title">Editar Viatge</string>
     <string name="form_trip_city">Ciutat / Títol</string>
     <string name="form_trip_budget">Preu (EUR)</string>
-    <string name="form_trip_start_end_date">Dates d\'inici i de fi (AAAA-MM-DD)</string>
+    <string name="form_trip_start_end_date">Dates d\'inici i de fi (DD/MM/AAAA)</string>
     <string name="form_trip_date_error">La data de fi ha de ser posterior a la d\'inici</string> <string name="form_trip_conflict_error">Les dates seleccionades exclouen activitats existents. Si us plau, mou-les o elimina-les primer.</string>
     <string name="form_trip_save_btn">Desar</string>
     <string name="form_trip_duplicate_error">Ya tienes un viaje idéntico en estas fechas.</string>
+    <string name="snackbar_profile_updated">Perfil actualitzat correctament.</string>
+    <string name="snackbar_language_changed">Idioma canviat a %1$s.</string>
+    <string name="snackbar_dark_mode_enabled">Mode fosc activat.</string>
+    <string name="snackbar_dark_mode_disabled">Mode clar activat.</string>
+    <string name="snackbar_trip_added">Viatge afegit correctament.</string>
+    <string name="snackbar_trip_updated">Viatge actualitzat correctament.</string>
+    <string name="snackbar_trip_deleted">Viatge eliminat correctament.</string>
+    <string name="snackbar_activity_added">Activitat afegida correctament.</string>
+    <string name="snackbar_activity_updated">Activitat actualitzada correctament.</string>
+    <string name="snackbar_activity_deleted">Activitat eliminada correctament.</string>
 
 
 </resources>

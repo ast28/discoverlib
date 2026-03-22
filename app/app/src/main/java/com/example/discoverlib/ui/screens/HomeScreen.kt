@@ -49,11 +49,11 @@ import com.example.discoverlib.domain.Trip
 import com.example.discoverlib.navegation.Routes
 import com.example.discoverlib.ui.components.DiscoverScaffold
 import com.example.discoverlib.ui.components.MainSection
+import com.example.discoverlib.ui.toDisplayDate
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
 import com.example.discoverlib.ui.viewmodels.TripViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 private const val TAG = "HomeScreen"
 
@@ -92,13 +92,13 @@ fun HomeScreen(
         selectedDate = selectedDate,
         canGoPrev = canGoPrev,
         canGoNext = canGoNext,
-        onPrevDay = { 
+        onPrevDay = {
             Log.d(TAG, "Previous day clicked. New date: ${selectedDate.minusDays(1)}")
-            selectedDate = selectedDate.minusDays(1) 
+            selectedDate = selectedDate.minusDays(1)
         },
-        onNextDay = { 
+        onNextDay = {
             Log.d(TAG, "Next day clicked. New date: ${selectedDate.plusDays(1)}")
-            selectedDate = selectedDate.plusDays(1) 
+            selectedDate = selectedDate.plusDays(1)
         },
         onTripClick = {
             featuredTrip?.let {
@@ -196,7 +196,7 @@ private fun NextTripSummaryCard(
             Column {
                 Text(stringResource(id = R.string.home_next_trip), color = colorResource(id = R.color.logo), fontWeight = FontWeight.Bold)
                 Text(trip.title, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                Text("${trip.startDate} - ${trip.endDate}", fontSize = 13.sp, color = Color.Gray)
+                Text("${trip.startDate.toDisplayDate()} - ${trip.endDate.toDisplayDate()}", fontSize = 13.sp, color = Color.Gray)
             }
             Column(horizontalAlignment = Alignment.End) {
                 val nights = java.time.temporal.ChronoUnit.DAYS.between(trip.startDate, trip.endDate)
@@ -219,8 +219,7 @@ private fun DailyCalendarCard(
     onActivityClick: (String) -> Unit
 ) {
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-    val dayFormatter = DateTimeFormatter.ofPattern("E dd", Locale("es", "ES"))
-    val formattedDay = selectedDate.format(dayFormatter).replace(".", "")
+    val formattedDay = selectedDate.toDisplayDate()
 
     val defaultHours = listOf("08:00", "10:00", "12:00", "14:00", "16:00", "18:00")
     val dayActivities = trip.activities.filter { it.date == selectedDate }

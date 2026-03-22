@@ -29,8 +29,10 @@ import com.example.discoverlib.domain.Trip
 import com.example.discoverlib.ui.components.DiscoverScaffold
 import com.example.discoverlib.ui.components.MainSection
 import com.example.discoverlib.ui.components.TripFormDialog
+import com.example.discoverlib.ui.toDisplayDate
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
 import com.example.discoverlib.ui.viewmodels.TripViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 private const val TAG = "TripsScreen"
@@ -43,8 +45,13 @@ fun TripsScreen(
     var showDialog by remember { mutableStateOf(false) }
     var tripToEdit by remember { mutableStateOf<Trip?>(null) }
     var tripToDelete by remember { mutableStateOf<Trip?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     val tripsList by viewModel.trips.collectAsState()
+    val tripAddedMessage = stringResource(id = R.string.snackbar_trip_added)
+    val tripUpdatedMessage = stringResource(id = R.string.snackbar_trip_updated)
+    val tripDeletedMessage = stringResource(id = R.string.snackbar_trip_deleted)
 
     LaunchedEffect(Unit) {
         Log.d(TAG, "TripsScreen initialized")
@@ -57,6 +64,7 @@ fun TripsScreen(
         tripsList = sortedTrips,
         showDialog = showDialog,
         tripToEdit = tripToEdit,
+        snackbarHostState = snackbarHostState,
         onAddClick = {
             Log.d(TAG, "Add trip button clicked")
             tripToEdit = null
@@ -67,9 +75,9 @@ fun TripsScreen(
             tripToEdit = trip
             showDialog = true
         },
-        onDeleteClick = { trip -> 
+        onDeleteClick = { trip ->
             Log.d(TAG, "Delete trip clicked for: ${trip.id}")
-            tripToDelete = trip 
+            tripToDelete = trip
         },
         onDismissDialog = {
             Log.d(TAG, "Trip form dialog dismissed")
@@ -85,8 +93,14 @@ fun TripsScreen(
                     endDate = end
                 )
                 val result = viewModel.saveEditedTrip(updated)
-                if (result.isSuccessful) Log.i(TAG, "Trip edited successfully")
-                else Log.e(TAG, "Error editing trip: ${result.message}")
+                if (result.isSuccessful) {
+                    Log.i(TAG, "Trip edited successfully")
+                    coroutineScope.launch { snackbarHostState.showSnackbar(tripUpdatedMessage) }
+                    showDialog = false
+                    tripToEdit = null
+                } else {
+                    Log.e(TAG, "Error editing trip: ${result.message}")
+                }
             } else {
                 Log.d(TAG, "Confirming new trip creation: $title")
                 val newTrip = Trip(
@@ -99,11 +113,15 @@ fun TripsScreen(
                     activities = mutableListOf()
                 )
                 val result = viewModel.saveNewTrip(newTrip)
-                if (result.isSuccessful) Log.i(TAG, "Trip created successfully")
-                else Log.e(TAG, "Error creating trip: ${result.message}")
+                if (result.isSuccessful) {
+                    Log.i(TAG, "Trip created successfully")
+                    coroutineScope.launch { snackbarHostState.showSnackbar(tripAddedMessage) }
+                    showDialog = false
+                    tripToEdit = null
+                } else {
+                    Log.e(TAG, "Error creating trip: ${result.message}")
+                }
             }
-            showDialog = false
-            tripToEdit = null
         }
     )
 
@@ -117,8 +135,12 @@ fun TripsScreen(
                     onClick = {
                         Log.d(TAG, "Confirming deletion of trip: ${tripToDelete!!.id}")
                         val success = viewModel.saveDeletedTrip(tripToDelete!!.id)
-                        if (success) Log.i(TAG, "Trip deleted successfully")
-                        else Log.e(TAG, "Error: Trip not found during deletion")
+                        if (success) {
+                            Log.i(TAG, "Trip deleted successfully")
+                            coroutineScope.launch { snackbarHostState.showSnackbar(tripDeletedMessage) }
+                        } else {
+                            Log.e(TAG, "Error: Trip not found during deletion")
+                        }
                         tripToDelete = null
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
@@ -126,9 +148,9 @@ fun TripsScreen(
             },
             dismissButton = {
                 TextButton(
-                    onClick = { 
+                    onClick = {
                         Log.d(TAG, "Deletion canceled")
-                        tripToDelete = null 
+                        tripToDelete = null
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.logo))
                 ) { Text(stringResource(id = R.string.dialog_cancel_btn), fontWeight = FontWeight.Bold) }
@@ -143,13 +165,18 @@ fun TripsScreenContent(
     tripsList: List<Trip>,
     showDialog: Boolean,
     tripToEdit: Trip?,
+    snackbarHostState: SnackbarHostState,
     onAddClick: () -> Unit,
     onEditClick: (Trip) -> Unit,
     onDeleteClick: (Trip) -> Unit,
     onDismissDialog: () -> Unit,
     onConfirmTrip: (String, LocalDate, LocalDate) -> Unit
 ) {
-    DiscoverScaffold(navController = navController, selectedSection = MainSection.TRIPS) { paddingValues ->
+    DiscoverScaffold(
+        navController = navController,
+        selectedSection = MainSection.TRIPS,
+        snackbarHostState = snackbarHostState
+    ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
             Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
                 Spacer(modifier = Modifier.height(20.dp))
@@ -172,15 +199,15 @@ fun TripsScreenContent(
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(trip.title, fontSize = 26.sp, fontWeight = FontWeight.Bold)
-                                    Text("${trip.startDate} - ${trip.endDate}", color = Color.Gray)
+                                    Text("${trip.startDate.toDisplayDate()} - ${trip.endDate.toDisplayDate()}", color = Color.Gray)
 
                                     val totalCost = trip.activities.sumOf { it.costEur }
                                     Text("${stringResource(id = R.string.trips_budget_prefix)} $totalCost EUR", fontWeight = FontWeight.Medium)
                                 }
                                 Box {
-                                    IconButton(onClick = { 
+                                    IconButton(onClick = {
                                         Log.d(TAG, "Options menu opened for trip: ${trip.id}")
-                                        showMenu = true 
+                                        showMenu = true
                                     }) {
                                         Icon(Icons.Default.MoreVert, contentDescription = stringResource(id = R.string.trips_options_desc))
                                     }
@@ -230,6 +257,7 @@ fun TripsScreenPreview() {
             tripsList = emptyList(),
             showDialog = false,
             tripToEdit = null,
+            snackbarHostState = SnackbarHostState(),
             onAddClick = {},
             onEditClick = {},
             onDeleteClick = {},

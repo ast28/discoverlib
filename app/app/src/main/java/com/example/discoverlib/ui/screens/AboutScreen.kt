@@ -45,9 +45,9 @@ fun AboutScreen(navController: NavController, viewModel: TripViewModel = hiltVie
     AboutScreenContent(
         navController = navController,
         teamList = teamMembers,
-        onTermsClick = { 
+        onTermsClick = {
             Log.d(TAG, "Terms and Conditions button clicked")
-            navController.navigate(Routes.Terms) 
+            navController.navigate(Routes.Terms)
         }
     )
 }

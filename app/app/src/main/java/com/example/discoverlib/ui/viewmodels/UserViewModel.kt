@@ -22,6 +22,8 @@ class UserViewModel @Inject constructor(
 
     private val _currentUser = MutableStateFlow(repository.getUser())
     val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
+    private val _pendingLanguageSnackbarCode = MutableStateFlow<String?>(null)
+    val pendingLanguageSnackbarCode: StateFlow<String?> = _pendingLanguageSnackbarCode.asStateFlow()
 
     fun getSavedUsername(): String {
         val user = repository.getUser()
@@ -134,5 +136,10 @@ class UserViewModel @Inject constructor(
         sharedPrefs.userLanguage = newLanguage
         Log.i(TAG, "Language preference saved: $newLanguage")
         _currentUser.value = updatedUser
+        _pendingLanguageSnackbarCode.value = newLanguage
+    }
+
+    fun consumePendingLanguageSnackbar() {
+        _pendingLanguageSnackbarCode.value = null
     }
 }

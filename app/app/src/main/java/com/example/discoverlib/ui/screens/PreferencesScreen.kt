@@ -33,6 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -44,6 +45,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,10 +62,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.discoverlib.R
+import com.example.discoverlib.ui.parseAppDateOrNull
+import com.example.discoverlib.ui.toDisplayDate
 import com.example.discoverlib.ui.components.DiscoverScaffold
 import com.example.discoverlib.ui.components.MainSection
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
 import com.example.discoverlib.ui.viewmodels.UserViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 private const val TAG = "PreferencesScreen"
@@ -76,6 +81,9 @@ fun PreferencesScreen(
     userViewModel: UserViewModel = hiltViewModel()
 ) {
     val user by userViewModel.currentUser.collectAsState()
+    val pendingLanguageCode by userViewModel.pendingLanguageSnackbarCode.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         Log.d(TAG, "PreferencesScreen initialized")
@@ -98,13 +106,41 @@ fun PreferencesScreen(
 
     var showProfileDialog by remember { mutableStateOf(false) }
 
+    val profileUpdatedMessage = stringResource(id = R.string.snackbar_profile_updated)
+    val darkModeEnabledMessage = stringResource(id = R.string.snackbar_dark_mode_enabled)
+    val darkModeDisabledMessage = stringResource(id = R.string.snackbar_dark_mode_disabled)
+    val languageNameRes = when (pendingLanguageCode) {
+        "es" -> R.string.language_name_spanish
+        "ca" -> R.string.language_name_catalan
+        "en" -> R.string.language_name_english
+        else -> null
+    }
+    val pendingLanguageMessage = if (pendingLanguageCode != null && pendingLanguageCode == currentLangCode && languageNameRes != null) {
+        stringResource(id = R.string.snackbar_language_changed, stringResource(id = languageNameRes))
+    } else {
+        null
+    }
+
+    LaunchedEffect(pendingLanguageMessage) {
+        pendingLanguageMessage?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            userViewModel.consumePendingLanguageSnackbar()
+        }
+    }
+
     PreferencesScreenContent(
         navController = navController,
         isDarkTheme = isDarkTheme,
+        snackbarHostState = snackbarHostState,
         onThemeChange = { newDarkTheme ->
             Log.d(TAG, "Theme change requested: darkTheme=$newDarkTheme")
             userViewModel.saveDarkMode(newDarkTheme)
             onThemeChange(newDarkTheme)
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar(
+                    if (newDarkTheme) darkModeEnabledMessage else darkModeDisabledMessage
+                )
+            }
         },
         languages = languagesDisplay,
         langIndex = langIndex,
@@ -115,15 +151,15 @@ fun PreferencesScreen(
             userViewModel.saveLanguage(selectedCode)
         },
         reminders = reminders,
-        onRemindersChange = { 
+        onRemindersChange = {
             Log.d(TAG, "Reminders toggled: $it")
-            reminders = it 
+            reminders = it
         },
         username = username,
         dob = dob,
-        onEditProfileClick = { 
+        onEditProfileClick = {
             Log.d(TAG, "Edit profile button clicked")
-            showProfileDialog = true 
+            showProfileDialog = true
         }
     )
 
@@ -131,20 +167,24 @@ fun PreferencesScreen(
         EditProfileDialog(
             initialName = username,
             initialDob = dob,
-            onDismiss = { 
+            onDismiss = {
                 Log.d(TAG, "Edit profile dialog dismissed")
-                showProfileDialog = false 
+                showProfileDialog = false
             },
             onConfirm = { newName, newDob ->
                 Log.d(TAG, "Confirming profile edit: name=$newName, dob=$newDob")
+                var wasUpdated = false
                 if (newName.isNotBlank()) {
-                    userViewModel.saveNewUsername(newName)
+                    wasUpdated = userViewModel.saveNewUsername(newName) || wasUpdated
                 }
-                try {
-                    val parsedDate = LocalDate.parse(newDob)
-                    userViewModel.saveNewDateOfBirth(parsedDate)
-                } catch (e: Exception) { 
+                val parsedDate = parseAppDateOrNull(newDob)
+                if (parsedDate != null) {
+                    wasUpdated = userViewModel.saveNewDateOfBirth(parsedDate) || wasUpdated
+                } else {
                     Log.e(TAG, "Error parsing date of birth: $newDob")
+                }
+                if (wasUpdated) {
+                    coroutineScope.launch { snackbarHostState.showSnackbar(profileUpdatedMessage) }
                 }
                 showProfileDialog = false
             }
@@ -156,6 +196,7 @@ fun PreferencesScreen(
 fun PreferencesScreenContent(
     navController: NavController,
     isDarkTheme: Boolean,
+    snackbarHostState: SnackbarHostState,
     onThemeChange: (Boolean) -> Unit,
     languages: List<String>,
     langIndex: Int,
@@ -166,7 +207,11 @@ fun PreferencesScreenContent(
     dob: String,
     onEditProfileClick: () -> Unit
 ) {
-    DiscoverScaffold(navController = navController, selectedSection = MainSection.SETTINGS) { paddingValues ->
+    DiscoverScaffold(
+        navController = navController,
+        selectedSection = MainSection.SETTINGS,
+        snackbarHostState = snackbarHostState
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -240,7 +285,9 @@ fun ProfileHeaderCard(
 
     val displayDob = if (dob.contains("Not defined") || dob.isBlank()) {
         "--"
-    } else dob
+    } else {
+        parseAppDateOrNull(dob)?.toDisplayDate() ?: dob
+    }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -458,6 +505,7 @@ fun PreferencesScreenPreview() {
         PreferencesScreenContent(
             navController = rememberNavController(),
             isDarkTheme = false,
+            snackbarHostState = SnackbarHostState(),
             onThemeChange = {},
             languages = listOf("English", "Español", "Català"),
             langIndex = 0,

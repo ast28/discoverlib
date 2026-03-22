@@ -125,7 +125,7 @@ class TripViewModel @Inject constructor(
 
         val trip = repository.getOneTrip(tripId)
         if (trip != null) {
-                val timeConflict = trip.activities.any {
+            val timeConflict = trip.activities.any {
                 it.id != activity.id && it.date == activity.date && it.time == activity.time
             }
             if (timeConflict) {
