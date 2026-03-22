@@ -54,52 +54,51 @@ fun ActivityScreen(
     activityId: String?,
     viewModel: TripViewModel = hiltViewModel()
 ) {
+    // 1. Observamos el flujo reactivo
     val trips by viewModel.trips.collectAsState()
+
+    // 2. Intentamos encontrar el viaje y la actividad
     val trip = trips.find { it.id == tripId }
     val activity = trip?.activities?.find { it.id == activityId }
 
-    LaunchedEffect(tripId, activityId) {
-        Log.d(TAG, "Navigated to ActivityScreen: tripId=$tripId, activityId=$activityId")
-    }
-
-    if (activity != null && trip != null) {
-        ActivityScreenContent(
-            navController = navController,
-            activity = activity,
-            tripStartDate = trip.startDate,
-            tripEndDate = trip.endDate,
-            onBackClick = {
-                Log.d(TAG, "Back button clicked. Navigating back.")
-                navController.popBackStack()
-            },
-            onSaveEdit = { editedActivity ->
-                Log.d(TAG, "Saving edited activity: ${editedActivity.id}")
-                val result = viewModel.editActivity(trip.id, editedActivity)
-                if (result.isSuccessful) {
-                    Log.i(TAG, "Activity updated successfully")
-                } else {
-                    Log.e(TAG, "Failed to update activity: ${result.message}")
+    // 3. Lógica de renderizado y logging inteligente
+    when {
+        // CASO ÉXITO: Tenemos todo lo necesario
+        trip != null && activity != null -> {
+            ActivityScreenContent(
+                navController = navController,
+                activity = activity,
+                tripStartDate = trip.startDate,
+                tripEndDate = trip.endDate,
+                onBackClick = { navController.popBackStack() },
+                onSaveEdit = { editedActivity ->
+                    viewModel.editActivity(trip.id, editedActivity)
                 }
-            }
-        )
-    } else {
-        LaunchedEffect(trips) {
-            if (trips.isEmpty()) {
-                Log.e(TAG, "Error: Activity or Trip not found. tripId=$tripId, activityId=$activityId")
+            )
+        }
+
+        // CASO CARGA: La lista está vacía, estamos esperando al repositorio
+        trips.isEmpty() -> {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = colorResource(id = R.color.logo))
             }
         }
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(stringResource(id = R.string.activity_not_found), color = Color.Gray, fontSize = 18.sp)
-                Button(
-                    onClick = {
-                        Log.d(TAG, "Go back button clicked from Error state")
-                        navController.popBackStack()
-                    },
-                    modifier = Modifier.padding(top = 24.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.logo))
-                ) {
-                    Text(stringResource(id = R.string.activity_go_back), color = Color.White)
+
+        // CASO ERROR REAL: Los datos llegaron pero el ID no existe
+        else -> {
+            // Solo aquí lanzamos el Log.e porque sabemos que es un error de verdad
+            Log.e("ActivityScreen", "Error: Activity or Trip not found after data load. tripId=$tripId, activityId=$activityId")
+
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(stringResource(id = R.string.activity_not_found), color = Color.Gray, fontSize = 18.sp)
+                    Button(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier.padding(top = 24.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.logo))
+                    ) {
+                        Text(stringResource(id = R.string.activity_go_back), color = Color.White)
+                    }
                 }
             }
         }
@@ -151,6 +150,7 @@ fun ActivityScreenContent(
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // Información con labels y datos en negrita usando tus Strings
                 val priceLabel = stringResource(id = R.string.activity_price)
                 val locationLabel = stringResource(id = R.string.activity_location)
 
@@ -177,14 +177,12 @@ fun ActivityScreenContent(
 
                 ActivityPhotosSection(activity)
 
+                // Spacer final para que el scroll permita subir el contenido por encima del botón
                 Spacer(modifier = Modifier.height(100.dp))
             }
 
             FloatingActionButton(
-                onClick = {
-                    Log.d(TAG, "Edit FAB clicked")
-                    showEditDialog = true
-                },
+                onClick = { showEditDialog = true },
                 containerColor = colorResource(id = R.color.logo),
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -199,13 +197,9 @@ fun ActivityScreenContent(
                 initialActivity = activity,
                 tripStartDate = tripStartDate,
                 tripEndDate = tripEndDate,
-                onDismiss = {
-                    Log.d(TAG, "Edit dialog dismissed")
-                    showEditDialog = false
-                },
+                onDismiss = { showEditDialog = false },
                 existingActivities = emptyList(),
                 onConfirm = { title, location, description, date, time, costEur, category ->
-                    Log.d(TAG, "Edit confirmed: $title")
                     onSaveEdit(activity.copy(
                         title = title, location = location, description = description,
                         date = date, time = time, costEur = costEur, category = category

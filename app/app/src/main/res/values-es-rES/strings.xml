@@ -114,7 +114,7 @@
     <string name="trip_detail_add_btn">Añadir actividad</string>
 
     <string name="trips_title">Viajes</string>
-    <string name="trips_budget_prefix">Presupuesto:</string>
+    <string name="trips_budget_prefix">Precio:</string>
     <string name="trips_options_desc">Opciones</string>
     <string name="trips_edit_action">Editar</string>
     <string name="trips_delete_action">Eliminar</string>
@@ -125,7 +125,7 @@
     <string name="form_trip_new_title">Nuevo Viaje</string>
     <string name="form_trip_edit_title">Editar Viaje</string>
     <string name="form_trip_city">Ciudad / Título</string>
-    <string name="form_trip_budget">Presupuesto (EUR)</string>
+    <string name="form_trip_budget">Precio (EUR)</string>
     <string name="form_trip_start_end_date">Fechas de inicio y de fin (AAAA-MM-DD)</string>
     <string name="form_trip_date_error">La fecha de fin debe ser posterior a la de inicio</string>
     <string name="form_trip_conflict_error">Las fechas seleccionadas excluyen actividades existentes. Por favor, muévelas o elimínalas primero.</string>

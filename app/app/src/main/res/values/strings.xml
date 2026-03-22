@@ -110,7 +110,7 @@
     <string name="trip_detail_add_btn">Add activity</string>
 
     <string name="trips_title">Trips</string>
-    <string name="trips_budget_prefix">Budget:</string>
+    <string name="trips_budget_prefix">Price:</string>
     <string name="trips_options_desc">Options</string>
     <string name="trips_edit_action">Edit</string>
     <string name="trips_delete_action">Delete</string>
@@ -121,7 +121,7 @@
     <string name="form_trip_new_title">New Trip</string>
     <string name="form_trip_edit_title">Edit Trip</string>
     <string name="form_trip_city">City / Title</string>
-    <string name="form_trip_budget">Budget (EUR)</string>
+    <string name="form_trip_budget">Price (EUR)</string>
     <string name="form_trip_start_end_date">Start and End Dates (YYYY-MM-DD)</string>
     <string name="form_trip_date_error">End date must be after start date</string>
     <string name="form_trip_conflict_error">Selected dates exclude existing activities. Please move or delete them first.</string>

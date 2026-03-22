@@ -111,7 +111,7 @@
     <string name="trip_detail_add_btn">Afegir activitat</string>
 
     <string name="trips_title">Viatges</string>
-    <string name="trips_budget_prefix">Pressupost:</string>
+    <string name="trips_budget_prefix">Preu:</string>
     <string name="trips_options_desc">Opcions</string>
     <string name="trips_edit_action">Editar</string>
     <string name="trips_delete_action">Eliminar</string>
@@ -122,7 +122,7 @@
     <string name="form_trip_new_title">Nou Viatge</string>
     <string name="form_trip_edit_title">Editar Viatge</string>
     <string name="form_trip_city">Ciutat / Títol</string>
-    <string name="form_trip_budget">Pressupost (EUR)</string>
+    <string name="form_trip_budget">Preu (EUR)</string>
     <string name="form_trip_start_end_date">Dates d\'inici i de fi (AAAA-MM-DD)</string>
     <string name="form_trip_date_error">La data de fi ha de ser posterior a la d\'inici</string> <string name="form_trip_conflict_error">Les dates seleccionades exclouen activitats existents. Si us plau, mou-les o elimina-les primer.</string>
     <string name="form_trip_save_btn">Desar</string>

@@ -1,11 +1,14 @@
 package com.example.discoverlib.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -13,9 +16,14 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,6 +43,7 @@ import com.example.discoverlib.domain.ActivityCategory
 import com.example.discoverlib.domain.TripActivity
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,6 +67,8 @@ fun ActivityFormDialog(
     var expanded by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf(initialActivity?.category ?: ActivityCategory.CULTURE) }
 
+    var showTimePicker by remember { mutableStateOf(false) }
+
     val categoryOptions = listOf(
         ActivityCategory.TRANSPORT to stringResource(id = R.string.cat_transport),
         ActivityCategory.TOURS to stringResource(id = R.string.cat_tours),
@@ -67,7 +78,11 @@ fun ActivityFormDialog(
     )
 
     var dateText by remember { mutableStateOf(initialActivity?.date?.toString() ?: tripStartDate.toString()) }
-    var timeText by remember { mutableStateOf(initialActivity?.time?.toString() ?: "10:00") }
+    var timeText by remember {
+        mutableStateOf(
+            initialActivity?.time?.let { String.format(Locale.getDefault(), "%02d:%02d", it.hour, it.minute) } ?: "10:00"
+        )
+    }
 
     val parsedDate = try { LocalDate.parse(dateText) } catch (e: Exception) { null }
     val parsedTime = try { LocalTime.parse(timeText) } catch (e: Exception) { null }
@@ -142,7 +157,9 @@ fun ActivityFormDialog(
                         label = { Text(stringResource(id = R.string.form_category)) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                        modifier = Modifier.menuAnchor().fillMaxWidth()
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
                     )
                     ExposedDropdownMenu(
                         expanded = expanded,
@@ -175,15 +192,41 @@ fun ActivityFormDialog(
                         selectedDate = dateText,
                         onDateSelected = { dateText = it },
                         isError = isDateError || isConflictError,
-                        modifier = Modifier.weight(1.8f)
+                        modifier = Modifier.weight(1.4f)
                     )
+
                     OutlinedTextField(
                         value = timeText,
-                        onValueChange = { timeText = it },
+                        onValueChange = { },
                         label = { Text(stringResource(id = R.string.form_time)) },
+                        readOnly = true,
+                        enabled = false,
+                        trailingIcon = {
+                            Icon(imageVector = Icons.Default.Schedule, contentDescription = "Seleccionar Hora")
+                        },
                         isError = isTimeError || isConflictError,
                         singleLine = true,
-                        modifier = Modifier.weight(1f)
+                        colors = OutlinedTextFieldDefaults.colors(
+                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                            disabledBorderColor = if (isTimeError || isConflictError) Color.Red else MaterialTheme.colorScheme.outline,
+                            disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledLabelColor = if (isTimeError || isConflictError) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant,
+                            disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { showTimePicker = true }
+                    )
+                }
+
+                if (showTimePicker) {
+                    TimePickerDialog(
+                        initialTime = parsedTime ?: LocalTime.of(10, 0),
+                        onDismissRequest = { showTimePicker = false },
+                        onTimeSelected = { selectedTime ->
+                            timeText = String.format(Locale.getDefault(), "%02d:%02d", selectedTime.hour, selectedTime.minute)
+                            showTimePicker = false
+                        }
                     )
                 }
 
@@ -239,6 +282,39 @@ fun ActivityFormDialog(
                 onClick = onDismiss,
                 colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.logo))
             ) { Text(stringResource(id = R.string.form_cancel), fontWeight = FontWeight.Bold) }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimePickerDialog(
+    initialTime: LocalTime,
+    onDismissRequest: () -> Unit,
+    onTimeSelected: (LocalTime) -> Unit
+) {
+    val timePickerState = rememberTimePickerState(
+        initialHour = initialTime.hour,
+        initialMinute = initialTime.minute,
+        is24Hour = true
+    )
+
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            TextButton(onClick = {
+                onTimeSelected(LocalTime.of(timePickerState.hour, timePickerState.minute))
+            }) {
+                Text(stringResource(id = R.string.form_save))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(stringResource(id = R.string.form_cancel))
+            }
+        },
+        text = {
+            TimePicker(state = timePickerState)
         }
     )
 }
