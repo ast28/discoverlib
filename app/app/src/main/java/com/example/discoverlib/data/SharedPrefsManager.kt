@@ -1,4 +1,4 @@
-package com.example.discoverlib.data.local
+package com.example.discoverlib.data
 
 import android.app.LocaleManager
 import android.content.Context

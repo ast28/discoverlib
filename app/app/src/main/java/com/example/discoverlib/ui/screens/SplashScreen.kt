@@ -47,7 +47,7 @@ fun SplashScreen(navController: NavController) {
         Log.d(TAG, "SplashScreen initialized. Starting delay...")
         delay(1800)
         Log.d(TAG, "Splash delay finished. Navigating to Home.")
-        navController.navigate(Routes.Home) {
+        navController.navigate(Routes.Login) {
             popUpTo(Routes.Splash) { inclusive = true }
         }
     }

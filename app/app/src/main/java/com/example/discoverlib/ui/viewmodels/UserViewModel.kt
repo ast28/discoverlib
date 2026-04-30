@@ -2,17 +2,21 @@ package com.example.discoverlib.ui.viewmodels
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.discoverlib.data.SharedPrefsManager
 import com.example.discoverlib.domain.TripRepository
 import com.example.discoverlib.domain.User
+import com.example.discoverlib.domain.ValidationResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import com.example.discoverlib.data.local.SharedPrefsManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 
 private const val TAG = "UserViewModel"
+private const val DEFAULT_USER_ID = "user_local_1"
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
@@ -20,99 +24,136 @@ class UserViewModel @Inject constructor(
     private val sharedPrefs: SharedPrefsManager
 ) : ViewModel() {
 
-    private val _currentUser = MutableStateFlow(repository.getUser())
+    private val _currentUser = MutableStateFlow<User?>(null)
     val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
+
     private val _pendingLanguageSnackbarCode = MutableStateFlow<String?>(null)
     val pendingLanguageSnackbarCode: StateFlow<String?> = _pendingLanguageSnackbarCode.asStateFlow()
 
-    fun getSavedUsername(): String {
-        val user = repository.getUser()
-        return if (user != null) { user.username }
-        else { "Not defined user name" }
+    init {
+        Log.d(TAG, "Initializing UserViewModel and loading base user...")
+        viewModelScope.launch {
+            try {
+                _currentUser.value = repository.getOneUser(DEFAULT_USER_ID)
+                if (_currentUser.value != null) {
+                    Log.i(TAG, "User successfully loaded from DB")
+                } else {
+                    Log.i(TAG, "User not found in DB, a new one will be created when saving preferences")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error loading user: ${e.message}")
+            }
+        }
     }
 
-    fun saveNewUsername(newName: String): Boolean {
-        Log.d(TAG, "Simulating username change: $newName")
+
+    fun saveNewUsername(newName: String, onResult: (ValidationResult) -> Unit) {
+        Log.d(TAG, "Validating request to change username to: '$newName'")
         val cleanedName = newName.trim()
+
         if (cleanedName.isBlank() || cleanedName.length < 3 || cleanedName.length > 20) {
-            Log.e(TAG, "Validation failed: Username must be between 3 and 20 characters and not blank.")
-            return false
+            Log.e(TAG, "Validation failed: Username must be between 3 and 20 characters")
+            onResult(ValidationResult(false, "Username must be between 3 and 20 characters."))
+            return
         }
-        val currentUser = repository.getUser()
-        val updatedUser = if (currentUser != null) {
-            currentUser.copy(username = cleanedName)
-        } else {
-            User(
-                username = cleanedName,
-                dateOfBirth = LocalDate.now(),
-                darkMode = false,
-                language = "en"
-            )
+
+        viewModelScope.launch {
+            try {
+                val user = _currentUser.value
+                if (user != null) {
+                    val updatedUser = user.copy(username = cleanedName)
+                    repository.updateUser(updatedUser)
+                    _currentUser.value = updatedUser
+                    Log.i(TAG, "Username successfully updated in Room (UPDATE)")
+                } else {
+                    val newUser = User(
+                        id = DEFAULT_USER_ID,
+                        username = cleanedName,
+                        dateOfBirth = LocalDate.now(),
+                        darkMode = false,
+                        language = "en"
+                    )
+                    repository.addUser(newUser)
+                    _currentUser.value = newUser
+                    Log.i(TAG, "New user created with username '$cleanedName' in Room (ADD)")
+                }
+                onResult(ValidationResult(true, "Username updated successfully!"))
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to save username: ${e.message}")
+                onResult(ValidationResult(false, "Internal error updating username."))
+            }
         }
-        val success = repository.saveUser(updatedUser)
-        if (success) {
-            Log.i(TAG, "Username updated successfully in repository")
-            _currentUser.value = updatedUser
-        } else {
-            Log.e(TAG, "Failed to save username in repository")
-        }
-        return success
     }
 
-    fun getSavedDateOfBirth(): String {
-        val user = repository.getUser()
-        return if (user != null) { user.dateOfBirth.toString() }
-        else { "Not defined date of birth" }
-    }
+    fun saveNewDateOfBirth(newDate: LocalDate, onResult: (ValidationResult) -> Unit) {
+        Log.d(TAG, "Validating request to change date of birth to: $newDate")
 
-    fun saveNewDateOfBirth(newDate: LocalDate): Boolean {
-        Log.d(TAG, "Simulating DOB change: $newDate")
         if (newDate.isAfter(LocalDate.now())) {
-            Log.e(TAG, "Validation failed: Date of birth cannot be in the future.")
-            return false
+            Log.e(TAG, "Validation failed: Date of birth cannot be in the future")
+            onResult(ValidationResult(false, "Date of birth cannot be in the future."))
+            return
         }
-        val currentUser = repository.getUser()
-        val updatedUser = if (currentUser != null) {
-            currentUser.copy(dateOfBirth = newDate)
-        } else {
-            User(
-                username = "",
-                dateOfBirth = newDate,
-                darkMode = false,
-                language = "en"
-            )
+
+        viewModelScope.launch {
+            try {
+                val user = _currentUser.value
+                if (user != null) {
+                    val updatedUser = user.copy(dateOfBirth = newDate)
+                    repository.updateUser(updatedUser)
+                    _currentUser.value = updatedUser
+                    Log.i(TAG, "Date of birth successfully updated in Room (UPDATE)")
+                } else {
+                    val newUser = User(
+                        id = DEFAULT_USER_ID,
+                        username = "",
+                        dateOfBirth = newDate,
+                        darkMode = false,
+                        language = "en"
+                    )
+                    repository.addUser(newUser)
+                    _currentUser.value = newUser
+                    Log.i(TAG, "New user created with date of birth in Room (ADD)")
+                }
+                onResult(ValidationResult(true, "Date of birth updated successfully!"))
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to save date of birth: ${e.message}")
+                onResult(ValidationResult(false, "Internal error updating date."))
+            }
         }
-        val success = repository.saveUser(updatedUser)
-        if (success) {
-            Log.i(TAG, "Date of birth updated successfully")
-            _currentUser.value = updatedUser
-        } else {
-            Log.e(TAG, "Failed to save date of birth")
-        }
-        return success
     }
+
+
 
     fun getDarkMode(): Boolean {
-        val user = repository.getUser()
-        return user?.darkMode ?: false
+        return _currentUser.value?.darkMode ?: false
     }
 
     fun saveDarkMode(isDark: Boolean) {
-        Log.d(TAG, "Simulating dark mode toggle: $isDark")
-        val currentUser = repository.getUser()
-        val updatedUser = if (currentUser != null) {
-            currentUser.copy(darkMode = isDark)
-        } else {
-            User(
-                username = "",
-                dateOfBirth = LocalDate.now(),
-                darkMode = isDark,
-                language = "en"
-            )
+        Log.d(TAG, "Request to change Dark Mode to: $isDark")
+        viewModelScope.launch {
+            try {
+                val user = _currentUser.value
+                if (user != null) {
+                    val updatedUser = user.copy(darkMode = isDark)
+                    repository.updateUser(updatedUser)
+                    _currentUser.value = updatedUser
+                    Log.i(TAG, "Dark Mode preference updated to $isDark (UPDATE)")
+                } else {
+                    val newUser = User(
+                        id = DEFAULT_USER_ID,
+                        username = "",
+                        dateOfBirth = LocalDate.now(),
+                        darkMode = isDark,
+                        language = "en"
+                    )
+                    repository.addUser(newUser)
+                    _currentUser.value = newUser
+                    Log.i(TAG, "User created with Dark Mode preference $isDark (ADD)")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to save dark mode: ${e.message}")
+            }
         }
-        repository.saveUser(updatedUser)
-        Log.i(TAG, "Dark mode preference saved")
-        _currentUser.value = updatedUser
     }
 
     fun getLanguage(): String {
@@ -120,23 +161,36 @@ class UserViewModel @Inject constructor(
     }
 
     fun saveLanguage(newLanguage: String) {
-        Log.d(TAG, "Simulating language change: $newLanguage")
-        val currentUser = repository.getUser()
-        val updatedUser = if (currentUser != null) {
-            currentUser.copy(language = newLanguage)
-        } else {
-            User(
-                username = "",
-                dateOfBirth = LocalDate.now(),
-                darkMode = false,
-                language = newLanguage
-            )
+        Log.d(TAG, "Request to change Language to: $newLanguage")
+        viewModelScope.launch {
+            try {
+                val user = _currentUser.value
+                if (user != null) {
+                    val updatedUser = user.copy(language = newLanguage)
+                    repository.updateUser(updatedUser)
+                    _currentUser.value = updatedUser
+                    Log.i(TAG, "Language preference updated to $newLanguage in DB (UPDATE)")
+                } else {
+                    val newUser = User(
+                        id = DEFAULT_USER_ID,
+                        username = "",
+                        dateOfBirth = LocalDate.now(),
+                        darkMode = false,
+                        language = newLanguage
+                    )
+                    repository.addUser(newUser)
+                    _currentUser.value = newUser
+                    Log.i(TAG, "User created with language preference $newLanguage in DB (ADD)")
+                }
+
+                sharedPrefs.userLanguage = newLanguage
+                _pendingLanguageSnackbarCode.value = newLanguage
+                Log.i(TAG, "Language $newLanguage also saved in SharedPreferences")
+
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to save language: ${e.message}")
+            }
         }
-        repository.saveUser(updatedUser)
-        sharedPrefs.userLanguage = newLanguage
-        Log.i(TAG, "Language preference saved: $newLanguage")
-        _currentUser.value = updatedUser
-        _pendingLanguageSnackbarCode.value = newLanguage
     }
 
     fun consumePendingLanguageSnackbar() {

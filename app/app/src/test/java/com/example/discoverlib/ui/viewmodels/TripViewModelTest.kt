@@ -1,6 +1,6 @@
 package com.example.discoverlib.ui.viewmodels
 
-import com.example.discoverlib.data.local.SharedPrefsManager
+import com.example.discoverlib.data.SharedPrefsManager
 import com.example.discoverlib.data.repository.TripRepositoryImpl
 import com.example.discoverlib.domain.*
 import org.junit.Assert.assertEquals

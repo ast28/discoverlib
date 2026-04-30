@@ -41,7 +41,6 @@ import com.example.discoverlib.domain.ValidationResult
 import com.example.discoverlib.ui.components.ActivityFormDialog
 import com.example.discoverlib.ui.components.DiscoverScaffold
 import com.example.discoverlib.ui.components.MainSection
-import com.example.discoverlib.ui.theme.DiscoverlibTheme
 import com.example.discoverlib.ui.viewmodels.TripViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -56,16 +55,12 @@ fun ActivityScreen(
     activityId: String?,
     viewModel: TripViewModel = hiltViewModel()
 ) {
-    // 1. Observamos el flujo reactivo
     val trips by viewModel.trips.collectAsState()
 
-    // 2. Intentamos encontrar el viaje y la actividad
     val trip = trips.find { it.id == tripId }
     val activity = trip?.activities?.find { it.id == activityId }
 
-    // 3. Lógica de renderizado y logging inteligente
     when {
-        // CASO ÉXITO: Tenemos todo lo necesario
         trip != null && activity != null -> {
             ActivityScreenContent(
                 navController = navController,
@@ -73,22 +68,21 @@ fun ActivityScreen(
                 tripStartDate = trip.startDate,
                 tripEndDate = trip.endDate,
                 onBackClick = { navController.popBackStack() },
-                onSaveEdit = { editedActivity ->
-                    viewModel.editActivity(trip.id, editedActivity)
+                onSaveEdit = { editedActivity, onValidationResult ->
+                    viewModel.updateActivity(tripId = trip.id, activity = editedActivity) { result ->
+                        onValidationResult(result)
+                    }
                 }
             )
         }
 
-        // CASO CARGA: La lista está vacía, estamos esperando al repositorio
         trips.isEmpty() -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = colorResource(id = R.color.logo))
             }
         }
 
-        // CASO ERROR REAL: Los datos llegaron pero el ID no existe
         else -> {
-            // Solo aquí lanzamos el Log.e porque sabemos que es un error de verdad
             Log.e("ActivityScreen", "Error: Activity or Trip not found after data load. tripId=$tripId, activityId=$activityId")
 
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -114,7 +108,7 @@ fun ActivityScreenContent(
     tripStartDate: LocalDate,
     tripEndDate: LocalDate,
     onBackClick: () -> Unit,
-    onSaveEdit: (TripActivity) -> ValidationResult
+    onSaveEdit: (TripActivity, (ValidationResult) -> Unit) -> Unit
 ) {
     var showEditDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -183,7 +177,6 @@ fun ActivityScreenContent(
 
                 ActivityPhotosSection(activity)
 
-                // Spacer final para que el scroll permita subir el contenido por encima del botón
                 Spacer(modifier = Modifier.height(100.dp))
             }
 
@@ -206,13 +199,21 @@ fun ActivityScreenContent(
                 onDismiss = { showEditDialog = false },
                 existingActivities = emptyList(),
                 onConfirm = { title, location, description, date, time, costEur, category ->
-                    val result = onSaveEdit(activity.copy(
+                    val edited = activity.copy(
                         title = title, location = location, description = description,
                         date = date, time = time, costEur = costEur, category = category
-                    ))
-                    if (result.isSuccessful) {
-                        coroutineScope.launch { snackbarHostState.showSnackbar(activityUpdatedMessage) }
-                        showEditDialog = false
+                    )
+                    onSaveEdit(edited) { result ->
+                        if (result.isSuccessful) {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(activityUpdatedMessage)
+                            }
+                            showEditDialog = false
+                        } else {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(result.message)
+                            }
+                        }
                     }
                 }
             )

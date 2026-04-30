@@ -142,4 +142,10 @@
     <string name="snackbar_activity_deleted">Activitat eliminada correctament.</string>
 
 
+
+    <string name="login_title">Iniciar Sessió</string>
+    <string name="login_email">Correu electrónic</string>
+    <string name="login_password">Contrasenya</string>
+    <string name="login_button">Entrar</string>
+    <string name="login_no_account">¿No tens conta? Registrat</string>
 </resources>

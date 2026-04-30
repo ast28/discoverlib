@@ -68,7 +68,6 @@ fun HomeScreen(
         Log.d(TAG, "HomeScreen initialized")
     }
 
-    // Buscamos el próximo viaje
     val featuredTrip = remember(trips) {
         val today = LocalDate.now()
         trips
@@ -76,13 +75,10 @@ fun HomeScreen(
             .minByOrNull { it.startDate }
     }
 
-    // --- MAGIA REACTIVA DEL CALENDARIO ---
-    // Guardamos la fecha que estamos viendo, por defecto el inicio del viaje
     var selectedDate by remember(featuredTrip) {
         mutableStateOf(featuredTrip?.startDate ?: LocalDate.now())
     }
 
-    // Comprobamos los límites para activar/desactivar las flechas
     val canGoPrev = featuredTrip != null && selectedDate.isAfter(featuredTrip.startDate)
     val canGoNext = featuredTrip != null && selectedDate.isBefore(featuredTrip.endDate)
 

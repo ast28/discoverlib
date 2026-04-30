@@ -1,25 +1,31 @@
 package com.example.discoverlib.domain
 
+import com.example.discoverlib.data.local.entity.ActivityEntity
+import com.example.discoverlib.data.local.entity.UserEntity
 import kotlinx.coroutines.flow.Flow
 
 interface TripRepository {
     fun getTeam(): List<TeamMember>
-    fun getSuggestedActivities(): List<MockActivity>
 
 
     fun getTrips(): Flow<List<Trip>>
-    fun getOneTrip(tripId: String): Trip?
-    fun addTrip(trip: Trip): Boolean
-    fun editTrip(trip: Trip): Boolean
-    fun deleteTrip(tripId: String): Boolean
+    suspend fun getOneTrip(tripId: String): Trip?
+    suspend fun addTrip(trip: Trip)
+    suspend fun updateTrip(trip: Trip)
+    suspend fun deleteTrip(tripId: String)
 
-    fun getOneActivity(tripId: String, activityId: String): TripActivity?
-    fun addActivity(tripId: String, activity: TripActivity): Boolean
-    fun editActivity(tripId: String, activity: TripActivity): Boolean
-    fun deleteActivity(tripId: String, activityId: String): Boolean
 
-    fun getUser(): User?
-    fun saveUser(user: User): Boolean
-    fun updateDarkMode(isDark: Boolean)
-    fun isDarkMode(): Boolean
+    fun getTripActivities(tripId: String) : Flow<List<TripActivity>>
+    suspend fun getTripActivitiesList(tripId: String): List<TripActivity>
+    suspend fun getOneActivity(activityId: String): TripActivity?
+    suspend fun addActivity(tripId: String, activity: TripActivity)
+    suspend fun updateActivity(tripId: String, activity: TripActivity)
+    suspend fun deleteTripActivities(tripId: String)
+    suspend fun deleteOneActivity(tripId: String, activityId: String)
+
+    fun getUsers(): Flow<List<User>>
+    suspend fun getOneUser(userId: String) : User?
+    suspend fun addUser(user: User)
+    suspend fun updateUser(user: User)
+    suspend fun deleteUser(userId: String)
 }

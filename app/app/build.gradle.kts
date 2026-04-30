@@ -75,4 +75,11 @@ dependencies {
     implementation(libs.androidx.appcompat.v171)
     implementation(libs.sheets.compose.dialogs.core)
     implementation(libs.sheets.compose.dialogs.calendar)
+    val room_version = "2.7.0"
+
+    implementation("androidx.room:room-runtime:$room_version")
+    kapt ("androidx.room:room-compiler:$room_version")
+    // optional - Kotlin Extensions and Coroutines support for Room
+    implementation("androidx.room:room-ktx:$room_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 }

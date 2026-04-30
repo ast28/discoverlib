@@ -145,4 +145,11 @@
     <string name="snackbar_activity_updated">Actividad actualizada correctamente.</string>
     <string name="snackbar_activity_deleted">Actividad eliminada correctamente.</string>
 
+
+    <string name="login_title">Iniciar Sesión</string>
+    <string name="login_email">Correo electrónico</string>
+    <string name="login_password">Contraseña</string>
+    <string name="login_button">Entrar</string>
+    <string name="login_no_account">¿No tienes cuenta? Regístrate</string>
+
 </resources>

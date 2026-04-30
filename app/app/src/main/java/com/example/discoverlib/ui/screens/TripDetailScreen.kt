@@ -1,5 +1,6 @@
 package com.example.discoverlib.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -64,11 +65,27 @@ fun TripDetailScreen(
             trip = trip,
             onBackClick = { navController.popBackStack() },
             onActivityClick = { activityId -> navController.navigate("activity/$tripId/$activityId") },
-            onSaveActivity = { newActivity ->
-                viewModel.addActivity(trip.id, newActivity)
+            onSaveActivity = { newActivity, onResult ->
+                // Añadimos el bloque del callback { result -> }
+                viewModel.addActivity(tripId = trip.id, activity = newActivity) { result ->
+                    if (result.isSuccessful) {
+                        Log.i("TripDetailScreen", "Activity added successfully to trip ${trip.id}")
+                    } else {
+                        Log.e("TripDetailScreen", "Error adding activity: ${result.message}")
+                    }
+                    onResult(result)
+                    // Aquí iría el scope.launch { snackbarHostState... } si lo necesitas
+                }
             },
-            onDeleteActivity = { activityId ->
-                viewModel.deleteActivity(trip.id, activityId)
+            onDeleteActivity = { activityId, onResult ->
+                viewModel.deleteOneActivity(tripId = trip.id, activityId = activityId) { result ->
+                    if (result.isSuccessful) {
+                        Log.i("TripDetailScreen", "Activity $activityId deleted successfully")
+                    } else {
+                        Log.e("TripDetailScreen", "Error deleting activity: ${result.message}")
+                    }
+                    onResult(result)
+                }
             }
         )
     } else {
@@ -84,8 +101,8 @@ fun TripDetailContent(
     trip: Trip,
     onBackClick: () -> Unit,
     onActivityClick: (String) -> Unit,
-    onSaveActivity: (TripActivity) -> ValidationResult,
-    onDeleteActivity: (String) -> ValidationResult
+    onSaveActivity: (TripActivity, (ValidationResult) -> Unit) -> Unit,
+    onDeleteActivity: (String, (ValidationResult) -> Unit) -> Unit
 ) {
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
     val snackbarHostState = remember { SnackbarHostState() }
@@ -309,11 +326,12 @@ fun TripDetailContent(
                         photo_maps = R.drawable.logo_color
                     )
 
-                    val result = onSaveActivity(newActivity)
-                    if (result.isSuccessful) {
-                        coroutineScope.launch { snackbarHostState.showSnackbar(activityAddedMessage) }
-                        showAddDialog = false
-                        selectedCategory = catAll
+                    onSaveActivity(newActivity) { result ->
+                        if (result.isSuccessful) {
+                            coroutineScope.launch { snackbarHostState.showSnackbar(activityAddedMessage) }
+                            showAddDialog = false
+                            selectedCategory = catAll
+                        }
                     }
                 }
             )
@@ -331,11 +349,12 @@ fun TripDetailContent(
                 confirmButton = {
                     Button(
                         onClick = {
-                            val result = onDeleteActivity(activity.id)
-                            if (result.isSuccessful) {
-                                coroutineScope.launch { snackbarHostState.showSnackbar(activityDeletedMessage) }
+                            onDeleteActivity(activity.id) { result ->
+                                if (result.isSuccessful) {
+                                    coroutineScope.launch { snackbarHostState.showSnackbar(activityDeletedMessage) }
+                                }
+                                activityToDelete = null
                             }
-                            activityToDelete = null
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A4A4A))
                     ) {
@@ -382,8 +401,8 @@ fun TripDetailScreenPreview() {
             ),
             onBackClick = {},
             onActivityClick = {},
-            onSaveActivity = { ValidationResult(true, "") },
-            onDeleteActivity = { ValidationResult(true, "") }
+            onSaveActivity = { _, onResult -> onResult(ValidationResult(true, "")) },
+            onDeleteActivity = { _, onResult -> onResult(ValidationResult(true, "")) }
         )
     }
 }

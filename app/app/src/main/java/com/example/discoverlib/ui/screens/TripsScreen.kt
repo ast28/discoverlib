@@ -92,14 +92,17 @@ fun TripsScreen(
                     startDate = start,
                     endDate = end
                 )
-                val result = viewModel.saveEditedTrip(updated)
-                if (result.isSuccessful) {
-                    Log.i(TAG, "Trip edited successfully")
-                    coroutineScope.launch { snackbarHostState.showSnackbar(tripUpdatedMessage) }
-                    showDialog = false
-                    tripToEdit = null
-                } else {
-                    Log.e(TAG, "Error editing trip: ${result.message}")
+
+                // Cambiado a updateTrip asíncrono
+                viewModel.updateTrip(updated) { result ->
+                    if (result.isSuccessful) {
+                        Log.i(TAG, "Trip edited successfully")
+                        coroutineScope.launch { snackbarHostState.showSnackbar(tripUpdatedMessage) }
+                        showDialog = false
+                        tripToEdit = null
+                    } else {
+                        Log.e(TAG, "Error editing trip: ${result.message}")
+                    }
                 }
             } else {
                 Log.d(TAG, "Confirming new trip creation: $title")
@@ -112,14 +115,17 @@ fun TripsScreen(
                     budgetEur = 0,
                     activities = mutableListOf()
                 )
-                val result = viewModel.saveNewTrip(newTrip)
-                if (result.isSuccessful) {
-                    Log.i(TAG, "Trip created successfully")
-                    coroutineScope.launch { snackbarHostState.showSnackbar(tripAddedMessage) }
-                    showDialog = false
-                    tripToEdit = null
-                } else {
-                    Log.e(TAG, "Error creating trip: ${result.message}")
+
+                // Cambiado a addTrip asíncrono
+                viewModel.addTrip(newTrip) { result ->
+                    if (result.isSuccessful) {
+                        Log.i(TAG, "Trip created successfully")
+                        coroutineScope.launch { snackbarHostState.showSnackbar(tripAddedMessage) }
+                        showDialog = false
+                        tripToEdit = null
+                    } else {
+                        Log.e(TAG, "Error creating trip: ${result.message}")
+                    }
                 }
             }
         }
@@ -134,14 +140,17 @@ fun TripsScreen(
                 Button(
                     onClick = {
                         Log.d(TAG, "Confirming deletion of trip: ${tripToDelete!!.id}")
-                        val success = viewModel.saveDeletedTrip(tripToDelete!!.id)
-                        if (success) {
-                            Log.i(TAG, "Trip deleted successfully")
-                            coroutineScope.launch { snackbarHostState.showSnackbar(tripDeletedMessage) }
-                        } else {
-                            Log.e(TAG, "Error: Trip not found during deletion")
+
+                        // Cambiado a deleteTrip asíncrono
+                        viewModel.deleteTrip(tripToDelete!!.id) { success ->
+                            if (success) {
+                                Log.i(TAG, "Trip deleted successfully")
+                                coroutineScope.launch { snackbarHostState.showSnackbar(tripDeletedMessage) }
+                            } else {
+                                Log.e(TAG, "Error: Trip not found during deletion")
+                            }
+                            tripToDelete = null
                         }
-                        tripToDelete = null
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
                 ) { Text(stringResource(id = R.string.dialog_delete_btn), color = Color.White) }

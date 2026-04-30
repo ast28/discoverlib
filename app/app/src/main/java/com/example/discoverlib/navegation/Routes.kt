@@ -2,6 +2,8 @@ package com.example.discoverlib.navegation
 
 object Routes {
     const val Splash = "splash"
+    const val Login = "login"
+    const val Signup = "signup"
     const val Home = "home"
     const val Trips = "trips"
     const val Gallery = "gallery"

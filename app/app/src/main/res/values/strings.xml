@@ -140,4 +140,10 @@
     <string name="snackbar_activity_added">Activity added successfully.</string>
     <string name="snackbar_activity_updated">Activity updated successfully.</string>
     <string name="snackbar_activity_deleted">Activity deleted successfully.</string>
+
+    <string name="login_title">Login Page</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+    <string name="login_button">Login</string>
+    <string name="login_no_account">Don\'t have an account? Sign up</string>
 </resources>

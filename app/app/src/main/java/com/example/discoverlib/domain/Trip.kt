@@ -6,6 +6,7 @@ import java.time.LocalTime
 
 
 data class User(
+    val id: String,
     val username: String,
     val dateOfBirth: LocalDate,
     val darkMode: Boolean,
@@ -41,8 +42,7 @@ data class MockActivity(
     val description: String,
     val location: String,
     val category: String,
-    val priceEur: Int,
-    val rating: Double
+    val priceEur: Int
 )
 
 enum class ActivityCategory {

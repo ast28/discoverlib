@@ -92,7 +92,7 @@ fun PreferencesScreen(
     val languagesDisplay = listOf("English", "Español", "Català")
     val languageCodes = listOf("en", "es", "ca")
 
-    val currentLangCode = user?.language ?: "en"
+    val currentLangCode = user?.language ?: "es"
 
     var langIndex by remember(currentLangCode) {
         val index = languageCodes.indexOf(currentLangCode)
@@ -173,20 +173,40 @@ fun PreferencesScreen(
             },
             onConfirm = { newName, newDob ->
                 Log.d(TAG, "Confirming profile edit: name=$newName, dob=$newDob")
-                var wasUpdated = false
-                if (newName.isNotBlank()) {
-                    wasUpdated = userViewModel.saveNewUsername(newName) || wasUpdated
-                }
                 val parsedDate = parseAppDateOrNull(newDob)
-                if (parsedDate != null) {
-                    wasUpdated = userViewModel.saveNewDateOfBirth(parsedDate) || wasUpdated
+
+                if (newName.isNotBlank()) {
+                    userViewModel.saveNewUsername(newName) { nameResult ->
+                        if (parsedDate != null) {
+                            userViewModel.saveNewDateOfBirth(parsedDate) { dobResult ->
+                                if (nameResult.isSuccessful || dobResult.isSuccessful) {
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar(profileUpdatedMessage)
+                                    }
+                                }
+                                showProfileDialog = false
+                            }
+                        } else {
+                            if (nameResult.isSuccessful) {
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar(profileUpdatedMessage)
+                                }
+                            }
+                            showProfileDialog = false
+                        }
+                    }
+                } else if (parsedDate != null) {
+                    userViewModel.saveNewDateOfBirth(parsedDate) { dobResult ->
+                        if (dobResult.isSuccessful) {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(profileUpdatedMessage)
+                            }
+                        }
+                        showProfileDialog = false
+                    }
                 } else {
-                    Log.e(TAG, "Error parsing date of birth: $newDob")
+                    showProfileDialog = false
                 }
-                if (wasUpdated) {
-                    coroutineScope.launch { snackbarHostState.showSnackbar(profileUpdatedMessage) }
-                }
-                showProfileDialog = false
             }
         )
     }
