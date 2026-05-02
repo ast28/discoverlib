@@ -27,6 +27,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -49,7 +51,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -62,11 +63,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.discoverlib.R
+import com.example.discoverlib.navegation.Routes
 import com.example.discoverlib.ui.parseAppDateOrNull
 import com.example.discoverlib.ui.toDisplayDate
 import com.example.discoverlib.ui.components.DiscoverScaffold
 import com.example.discoverlib.ui.components.MainSection
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
+import com.example.discoverlib.ui.viewmodels.AuthState
+import com.example.discoverlib.ui.viewmodels.AuthViewModel
 import com.example.discoverlib.ui.viewmodels.UserViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -78,10 +82,13 @@ fun PreferencesScreen(
     navController: NavController,
     isDarkTheme: Boolean,
     onThemeChange: (Boolean) -> Unit,
-    userViewModel: UserViewModel = hiltViewModel()
+    userViewModel: UserViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val user by userViewModel.currentUser.collectAsState()
     val pendingLanguageCode by userViewModel.pendingLanguageSnackbarCode.collectAsState()
+    val authState by authViewModel.authState.collectAsState()
+
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
@@ -89,10 +96,18 @@ fun PreferencesScreen(
         Log.d(TAG, "PreferencesScreen initialized")
     }
 
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Unauthenticated) {
+            navController.navigate(Routes.Login) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
+
     val languagesDisplay = listOf("English", "Español", "Català")
     val languageCodes = listOf("en", "es", "ca")
 
-    val currentLangCode = user?.language ?: "es"
+    val currentLangCode = user?.language ?: "en"
 
     var langIndex by remember(currentLangCode) {
         val index = languageCodes.indexOf(currentLangCode)
@@ -103,8 +118,13 @@ fun PreferencesScreen(
 
     val username = user?.username?.ifBlank { "Not defined" } ?: "Not defined"
     val dob = user?.dateOfBirth?.toString() ?: "Not defined"
+    val address = user?.address ?: "Not defined"
+    val country = user?.country ?: "Not defined"
+    val phone = user?.phoneNumber ?: "Not defined"
+    val acceptEmails = user?.acceptReceiveEmails ?: false
 
     var showProfileDialog by remember { mutableStateOf(false) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
     val profileUpdatedMessage = stringResource(id = R.string.snackbar_profile_updated)
     val darkModeEnabledMessage = stringResource(id = R.string.snackbar_dark_mode_enabled)
@@ -157,56 +177,73 @@ fun PreferencesScreen(
         },
         username = username,
         dob = dob,
+        address = address,
+        country = country,
+        phone = phone,
+        acceptEmails = acceptEmails,
         onEditProfileClick = {
             Log.d(TAG, "Edit profile button clicked")
             showProfileDialog = true
+        },
+        onLogoutClick = {
+            Log.d(TAG, "Logout dialog requested")
+            showLogoutDialog = true
         }
     )
 
-    if (showProfileDialog) {
+    if (showProfileDialog && user != null) {
         EditProfileDialog(
-            initialName = username,
-            initialDob = dob,
+            user = user!!,
             onDismiss = {
                 Log.d(TAG, "Edit profile dialog dismissed")
                 showProfileDialog = false
             },
-            onConfirm = { newName, newDob ->
+            onConfirm = { newName, newDob, newAddress, newCountry, newPhone, newAcceptEmails ->
                 Log.d(TAG, "Confirming profile edit: name=$newName, dob=$newDob")
-                val parsedDate = parseAppDateOrNull(newDob)
+                val parsedDate = parseAppDateOrNull(newDob) ?: user!!.dateOfBirth
 
-                if (newName.isNotBlank()) {
-                    userViewModel.saveNewUsername(newName) { nameResult ->
-                        if (parsedDate != null) {
-                            userViewModel.saveNewDateOfBirth(parsedDate) { dobResult ->
-                                if (nameResult.isSuccessful || dobResult.isSuccessful) {
-                                    coroutineScope.launch {
-                                        snackbarHostState.showSnackbar(profileUpdatedMessage)
-                                    }
-                                }
-                                showProfileDialog = false
-                            }
-                        } else {
-                            if (nameResult.isSuccessful) {
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar(profileUpdatedMessage)
-                                }
-                            }
-                            showProfileDialog = false
+                userViewModel.updateFullProfile(
+                    username = newName,
+                    dob = parsedDate,
+                    address = newAddress,
+                    country = newCountry,
+                    phone = newPhone,
+                    acceptEmails = newAcceptEmails
+                ) { result ->
+                    if (result.isSuccessful) {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(profileUpdatedMessage)
                         }
                     }
-                } else if (parsedDate != null) {
-                    userViewModel.saveNewDateOfBirth(parsedDate) { dobResult ->
-                        if (dobResult.isSuccessful) {
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar(profileUpdatedMessage)
-                            }
-                        }
-                        showProfileDialog = false
-                    }
-                } else {
                     showProfileDialog = false
                 }
+            }
+        )
+    }
+
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            title = { Text(stringResource(id = R.string.dialog_logout_title), fontWeight = FontWeight.Bold) },
+            text = { Text(stringResource(id = R.string.dialog_logout_desc)) },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        Log.d(TAG, "Logout confirmed")
+                        showLogoutDialog = false
+                        authViewModel.logout()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                ) { Text(stringResource(id = R.string.logout), color = Color.White) }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        Log.d(TAG, "Logout canceled")
+                        showLogoutDialog = false
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.logo))
+                ) { Text(stringResource(id = R.string.dialog_cancel_btn), fontWeight = FontWeight.Bold) }
             }
         )
     }
@@ -225,7 +262,12 @@ fun PreferencesScreenContent(
     onRemindersChange: (Boolean) -> Unit,
     username: String,
     dob: String,
-    onEditProfileClick: () -> Unit
+    address: String,
+    country: String,
+    phone: String,
+    acceptEmails: Boolean,
+    onEditProfileClick: () -> Unit,
+    onLogoutClick: () -> Unit
 ) {
     DiscoverScaffold(
         navController = navController,
@@ -259,6 +301,27 @@ fun PreferencesScreenContent(
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
+                text = "Personal Information",
+                fontWeight = FontWeight.Bold,
+                color = colorResource(id = R.color.logo),
+                modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
+            )
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    InfoRow(label = "Address", value = address)
+                    InfoRow(label = "Country", value = country)
+                    InfoRow(label = "Phone", value = phone)
+                    InfoRow(label = "Newsletter", value = if (acceptEmails) "Subscribed" else "Not Subscribed")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
                 text = stringResource(id = R.string.settings_app_title),
                 fontWeight = FontWeight.Bold,
                 color = colorResource(id = R.color.logo),
@@ -285,11 +348,40 @@ fun PreferencesScreenContent(
                         checked = isDarkTheme,
                         onCheckedChange = onThemeChange
                     )
+
+                    PreferenceToggle(
+                        title = "Reminders",
+                        subtitle = "Receive notifications for trips",
+                        checked = reminders,
+                        onCheckedChange = onRemindersChange
+                    )
                 }
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            TextButton(
+                onClick = onLogoutClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(id = R.string.logout),
+                    color = Color.Red,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
         }
+    }
+}
+
+@Composable
+fun InfoRow(label: String, value: String) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(text = label, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+        Text(text = value, color = Color.Gray, fontSize = 14.sp)
     }
 }
 
@@ -368,18 +460,19 @@ fun ProfileHeaderCard(
 
 @Composable
 fun EditProfileDialog(
-    initialName: String,
-    initialDob: String,
+    user: com.example.discoverlib.domain.User,
     onDismiss: () -> Unit,
-    onConfirm: (String, String) -> Unit
+    onConfirm: (String, String, String, String, String, Boolean) -> Unit
 ) {
-    var nameText by remember { mutableStateOf(if (initialName.contains("Not defined")) "" else initialName) }
-    var dobText by remember { mutableStateOf(if (initialDob.contains("Not defined")) "" else initialDob) }
+    var nameText by remember { mutableStateOf(if (user.username.contains("Not defined")) "" else user.username) }
+    var dobText by remember { mutableStateOf(user.dateOfBirth.toString()) }
+    var addressText by remember { mutableStateOf(user.address) }
+    var countryText by remember { mutableStateOf(user.country) }
+    var phoneText by remember { mutableStateOf(user.phoneNumber) }
+    var acceptEmails by remember { mutableStateOf(user.acceptReceiveEmails) }
 
     val parsedDate = try { LocalDate.parse(dobText) } catch (e: Exception) { null }
-    val minAgeDate = LocalDate.now().minusYears(18)
-
-    val isAgeError = parsedDate != null && parsedDate.isAfter(minAgeDate)
+    val isAgeError = parsedDate != null && parsedDate.isAfter(LocalDate.now().minusYears(18))
 
     val isFormValid = nameText.isNotBlank() && parsedDate != null && !isAgeError
 
@@ -387,7 +480,7 @@ fun EditProfileDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(id = R.string.profile_edit_title), fontWeight = FontWeight.Bold) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = nameText,
                     onValueChange = { nameText = it },
@@ -412,11 +505,44 @@ fun EditProfileDialog(
                         modifier = Modifier.padding(start = 4.dp, top = 2.dp)
                     )
                 }
+
+                OutlinedTextField(
+                    value = addressText,
+                    onValueChange = { addressText = it },
+                    label = { Text("Address") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = countryText,
+                    onValueChange = { countryText = it },
+                    label = { Text("Country") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = phoneText,
+                    onValueChange = { phoneText = it },
+                    label = { Text("Phone Number") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = acceptEmails,
+                        onCheckedChange = { acceptEmails = it },
+                        colors = CheckboxDefaults.colors(checkedColor = colorResource(id = R.color.logo))
+                    )
+                    Text(text = "Receive promo emails", fontSize = 14.sp)
+                }
             }
         },
         confirmButton = {
             Button(
-                onClick = { onConfirm(nameText, dobText) },
+                onClick = { onConfirm(nameText, dobText, addressText, countryText, phoneText, acceptEmails) },
                 enabled = isFormValid,
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.logo))
             ) { Text("Save", color = Color.White) }
@@ -429,6 +555,7 @@ fun EditProfileDialog(
         }
     )
 }
+
 @Composable
 fun PreferenceDropdown(
     title: String,
@@ -499,8 +626,7 @@ private fun PreferenceToggle(
             .border(1.dp, Color(0x22FF3D00), RoundedCornerShape(10.dp))
             .padding(horizontal = 12.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+        verticalAlignment = Alignment.CenterVertically) {
         Column(modifier = Modifier.weight(1f)) {
             Text(title, fontWeight = FontWeight.Bold, fontSize = 15.sp)
             Text(subtitle, color = Color.Gray, fontSize = 12.sp)
@@ -534,7 +660,12 @@ fun PreferencesScreenPreview() {
             onRemindersChange = {},
             username = "Alba Senar",
             dob = "2005-03-24",
-            onEditProfileClick = {}
+            address = "Not defined",
+            country = "Not defined",
+            phone = "Not defined",
+            acceptEmails = false,
+            onEditProfileClick = {},
+            onLogoutClick = {}
         )
     }
 }

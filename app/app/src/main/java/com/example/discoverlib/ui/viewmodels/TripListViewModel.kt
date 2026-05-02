@@ -3,6 +3,7 @@ package com.example.discoverlib.ui.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.discoverlib.domain.AuthRepository
 import com.example.discoverlib.domain.TeamMember
 import com.example.discoverlib.domain.Trip
 import com.example.discoverlib.domain.TripActivity
@@ -11,6 +12,7 @@ import com.example.discoverlib.domain.ValidationResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -18,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TripViewModel @Inject constructor(
-    private val repository: TripRepository
+    private val repository: TripRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val TAG = "TripViewModel"
@@ -28,12 +31,12 @@ class TripViewModel @Inject constructor(
         return repository.getTeam()
     }
 
-    val trips: StateFlow<List<Trip>> = repository.getTrips()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+    val trips: StateFlow<List<Trip>> = authRepository.getCurrentUserFlow()
+        .flatMapLatest { firebaseUser ->
+            val uid = firebaseUser?.uid ?: ""
+            repository.getTrips(uid)
+        }
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     fun getOneTrip(tripId: String, onResult: (Trip?) -> Unit) {
         Log.d(TAG, "Request to get trip details: $tripId")
@@ -68,7 +71,12 @@ class TripViewModel @Inject constructor(
             return
         }
 
-        val tripWithId = trip.copy(id = java.util.UUID.randomUUID().toString())
+        // MODIFICACIÓN T4.2: Asignamos el ID del usuario actual de Firebase al viaje
+        val currentUser = authRepository.getCurrentUser()
+        val tripWithId = trip.copy(
+            id = java.util.UUID.randomUUID().toString(),
+            userId = currentUser?.uid ?: ""
+        )
 
         viewModelScope.launch {
             try {

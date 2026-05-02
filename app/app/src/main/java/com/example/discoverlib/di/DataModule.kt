@@ -8,6 +8,7 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.discoverlib.data.InitialData
 import com.example.discoverlib.data.local.AppDatabase
+import com.example.discoverlib.data.local.dao.AccessLogDao
 import com.example.discoverlib.data.local.dao.ActivityDao
 import com.example.discoverlib.data.local.dao.TripDao
 import com.example.discoverlib.data.local.dao.UserDao
@@ -51,13 +52,14 @@ object DataModule {
                     val tripDao = database.tripDao()
                     val activityDao = database.activityDao()
 
-                    InitialData.getInitialTrips().forEach { trip ->
-                        tripDao.addTrip(trip.toEntity())
-
-                        trip.activities.forEach { activity ->
-                            activityDao.addActivity(activity.toEntity(trip.id))
-                        }
+                    InitialData.getInitialTrips().forEach { tripEntity ->
+                        tripDao.addTrip(tripEntity)
                     }
+
+                    InitialData.getInitialActivities().forEach { activityEntity ->
+                        activityDao.addActivity(activityEntity)
+                    }
+
                     Log.i(TAG, "Initial data populated successfully!")
                 }
             }
@@ -72,5 +74,8 @@ object DataModule {
 
     @Provides
     fun provideUserDao(db: AppDatabase): UserDao = db.userDao()
+
+    @Provides
+    fun provideAccessLogDao(db: AppDatabase): AccessLogDao = db.accessLogDao()
 
 }

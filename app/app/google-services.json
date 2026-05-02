@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "567825665790",
+    "project_id": "discoverlib",
+    "storage_bucket": "discoverlib.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:567825665790:android:99651ed7528c7bdaf89faf",
+        "android_client_info": {
+          "package_name": "com.example.discoverlib"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEYdljjPdOVczw9UJnCVJBXXQId68zxW0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

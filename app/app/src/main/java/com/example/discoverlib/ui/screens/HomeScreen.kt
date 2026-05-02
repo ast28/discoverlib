@@ -320,6 +320,7 @@ fun HomeScreenPreview() {
             navController = rememberNavController(),
             featuredTrip = Trip(
                 id = "1",
+                userId = "preview_user",
                 title = "Roma",
                 startDate = LocalDate.now(),
                 endDate = LocalDate.now().plusDays(4),

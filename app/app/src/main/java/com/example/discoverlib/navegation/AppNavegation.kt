@@ -16,6 +16,7 @@ import com.example.discoverlib.ui.screens.TermsScreen
 import com.example.discoverlib.ui.screens.TripsScreen
 import com.example.discoverlib.ui.screens.TripDetailScreen
 import com.example.discoverlib.ui.screens.LoginScreen
+import com.example.discoverlib.ui.screens.SignupScreen
 
 @Composable
 fun AppNavigation(isDarkTheme: Boolean, onThemeChange: (Boolean) -> Unit) {
@@ -25,6 +26,7 @@ fun AppNavigation(isDarkTheme: Boolean, onThemeChange: (Boolean) -> Unit) {
     NavHost(navController = navController, startDestination = Routes.Splash) {
         composable(Routes.Splash) { SplashScreen(navController) }
         composable(Routes.Login) { LoginScreen(navController) }
+        composable(Routes.Signup) { SignupScreen(navController = navController) }
         composable(Routes.Home) { HomeScreen(navController) }
         composable(Routes.Trips) { TripsScreen(navController) }
         composable(

@@ -148,4 +148,18 @@
     <string name="login_password">Contrasenya</string>
     <string name="login_button">Entrar</string>
     <string name="login_no_account">¿No tens conta? Registrat</string>
+
+    <string name="logout">Tancar sessió</string>
+    <string name="dialog_logout_title">Tancar Sessió</string>
+    <string name="dialog_logout_desc">Estàs segur que vols tancar la sessió?</string>
+
+    <string name="signup_title">Crear compte</string>
+    <string name="signup_button">Registrar-se</string>
+    <string name="signup_already_have_account">Ja tens compte? Inicia sessió</string>
+
+    <string name="forgot_password">Has oblidat la contrasenya?</string>
+    <string name="reset_password_title">Recuperar contrasenya</string>
+    <string name="reset_password_desc">Introdueix el teu correu electrònic i t\'enviarem un enllaç per restablir-la.</string>
+    <string name="reset_password_send">Enviar</string>
+    <string name="reset_password_cancel">Cancel·lar</string>
 </resources>

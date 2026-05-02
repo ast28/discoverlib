@@ -383,26 +383,3 @@ private fun StatCard(value: String, label: String, modifier: Modifier = Modifier
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun TripDetailScreenPreview() {
-    DiscoverlibTheme {
-        TripDetailContent(
-            navController = rememberNavController(),
-            trip = Trip(
-                id = "1",
-                title = "Roma",
-                startDate = LocalDate.now(),
-                endDate = LocalDate.now().plusDays(4),
-                description = "Trip to Rome",
-                budgetEur = 600,
-                activities = mutableListOf()
-            ),
-            onBackClick = {},
-            onActivityClick = {},
-            onSaveActivity = { _, onResult -> onResult(ValidationResult(true, "")) },
-            onDeleteActivity = { _, onResult -> onResult(ValidationResult(true, "")) }
-        )
-    }
-}

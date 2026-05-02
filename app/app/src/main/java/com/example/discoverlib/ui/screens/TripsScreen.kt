@@ -93,7 +93,6 @@ fun TripsScreen(
                     endDate = end
                 )
 
-                // Cambiado a updateTrip asíncrono
                 viewModel.updateTrip(updated) { result ->
                     if (result.isSuccessful) {
                         Log.i(TAG, "Trip edited successfully")
@@ -108,6 +107,7 @@ fun TripsScreen(
                 Log.d(TAG, "Confirming new trip creation: $title")
                 val newTrip = Trip(
                     id = java.util.UUID.randomUUID().toString(),
+                    userId = "",
                     title = title,
                     startDate = start,
                     endDate = end,
@@ -116,7 +116,6 @@ fun TripsScreen(
                     activities = mutableListOf()
                 )
 
-                // Cambiado a addTrip asíncrono
                 viewModel.addTrip(newTrip) { result ->
                     if (result.isSuccessful) {
                         Log.i(TAG, "Trip created successfully")
@@ -141,7 +140,6 @@ fun TripsScreen(
                     onClick = {
                         Log.d(TAG, "Confirming deletion of trip: ${tripToDelete!!.id}")
 
-                        // Cambiado a deleteTrip asíncrono
                         viewModel.deleteTrip(tripToDelete!!.id) { success ->
                             if (success) {
                                 Log.i(TAG, "Trip deleted successfully")

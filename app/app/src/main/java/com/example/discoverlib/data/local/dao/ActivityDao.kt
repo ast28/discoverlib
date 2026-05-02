@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ActivityDao {
+
+    @Query("SELECT * FROM activities")
+    fun getAllActivities(): Flow<List<ActivityEntity>>
     @Query("SELECT * FROM activities WHERE tripId = :tripId")
     fun getTripActivities(tripId: String) : Flow<List<ActivityEntity>>
 

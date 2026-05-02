@@ -13,6 +13,9 @@ interface TripDao {
     @Query("SELECT * FROM trips")
     fun getTrips(): Flow<List<TripEntity>>
 
+    @Query("SELECT * FROM trips WHERE userId = :currentUserId OR userId = 'DEFAULT_TEST_USER'")
+    fun getTripsForUser(currentUserId: String): Flow<List<TripEntity>>
+
     @Query("SELECT * FROM trips WHERE id = :tripId")
     suspend fun getOneTrip(tripId: String): TripEntity?
 

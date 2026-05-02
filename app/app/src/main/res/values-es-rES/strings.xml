@@ -152,4 +152,18 @@
     <string name="login_button">Entrar</string>
     <string name="login_no_account">¿No tienes cuenta? Regístrate</string>
 
+    <string name="logout">Cerrar sesión</string>
+    <string name="dialog_logout_title">Cerrar Sesión</string>
+    <string name="dialog_logout_desc">¿Estás seguro de que quieres cerrar sesión?</string>
+
+    <string name="signup_title">Crear cuenta</string>
+    <string name="signup_button">Registrarse</string>
+    <string name="signup_already_have_account">¿Ya tienes cuenta? Inicia sesión</string>
+
+    <string name="forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="reset_password_title">Recuperar contraseña</string>
+    <string name="reset_password_desc">Introduce tu correo electrónico y te enviaremos un enlace para restablecerla.</string>
+    <string name="reset_password_send">Enviar</string>
+    <string name="reset_password_cancel">Cancelar</string>
+
 </resources>

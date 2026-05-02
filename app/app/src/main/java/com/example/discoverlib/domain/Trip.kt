@@ -10,11 +10,16 @@ data class User(
     val username: String,
     val dateOfBirth: LocalDate,
     val darkMode: Boolean,
-    val language: String
+    val language: String,
+    val address: String,
+    val country: String,
+    val phoneNumber: String,
+    val acceptReceiveEmails: Boolean
 )
 
 data class Trip(
     val id: String,
+    val userId: String,
     var title: String,
     var startDate: LocalDate,
     var endDate: LocalDate,

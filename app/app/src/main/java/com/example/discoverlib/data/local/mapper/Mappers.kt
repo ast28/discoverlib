@@ -15,6 +15,7 @@ import kotlin.String
 fun Trip.toEntity(): TripEntity {
     return TripEntity(
         id = id,
+        userId = this.userId,
         title = title,
         startDate = startDate.toString(),
         endDate = endDate.toString(),
@@ -45,15 +46,19 @@ fun User.toEntity(): UserEntity {
         username = username,
         dateOfBirth = dateOfBirth.toString(),
         darkMode = darkMode,
-        language = language
+        language = language,
+        address = address,
+        country = country,
+        phoneNumber = phoneNumber,
+        acceptReceiveEmails = acceptReceiveEmails
     )
 }
 
 // De entidad a dominio
-// pasa lista de actividades o si no pasa nada se guarda como emptylist
 fun TripEntity.toDomain(activitiesList: List<ActivityEntity> = emptyList()): Trip {
     return Trip(
         id = id,
+        userId = this.userId,
         title = title,
         startDate = LocalDate.parse(startDate),
         endDate = LocalDate.parse(endDate),
@@ -62,6 +67,7 @@ fun TripEntity.toDomain(activitiesList: List<ActivityEntity> = emptyList()): Tri
         activities = activitiesList.map { it.toDomain() }.toMutableList()
     )
 }
+
 fun ActivityEntity.toDomain(): TripActivity {
     return TripActivity(
         id = id,
@@ -83,6 +89,10 @@ fun UserEntity.toDomain(): User {
         username = username,
         dateOfBirth = LocalDate.parse(dateOfBirth),
         darkMode = darkMode,
-        language = language
+        language = language,
+        address = address,
+        country = country,
+        phoneNumber = phoneNumber,
+        acceptReceiveEmails = acceptReceiveEmails
     )
 }

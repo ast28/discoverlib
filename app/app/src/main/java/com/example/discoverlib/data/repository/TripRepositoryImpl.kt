@@ -14,6 +14,7 @@ import com.example.discoverlib.domain.TripActivity
 import com.example.discoverlib.domain.TripRepository
 import com.example.discoverlib.domain.User
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlin.collections.map
 
@@ -32,13 +33,16 @@ class TripRepositoryImpl @Inject constructor(
         )
     }
 
-    override fun getTrips(): Flow<List<Trip>> {
-        Log.d(TAG, "Observing the full list of trips (Flow) from SQLite")
-        val tripsEntity = tripDao.getTrips()
 
-        return tripsEntity.map { entityList ->
-            entityList.map { entity ->
-                entity.toDomain()
+    override fun getTrips(userId: String): Flow<List<Trip>> {
+        return combine(
+            flow = tripDao.getTripsForUser(userId),
+            flow2 = activityDao.getAllActivities()
+        ) { allTrips, allActivities ->
+
+            allTrips.map { tripEntity ->
+                val tripActivities = allActivities.filter { it.tripId == tripEntity.id }
+                tripEntity.toDomain(tripActivities)
             }
         }
     }
@@ -120,39 +124,5 @@ class TripRepositoryImpl @Inject constructor(
     override suspend fun deleteOneActivity(tripId: String, activityId: String) {
         Log.i(TAG, "Deleting activity $activityId of trip $tripId in SQLite")
         activityDao.deleteOneActivity(tripId, activityId)
-    }
-
-    override fun getUsers(): Flow<List<User>> {
-        Log.d(TAG, "Observing users list (Flow) from SQLite")
-        val usersEntities = userDao.getUsers()
-
-        return usersEntities.map { entityList ->
-            entityList.map { entity ->
-                entity.toDomain()
-            }
-        }
-    }
-
-    override suspend fun getOneUser(userId: String): User? {
-        Log.d(TAG, "Querying user details in SQLite: $userId")
-        val userEntity = userDao.getOneUser(userId) ?: return null
-        return userEntity.toDomain()
-    }
-
-    override suspend fun addUser(user: User) {
-        Log.i(TAG, "Inserting new user into SQLite: ${user.id}")
-        val userEntity = user.toEntity()
-        userDao.addUser(userEntity)
-    }
-
-    override suspend fun updateUser(user: User) {
-        Log.i(TAG, "Updating user data in SQLite: ${user.id}")
-        val userEntity = user.toEntity()
-        userDao.updateUser(userEntity)
-    }
-
-    override suspend fun deleteUser(userId: String) {
-        Log.i(TAG, "Deleting user in SQLite: $userId")
-        userDao.deleteUser(userId)
     }
 }

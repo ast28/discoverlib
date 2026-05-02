@@ -146,4 +146,18 @@
     <string name="login_password">Password</string>
     <string name="login_button">Login</string>
     <string name="login_no_account">Don\'t have an account? Sign up</string>
+
+    <string name="logout">Log Out</string>
+    <string name="dialog_logout_title">Log Out</string>
+    <string name="dialog_logout_desc">Are you sure you want to log out of your account?</string>
+
+    <string name="signup_title">Create Account</string>
+    <string name="signup_button">Sign Up</string>
+    <string name="signup_already_have_account">Already have an account? Log in</string>
+
+    <string name="forgot_password">Forgot your password?</string>
+    <string name="reset_password_title">Reset Password</string>
+    <string name="reset_password_desc">Enter your email address and we will send you a link to reset your password.</string>
+    <string name="reset_password_send">Send</string>
+    <string name="reset_password_cancel">Cancel</string>
 </resources>
