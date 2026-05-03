@@ -8,7 +8,6 @@
     <string name="nav_settings">Ajustes</string>
     <string name="nav_about">Sobre la app</string>
 
-
     <string name="profile_default_name">Viajero</string>
     <string name="profile_edit_title">Editar Perfil</string>
     <string name="settings_title">Ajustes</string>
@@ -29,7 +28,6 @@
     <string name="dialog_edit_dob">Editar Fecha de Nacimiento</string>
     <string name="dialog_dob_format">DD/MM/AAAA</string>
     <string name="settings_age_error">Debes tener al menos 18 para utilizar la app.</string>
-
 
     <string name="about_title">Sobre nosotros</string>
     <string name="about_subtitle">Planea tus aventuras, a tu manera.</string>
@@ -133,7 +131,7 @@
     <string name="form_trip_date_error">La fecha de fin debe ser posterior a la de inicio</string>
     <string name="form_trip_conflict_error">Las fechas seleccionadas excluyen actividades existentes. Por favor, muévelas o elimínalas primero.</string>
     <string name="form_trip_save_btn">Guardar</string>
-    <string name="form_trip_duplicate_error">Ja tens un viatge idéntic en aquestes dates.</string>
+    <string name="form_trip_duplicate_error">Ya tienes un viaje idéntico en estas fechas.</string>
     <string name="snackbar_profile_updated">Perfil actualizado correctamente.</string>
     <string name="snackbar_language_changed">Idioma cambiado a %1$s.</string>
     <string name="snackbar_dark_mode_enabled">Modo oscuro activado.</string>
@@ -144,7 +142,6 @@
     <string name="snackbar_activity_added">Actividad añadida correctamente.</string>
     <string name="snackbar_activity_updated">Actividad actualizada correctamente.</string>
     <string name="snackbar_activity_deleted">Actividad eliminada correctamente.</string>
-
 
     <string name="login_title">Iniciar Sesión</string>
     <string name="login_email">Correo electrónico</string>
@@ -165,5 +162,19 @@
     <string name="reset_password_desc">Introduce tu correo electrónico y te enviaremos un enlace para restablecerla.</string>
     <string name="reset_password_send">Enviar</string>
     <string name="reset_password_cancel">Cancelar</string>
+
+    <string name="error_username_taken">Este nombre de usuario ya está en uso.</string>
+    <string name="error_empty_fields">Por favor, rellena todos los campos.</string>
+    <string name="error_age_18">Debes tener al menos 18 años.</string>
+    <string name="error_invalid_date">Formato de fecha inválido.</string>
+    <string name="error_phone_format">El teléfono debe tener exactamente 9 dígitos.</string>
+
+    <string name="settings_address">Dirección</string>
+    <string name="settings_country">País</string>
+    <string name="settings_phone">Número de teléfono</string>
+    <string name="settings_promo_emails">Recibir correos promocionales</string>
+    <string name="save_btn">Guardar</string>
+
+    <string name="signup_verification_sent">Correo de verificación enviado. Revisa tu bandeja de entrada e inicia sesión.</string>
 
 </resources>

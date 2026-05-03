@@ -5,6 +5,8 @@ import com.example.discoverlib.data.local.dao.AccessLogDao
 import com.example.discoverlib.data.local.entity.AccessLogEntity
 import javax.inject.Inject
 import com.example.discoverlib.domain.AuthRepository
+import com.example.discoverlib.domain.User
+import com.example.discoverlib.domain.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.CoroutineScope
@@ -14,12 +16,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 
 class AuthRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
-    private val accessLogDao: AccessLogDao
+    private val accessLogDao: AccessLogDao,
+    private val userRepository: UserRepository
 ) : AuthRepository {
 
     private val TAG = "AuthRepository"
@@ -72,7 +76,14 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun signup(gmail: String, password: String): String {
+    override suspend fun signup(gmail: String,
+                                password: String,
+                                username: String,
+                                dob: String,
+                                address: String,
+                                country: String,
+                                phone: String,
+                                acceptEmails: Boolean): String {
         Log.d(TAG, "Attempting signup for email: $gmail")
 
         try {
@@ -82,12 +93,25 @@ class AuthRepositoryImpl @Inject constructor(
             user.sendEmailVerification().await()
             Log.d(TAG, "Email sent.")
 
+            val newUser = User(
+                id = user.uid,
+                username = username,
+                dateOfBirth = LocalDate.parse(dob),
+                darkMode = false,
+                language = "en",
+                address = address,
+                country = country,
+                phoneNumber = phone,
+                acceptReceiveEmails = acceptEmails
+            )
+
+            userRepository.addUser(newUser)
+
             auth.signOut()
 
             Log.i(TAG, "Signup successful for UID: ${user.uid}. Awaiting email verification.")
 
-            throw Exception("Please, confirm your email")
-
+            return user.uid
         } catch (e: Exception) {
             Log.e(TAG, "Signup failed: ${e.message}", e)
             throw e

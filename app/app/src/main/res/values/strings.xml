@@ -32,7 +32,7 @@
     <string name="about_subtitle">Plan your adventures, your way.</string>
     <string name="about_team">Team</string>
     <string name="about_tech_info">Technical info</string>
-    <string name="about_version">Version 2.1.0</string>
+    <string name="about_version">Version 3.1.0</string>
     <string name="about_api">Android min API 26</string>
     <string name="about_kotlin">Kotlin 2.0.21</string>
     <string name="about_license">License: MIT</string>
@@ -93,7 +93,8 @@
 
     <string name="splash_subtitle">Plan your adventures, your way</string>
 
-    <string name="terms_title">Terms &amp; Conditions</string> <string name="terms_accept">Accept</string>
+    <string name="terms_title">Terms &amp; Conditions</string>
+    <string name="terms_accept">Accept</string>
     <string name="terms_decline">Decline</string>
     <string name="terms_item_1_title">Data Privacy</string>
     <string name="terms_item_1_desc">We respect your privacy. Your trip data is stored locally on your device.</string>
@@ -160,4 +161,19 @@
     <string name="reset_password_desc">Enter your email address and we will send you a link to reset your password.</string>
     <string name="reset_password_send">Send</string>
     <string name="reset_password_cancel">Cancel</string>
+
+    <string name="error_username_taken">Username is already in use.</string>
+    <string name="error_empty_fields">Please fill in all fields.</string>
+    <string name="error_age_18">You must be at least 18 years old.</string>
+    <string name="error_invalid_date">Invalid date format.</string>
+    <string name="error_phone_format">The phone number must contain exactly 9 digits.</string>
+
+    <string name="settings_address">Address</string>
+    <string name="settings_country">Country</string>
+    <string name="settings_phone">Phone Number</string>
+    <string name="settings_promo_emails">Receive promo emails</string>
+    <string name="save_btn">Save</string>
+
+    <string name="signup_verification_sent">Verification email sent. Please check your inbox and log in.</string>
+
 </resources>

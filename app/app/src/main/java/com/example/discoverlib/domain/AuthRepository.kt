@@ -8,7 +8,14 @@ interface AuthRepository {
 
     fun getCurrentUserFlow(): Flow<FirebaseUser?>
 
-    suspend fun signup(gmail: String, password: String): String
+    suspend fun signup(gmail: String,
+                       password: String,
+                       username: String,
+                       dob: String,
+                       address: String,
+                       country: String,
+                       phone: String,
+                       acceptEmails: Boolean): String
     fun logout()
     suspend fun resetPassword(gmail: String)
 }

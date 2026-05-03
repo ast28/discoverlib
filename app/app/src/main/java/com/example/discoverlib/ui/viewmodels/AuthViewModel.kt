@@ -21,6 +21,7 @@ sealed class AuthState {
     object Authenticated : AuthState()
     object Unauthenticated : AuthState()
     object Loading : AuthState()
+    object AwaitingVerification : AuthState()
     data class Error(val message: String) : AuthState()
 }
 
@@ -74,10 +75,10 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun signup(email: String, pass: String) {
+    fun signup(gmail: String, pass: String, username: String, dob: String, address: String, country: String, phone: String, acceptEmails: Boolean) {
         Log.d(TAG, "Attempting signup...")
 
-        if (email.isBlank() || pass.isBlank()) {
+        if (gmail.isBlank() || pass.isBlank()) {
             Log.w(TAG, "Signup failed: Empty fields")
             _authState.value = AuthState.Error("Email or password can't be empty")
             return
@@ -87,11 +88,9 @@ class AuthViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                val uid = authRepository.signup(email, pass)
+                val uid = authRepository.signup(gmail, pass, username, dob, address, country, phone, acceptEmails)
                 Log.i(TAG, "Signup successful. UID: $uid")
-                _authState.value = AuthState.Authenticated
-
-
+                _authState.value = AuthState.AwaitingVerification
             } catch (e: Exception) {
                 Log.e(TAG, "Signup error: ${e.message}")
                 _authState.value = AuthState.Error(e.message ?: "Something went wrong")

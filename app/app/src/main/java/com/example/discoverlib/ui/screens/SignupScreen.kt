@@ -51,6 +51,7 @@ import com.example.discoverlib.ui.viewmodels.AuthState
 import com.example.discoverlib.ui.viewmodels.AuthViewModel
 import com.example.discoverlib.ui.viewmodels.UserViewModel
 import java.time.LocalDate
+import java.time.Period
 
 @Composable
 fun SignupScreen(
@@ -62,7 +63,9 @@ fun SignupScreen(
     var password by remember { mutableStateOf("") }
 
     var username by remember { mutableStateOf("") }
-    var dob by remember { mutableStateOf("") }
+
+    var dob by remember { mutableStateOf(LocalDate.now().minusYears(18).toString()) }
+
     var address by remember { mutableStateOf("") }
     var country by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
@@ -72,6 +75,8 @@ fun SignupScreen(
     var formError by remember { mutableStateOf<String?>(null) }
 
     val authState by viewModel.authState.collectAsState()
+
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     LaunchedEffect(authState) {
         if (authState is AuthState.Authenticated) {
@@ -88,6 +93,16 @@ fun SignupScreen(
 
             navController.navigate(Routes.Home) {
                 popUpTo(Routes.Login) { inclusive = true }
+            }
+        } else if (authState is AuthState.AwaitingVerification) {
+            android.widget.Toast.makeText(
+                context,
+                R.string.signup_verification_sent,
+                android.widget.Toast.LENGTH_LONG
+            ).show()
+
+            navController.navigate(Routes.Login) {
+                popUpTo(Routes.Signup) { inclusive = true }
             }
         }
     }
@@ -238,9 +253,16 @@ fun SignupScreen(
                 }
 
                 if (authState is AuthState.Error) {
+                    val rawMessage = (authState as AuthState.Error).message
+                    val displayMessage = if (rawMessage.contains("confirm your email", ignoreCase = true)) {
+                        "A verification link has been sent. Please check your inbox to activate your account."
+                    } else {
+                        rawMessage
+                    }
+
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = (authState as AuthState.Error).message,
+                        text = displayMessage,
                         color = MaterialTheme.colorScheme.error,
                         fontSize = 14.sp
                     )
@@ -258,9 +280,23 @@ fun SignupScreen(
                             return@Button
                         }
 
+                        val birthDate = try { LocalDate.parse(dob) } catch (e: Exception) { null }
+                        if (birthDate != null) {
+                            val age = Period.between(birthDate, LocalDate.now()).years
+                            if (age < 18) {
+                                formError = "You must be at least 18 years old."
+                                return@Button
+                            }
+                        }
+
+                        if (phone.length != 9 || !phone.all { it.isDigit() }) {
+                            formError = "The phone number must contain exactly 9 digits."
+                            return@Button
+                        }
+
                         userViewModel.checkUsernameAvailability(username) { isAvailable ->
                             if (isAvailable) {
-                                viewModel.signup(email, password)
+                                viewModel.signup(email, password, username, dob, address, country, phone, acceptEmails)
                             } else {
                                 usernameError = "Username is already in use"
                             }

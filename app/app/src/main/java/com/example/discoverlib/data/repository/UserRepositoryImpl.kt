@@ -7,6 +7,7 @@ import com.example.discoverlib.data.local.mapper.toDomain
 import com.example.discoverlib.data.local.mapper.toEntity
 import com.example.discoverlib.domain.UserRepository
 import com.example.discoverlib.domain.User
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlin.collections.map
@@ -32,6 +33,12 @@ class UserRepositoryImpl @Inject constructor(
         Log.d(TAG, "Querying user details in SQLite: $userId")
         val userEntity = userDao.getOneUser(userId) ?: return null
         return userEntity.toDomain()
+    }
+
+    override fun getUserFlow(userId: String): Flow<User?> {
+        return userDao.getUserFlow(userId).map { userEntity ->
+            userEntity?.toDomain()
+        }
     }
 
     override suspend fun addUser(user: User) {

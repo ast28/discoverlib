@@ -35,34 +35,38 @@ class UserViewModel @Inject constructor(
         loadUserFromDatabase()
     }
 
-    fun loadUserFromDatabase() {
-        Log.d(TAG, "Checking for logged-in user in Firebase...")
-        val firebaseUser = authRepository.getCurrentUser()
+    fun getFirebaseUid(): String = authRepository.getCurrentUser()?.uid ?: ""
 
+    fun loadUserFromDatabase() {
+        val firebaseUser = authRepository.getCurrentUser()
         if (firebaseUser == null) {
-            Log.w(TAG, "No user logged in Firebase. Cannot load local profile.")
             _currentUser.value = null
             return
         }
-
         val uid = firebaseUser.uid
 
         viewModelScope.launch {
-            try {
-                Log.d(TAG, "Looking for local profile with UID: $uid in Room")
-                _currentUser.value = repository.getOneUser(uid)
-
-                if (_currentUser.value != null) {
-                    Log.i(TAG, "User profile successfully loaded from Room DB")
+            repository.getUserFlow(uid).collect { localUser ->
+                if (localUser != null) {
+                    _currentUser.value = localUser
                 } else {
-                    Log.i(TAG, "Profile not found in Room for this UID. A new one will be created upon saving.")
+                    Log.i(TAG, "Creating default local profile for UID: $uid")
+                    val defaultUser = User(
+                        id = uid,
+                        username = "Traveler",
+                        dateOfBirth = LocalDate.now().minusYears(18),
+                        darkMode = false,
+                        language = "en",
+                        address = "",
+                        country = "",
+                        phoneNumber = "",
+                        acceptReceiveEmails = false
+                    )
+                    repository.addUser(defaultUser)
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "Error loading user from Room: ${e.message}")
             }
         }
     }
-
 
     fun checkUsernameAvailability(username: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
@@ -80,46 +84,26 @@ class UserViewModel @Inject constructor(
         acceptEmails: Boolean
     ) {
         val firebaseUser = authRepository.getCurrentUser() ?: return
+        val newUser = User(
+            id = firebaseUser.uid,
+            username = username,
+            dateOfBirth = dob,
+            darkMode = false,
+            language = "en",
+            address = address,
+            country = country,
+            phoneNumber = phone,
+            acceptReceiveEmails = acceptEmails
+        )
+
+        _currentUser.value = newUser
+
         viewModelScope.launch {
             try {
-                val newUser = User(
-                    id = firebaseUser.uid,
-                    username = username,
-                    dateOfBirth = dob,
-                    darkMode = false,
-                    language = "en",
-                    address = address,
-                    country = country,
-                    phoneNumber = phone,
-                    acceptReceiveEmails = acceptEmails
-                )
                 repository.addUser(newUser)
-                _currentUser.value = newUser
             } catch (e: Exception) {
                 Log.e(TAG, "Error saving initial user profile: ${e.message}")
             }
-        }
-    }
-
-
-    private suspend fun saveOrUpdateUser(updateAction: (User) -> User, createAction: (String) -> User) {
-        val firebaseUser = authRepository.getCurrentUser() ?: return
-        val uid = firebaseUser.uid
-        val currentLocalUser = _currentUser.value
-
-        try {
-            if (currentLocalUser != null) {
-                val updatedUser = updateAction(currentLocalUser)
-                repository.updateUser(updatedUser)
-                _currentUser.value = updatedUser
-            } else {
-                val newUser = createAction(uid)
-                repository.addUser(newUser)
-                _currentUser.value = newUser
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Database operation failed: ${e.message}")
-            throw e
         }
     }
 
@@ -132,19 +116,21 @@ class UserViewModel @Inject constructor(
         acceptEmails: Boolean,
         onResult: (ValidationResult) -> Unit
     ) {
+        val user = _currentUser.value ?: return
+        val updatedUser = user.copy(
+            username = username,
+            dateOfBirth = dob,
+            address = address,
+            country = country,
+            phoneNumber = phone,
+            acceptReceiveEmails = acceptEmails
+        )
+
+        _currentUser.value = updatedUser
+
         viewModelScope.launch {
             try {
-                saveOrUpdateUser(
-                    updateAction = { it.copy(
-                        username = username,
-                        dateOfBirth = dob,
-                        address = address,
-                        country = country,
-                        phoneNumber = phone,
-                        acceptReceiveEmails = acceptEmails
-                    )},
-                    createAction = { uid -> User(uid, username, dob, false, "en", address, country, phone, acceptEmails) }
-                )
+                repository.updateUser(updatedUser)
                 onResult(ValidationResult(true, "Profile updated!"))
             } catch (e: Exception) {
                 onResult(ValidationResult(false, "Update failed"))
@@ -152,69 +138,30 @@ class UserViewModel @Inject constructor(
         }
     }
 
-    fun saveNewUsername(newName: String, onResult: (ValidationResult) -> Unit) {
-        val cleanedName = newName.trim()
-        if (cleanedName.isBlank() || cleanedName.length < 3 || cleanedName.length > 20) {
-            onResult(ValidationResult(false, "Username must be between 3 and 20 characters."))
-            return
-        }
-
-        viewModelScope.launch {
-            try {
-                saveOrUpdateUser(
-                    updateAction = { it.copy(username = cleanedName) },
-                    createAction = { uid -> User(id = uid, username = cleanedName, dateOfBirth = LocalDate.now(), darkMode = false, language = "en", address = "", country = "", phoneNumber = "", acceptReceiveEmails = false) }
-                )
-                onResult(ValidationResult(true, "Username updated successfully!"))
-            } catch (e: Exception) {
-                onResult(ValidationResult(false, "Internal error updating username."))
-            }
-        }
-    }
-
-    fun saveNewDateOfBirth(newDate: LocalDate, onResult: (ValidationResult) -> Unit) {
-        if (newDate.isAfter(LocalDate.now())) {
-            onResult(ValidationResult(false, "Date of birth cannot be in the future."))
-            return
-        }
-
-        viewModelScope.launch {
-            try {
-                saveOrUpdateUser(
-                    updateAction = { it.copy(dateOfBirth = newDate) },
-                    createAction = { uid -> User(id = uid, username = "", dateOfBirth = newDate, darkMode = false, language = "en", address = "", country = "", phoneNumber = "", acceptReceiveEmails = false) }
-                )
-                onResult(ValidationResult(true, "Date of birth updated successfully!"))
-            } catch (e: Exception) {
-                onResult(ValidationResult(false, "Internal error updating date."))
-            }
-        }
-    }
-
-    fun getDarkMode(): Boolean = _currentUser.value?.darkMode ?: false
-
     fun saveDarkMode(isDark: Boolean) {
+        val user = _currentUser.value ?: return
+        val updatedUser = user.copy(darkMode = isDark)
+
+        _currentUser.value = updatedUser
+
         viewModelScope.launch {
             try {
-                saveOrUpdateUser(
-                    updateAction = { it.copy(darkMode = isDark) },
-                    createAction = { uid -> User(id = uid, username = "", dateOfBirth = LocalDate.now(), darkMode = isDark, language = "en", address = "", country = "", phoneNumber = "", acceptReceiveEmails = false) }
-                )
+                repository.updateUser(updatedUser)
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to save dark mode", e)
             }
         }
     }
 
-    fun getLanguage(): String = sharedPrefs.userLanguage
-
     fun saveLanguage(newLanguage: String) {
+        val user = _currentUser.value ?: return
+        val updatedUser = user.copy(language = newLanguage)
+
+        _currentUser.value = updatedUser
+
         viewModelScope.launch {
             try {
-                saveOrUpdateUser(
-                    updateAction = { it.copy(language = newLanguage) },
-                    createAction = { uid -> User(id = uid, username = "", dateOfBirth = LocalDate.now(), darkMode = false, language = newLanguage, address = "", country = "", phoneNumber = "", acceptReceiveEmails = false) }
-                )
+                repository.updateUser(updatedUser)
                 sharedPrefs.userLanguage = newLanguage
                 _pendingLanguageSnackbarCode.value = newLanguage
             } catch (e: Exception) {

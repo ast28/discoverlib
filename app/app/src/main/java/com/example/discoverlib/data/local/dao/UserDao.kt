@@ -2,6 +2,7 @@ package com.example.discoverlib.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.discoverlib.data.local.entity.UserEntity
@@ -15,7 +16,10 @@ interface UserDao {
     @Query("SELECT * FROM users where id = :userId")
     suspend fun getOneUser(userId: String) : UserEntity?
 
-    @Insert
+    @Query("SELECT * FROM users WHERE id = :userId")
+    fun getUserFlow(userId: String): Flow<UserEntity?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addUser(user: UserEntity)
 
     @Update

@@ -191,16 +191,33 @@ fun PreferencesScreen(
         }
     )
 
-    if (showProfileDialog && user != null) {
+    if (showProfileDialog) {
+        val currentUid = userViewModel.getFirebaseUid()
+        val dialogUser = user ?: com.example.discoverlib.domain.User(
+            id = currentUid,
+            username = "",
+            dateOfBirth = LocalDate.now().minusYears(18),
+            darkMode = isDarkTheme,
+            language = currentLangCode,
+            address = "",
+            country = "",
+            phoneNumber = "",
+            acceptReceiveEmails = false
+        )
+
         EditProfileDialog(
-            user = user!!,
+            user = dialogUser,
             onDismiss = {
                 Log.d(TAG, "Edit profile dialog dismissed")
                 showProfileDialog = false
             },
+            onCheckUsername = { newName, callback ->
+                // Pasamos la función de comprobación del ViewModel al Dialogo
+                userViewModel.checkUsernameAvailability(newName, callback)
+            },
             onConfirm = { newName, newDob, newAddress, newCountry, newPhone, newAcceptEmails ->
                 Log.d(TAG, "Confirming profile edit: name=$newName, dob=$newDob")
-                val parsedDate = parseAppDateOrNull(newDob) ?: user!!.dateOfBirth
+                val parsedDate = parseAppDateOrNull(newDob) ?: dialogUser.dateOfBirth
 
                 userViewModel.updateFullProfile(
                     username = newName,
@@ -214,8 +231,12 @@ fun PreferencesScreen(
                         coroutineScope.launch {
                             snackbarHostState.showSnackbar(profileUpdatedMessage)
                         }
+                        showProfileDialog = false
+                    } else {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(result.message)
+                        }
                     }
-                    showProfileDialog = false
                 }
             }
         )
@@ -233,7 +254,7 @@ fun PreferencesScreen(
                         showLogoutDialog = false
                         authViewModel.logout()
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
                 ) { Text(stringResource(id = R.string.logout), color = Color.White) }
             },
             dismissButton = {
@@ -312,9 +333,9 @@ fun PreferencesScreenContent(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    InfoRow(label = "Address", value = address)
-                    InfoRow(label = "Country", value = country)
-                    InfoRow(label = "Phone", value = phone)
+                    InfoRow(label = stringResource(id = R.string.settings_address), value = address)
+                    InfoRow(label = stringResource(id = R.string.settings_country), value = country)
+                    InfoRow(label = stringResource(id = R.string.settings_phone), value = phone)
                     InfoRow(label = "Newsletter", value = if (acceptEmails) "Subscribed" else "Not Subscribed")
                 }
             }
@@ -462,6 +483,7 @@ fun ProfileHeaderCard(
 fun EditProfileDialog(
     user: com.example.discoverlib.domain.User,
     onDismiss: () -> Unit,
+    onCheckUsername: (String, (Boolean) -> Unit) -> Unit, // Función recibida para validar
     onConfirm: (String, String, String, String, String, Boolean) -> Unit
 ) {
     var nameText by remember { mutableStateOf(if (user.username.contains("Not defined")) "" else user.username) }
@@ -471,10 +493,14 @@ fun EditProfileDialog(
     var phoneText by remember { mutableStateOf(user.phoneNumber) }
     var acceptEmails by remember { mutableStateOf(user.acceptReceiveEmails) }
 
-    val parsedDate = try { LocalDate.parse(dobText) } catch (e: Exception) { null }
-    val isAgeError = parsedDate != null && parsedDate.isAfter(LocalDate.now().minusYears(18))
+    var formError by remember { mutableStateOf<String?>(null) }
 
-    val isFormValid = nameText.isNotBlank() && parsedDate != null && !isAgeError
+    // Textos de error extraídos de strings.xml
+    val errorEmptyFields = stringResource(id = R.string.error_empty_fields)
+    val errorAge = stringResource(id = R.string.error_age_18)
+    val errorInvalidDate = stringResource(id = R.string.error_invalid_date)
+    val errorPhone = stringResource(id = R.string.error_phone_format)
+    val errorUsernameTaken = stringResource(id = R.string.error_username_taken)
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -483,7 +509,7 @@ fun EditProfileDialog(
             Column(modifier = Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = nameText,
-                    onValueChange = { nameText = it },
+                    onValueChange = { nameText = it; formError = null },
                     label = { Text(stringResource(id = R.string.settings_username)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
@@ -492,40 +518,31 @@ fun EditProfileDialog(
                 com.example.discoverlib.ui.components.DatePickerField(
                     label = stringResource(id = R.string.settings_dob),
                     selectedDate = dobText,
-                    onDateSelected = { dobText = it },
-                    isError = isAgeError,
+                    onDateSelected = { dobText = it; formError = null },
+                    isError = false,
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                if (isAgeError) {
-                    Text(
-                        text = stringResource(id = R.string.settings_age_error),
-                        color = Color.Red,
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(start = 4.dp, top = 2.dp)
-                    )
-                }
-
                 OutlinedTextField(
                     value = addressText,
-                    onValueChange = { addressText = it },
-                    label = { Text("Address") },
+                    onValueChange = { addressText = it; formError = null },
+                    label = { Text(stringResource(id = R.string.settings_address)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 OutlinedTextField(
                     value = countryText,
-                    onValueChange = { countryText = it },
-                    label = { Text("Country") },
+                    onValueChange = { countryText = it; formError = null },
+                    label = { Text(stringResource(id = R.string.settings_country)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 OutlinedTextField(
                     value = phoneText,
-                    onValueChange = { phoneText = it },
-                    label = { Text("Phone Number") },
+                    onValueChange = { phoneText = it; formError = null },
+                    label = { Text(stringResource(id = R.string.settings_phone)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -536,25 +553,74 @@ fun EditProfileDialog(
                         onCheckedChange = { acceptEmails = it },
                         colors = CheckboxDefaults.colors(checkedColor = colorResource(id = R.color.logo))
                     )
-                    Text(text = "Receive promo emails", fontSize = 14.sp)
+                    Text(text = stringResource(id = R.string.settings_promo_emails), fontSize = 14.sp)
+                }
+
+                if (formError != null) {
+                    Text(
+                        text = formError!!,
+                        color = Color.Red,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
                 }
             }
         },
         confirmButton = {
             Button(
-                onClick = { onConfirm(nameText, dobText, addressText, countryText, phoneText, acceptEmails) },
-                enabled = isFormValid,
+                onClick = {
+                    formError = null
+
+                    if (nameText.isBlank() || dobText.isBlank() || addressText.isBlank() || countryText.isBlank() || phoneText.isBlank()) {
+                        formError = errorEmptyFields
+                        return@Button
+                    }
+
+                    val birthDate = try { LocalDate.parse(dobText) } catch (e: Exception) { null }
+                    if (birthDate != null) {
+                        val age = java.time.Period.between(birthDate, LocalDate.now()).years
+                        if (age < 18) {
+                            formError = errorAge
+                            return@Button
+                        }
+                    } else {
+                        formError = errorInvalidDate
+                        return@Button
+                    }
+
+                    if (phoneText.length != 9 || !phoneText.all { it.isDigit() }) {
+                        formError = errorPhone
+                        return@Button
+                    }
+
+                    // COMPROBACIÓN FINAL DE NOMBRE DE USUARIO
+                    if (nameText.trim() != user.username.trim()) {
+                        // Si ha cambiado el nombre, comprobamos si está libre
+                        onCheckUsername(nameText) { isAvailable ->
+                            if (isAvailable) {
+                                onConfirm(nameText, dobText, addressText, countryText, phoneText, acceptEmails)
+                            } else {
+                                formError = errorUsernameTaken
+                            }
+                        }
+                    } else {
+                        // Si el nombre es exactamente el mismo que ya tenía, guardamos directo
+                        onConfirm(nameText, dobText, addressText, countryText, phoneText, acceptEmails)
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.logo))
-            ) { Text("Save", color = Color.White) }
+            ) { Text(stringResource(id = R.string.save_btn), color = Color.White) }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismiss,
                 colors = ButtonDefaults.textButtonColors(contentColor = colorResource(id = R.color.logo))
-            ) { Text("Cancel", fontWeight = FontWeight.Bold) }
+            ) { Text(stringResource(id = R.string.dialog_cancel_btn), fontWeight = FontWeight.Bold) }
         }
     )
 }
+
+// ... (Resto del código original de PreferenceDropdown y PreferenceToggle no cambia)
 
 @Composable
 fun PreferenceDropdown(
@@ -640,32 +706,6 @@ private fun PreferenceToggle(
                 uncheckedThumbColor = Color.White,
                 uncheckedTrackColor = Color.LightGray
             )
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreferencesScreenPreview() {
-    DiscoverlibTheme {
-        PreferencesScreenContent(
-            navController = rememberNavController(),
-            isDarkTheme = false,
-            snackbarHostState = SnackbarHostState(),
-            onThemeChange = {},
-            languages = listOf("English", "Español", "Català"),
-            langIndex = 0,
-            onLangChange = {},
-            reminders = false,
-            onRemindersChange = {},
-            username = "Alba Senar",
-            dob = "2005-03-24",
-            address = "Not defined",
-            country = "Not defined",
-            phone = "Not defined",
-            acceptEmails = false,
-            onEditProfileClick = {},
-            onLogoutClick = {}
         )
     }
 }

@@ -18,15 +18,12 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
-
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
         splashScreen.setKeepOnScreenCondition { false }
 
         setContent {
             val userViewModel: UserViewModel = hiltViewModel()
-
             val user by userViewModel.currentUser.collectAsState()
 
             val isDarkTheme = user?.darkMode ?: isSystemInDarkTheme()

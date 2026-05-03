@@ -71,7 +71,13 @@ class TripViewModel @Inject constructor(
             return
         }
 
-        // MODIFICACIÓN T4.2: Asignamos el ID del usuario actual de Firebase al viaje
+        val existsTitle = trips.value.any { it.title.trim().equals(trip.title.trim(), ignoreCase = true) }
+        if (existsTitle) {
+            Log.e(TAG, "Validation failed: A trip with the title '${trip.title}' already exists")
+            onResult(ValidationResult(false, "You already have a trip with this name."))
+            return
+        }
+
         val currentUser = authRepository.getCurrentUser()
         val tripWithId = trip.copy(
             id = java.util.UUID.randomUUID().toString(),

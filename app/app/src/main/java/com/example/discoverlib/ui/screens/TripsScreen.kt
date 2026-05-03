@@ -101,6 +101,7 @@ fun TripsScreen(
                         tripToEdit = null
                     } else {
                         Log.e(TAG, "Error editing trip: ${result.message}")
+                        coroutineScope.launch { snackbarHostState.showSnackbar(result.message) }
                     }
                 }
             } else {
@@ -124,6 +125,7 @@ fun TripsScreen(
                         tripToEdit = null
                     } else {
                         Log.e(TAG, "Error creating trip: ${result.message}")
+                        coroutineScope.launch { snackbarHostState.showSnackbar(result.message) }
                     }
                 }
             }
@@ -146,6 +148,7 @@ fun TripsScreen(
                                 coroutineScope.launch { snackbarHostState.showSnackbar(tripDeletedMessage) }
                             } else {
                                 Log.e(TAG, "Error: Trip not found during deletion")
+                                coroutineScope.launch { snackbarHostState.showSnackbar("Error deleting trip.") }
                             }
                             tripToDelete = null
                         }

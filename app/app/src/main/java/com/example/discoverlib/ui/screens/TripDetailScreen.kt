@@ -66,7 +66,6 @@ fun TripDetailScreen(
             onBackClick = { navController.popBackStack() },
             onActivityClick = { activityId -> navController.navigate("activity/$tripId/$activityId") },
             onSaveActivity = { newActivity, onResult ->
-                // Añadimos el bloque del callback { result -> }
                 viewModel.addActivity(tripId = trip.id, activity = newActivity) { result ->
                     if (result.isSuccessful) {
                         Log.i("TripDetailScreen", "Activity added successfully to trip ${trip.id}")
@@ -74,7 +73,6 @@ fun TripDetailScreen(
                         Log.e("TripDetailScreen", "Error adding activity: ${result.message}")
                     }
                     onResult(result)
-                    // Aquí iría el scope.launch { snackbarHostState... } si lo necesitas
                 }
             },
             onDeleteActivity = { activityId, onResult ->
@@ -331,6 +329,8 @@ fun TripDetailContent(
                             coroutineScope.launch { snackbarHostState.showSnackbar(activityAddedMessage) }
                             showAddDialog = false
                             selectedCategory = catAll
+                        } else {
+                            coroutineScope.launch { snackbarHostState.showSnackbar(result.message) }
                         }
                     }
                 }
@@ -352,6 +352,8 @@ fun TripDetailContent(
                             onDeleteActivity(activity.id) { result ->
                                 if (result.isSuccessful) {
                                     coroutineScope.launch { snackbarHostState.showSnackbar(activityDeletedMessage) }
+                                } else {
+                                    coroutineScope.launch { snackbarHostState.showSnackbar(result.message) }
                                 }
                                 activityToDelete = null
                             }
