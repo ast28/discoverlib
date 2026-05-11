@@ -24,9 +24,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val userViewModel: UserViewModel = hiltViewModel()
-            val user by userViewModel.currentUser.collectAsState()
-
-            val isDarkTheme = user?.darkMode ?: isSystemInDarkTheme()
+            val isDarkTheme by userViewModel.isDarkMode.collectAsState()
 
             DiscoverlibTheme(darkTheme = isDarkTheme) {
                 AppNavigation(

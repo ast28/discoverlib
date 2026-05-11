@@ -47,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.discoverlib.R
 import com.example.discoverlib.navegation.Routes
+import com.example.discoverlib.ui.components.DatePickerField
 import com.example.discoverlib.ui.viewmodels.AuthState
 import com.example.discoverlib.ui.viewmodels.AuthViewModel
 import com.example.discoverlib.ui.viewmodels.UserViewModel
@@ -191,7 +192,7 @@ fun SignupScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                com.example.discoverlib.ui.components.DatePickerField(
+                DatePickerField(
                     label = "Date of Birth",
                     selectedDate = dob,
                     onDateSelected = { dob = it },

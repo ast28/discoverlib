@@ -9,9 +9,16 @@ import com.example.discoverlib.domain.UserRepository
 import com.example.discoverlib.domain.User
 import com.example.discoverlib.domain.ValidationResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
@@ -25,48 +32,64 @@ class UserViewModel @Inject constructor(
     private val sharedPrefs: SharedPrefsManager
 ) : ViewModel() {
 
-    private val _currentUser = MutableStateFlow<User?>(null)
-    val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val currentUser: StateFlow<User?> = authRepository.getCurrentUserFlow()
+        .flatMapLatest { firebaseUser ->
+            if (firebaseUser == null) {
+                flowOf(null)
+            } else {
+                repository.getUserFlow(firebaseUser.uid)
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val isDarkMode: StateFlow<Boolean> = authRepository.getCurrentUserFlow()
+        .flatMapLatest { firebaseUser ->
+            if (firebaseUser == null) {
+                flowOf(false)
+            } else {
+                repository.getUserFlow(firebaseUser.uid)
+                    .map { it?.darkMode ?: false }
+                    .onStart { emit(sharedPrefs.darkTheme) } // Caché rápida para el Splash Screen
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = authRepository.getCurrentUser() != null && sharedPrefs.darkTheme
+        )
 
     private val _pendingLanguageSnackbarCode = MutableStateFlow<String?>(null)
     val pendingLanguageSnackbarCode: StateFlow<String?> = _pendingLanguageSnackbarCode.asStateFlow()
 
     init {
-        loadUserFromDatabase()
-    }
-
-    fun getFirebaseUid(): String = authRepository.getCurrentUser()?.uid ?: ""
-
-    fun loadUserFromDatabase() {
-        val firebaseUser = authRepository.getCurrentUser()
-        if (firebaseUser == null) {
-            _currentUser.value = null
-            return
-        }
-        val uid = firebaseUser.uid
-
         viewModelScope.launch {
-            repository.getUserFlow(uid).collect { localUser ->
-                if (localUser != null) {
-                    _currentUser.value = localUser
-                } else {
-                    Log.i(TAG, "Creating default local profile for UID: $uid")
-                    val defaultUser = User(
-                        id = uid,
-                        username = "Traveler",
-                        dateOfBirth = LocalDate.now().minusYears(18),
-                        darkMode = false,
-                        language = "en",
-                        address = "",
-                        country = "",
-                        phoneNumber = "",
-                        acceptReceiveEmails = false
-                    )
-                    repository.addUser(defaultUser)
+            authRepository.getCurrentUserFlow().collect { firebaseUser ->
+                if (firebaseUser != null) {
+                    val localUser = repository.getOneUser(firebaseUser.uid)
+                    if (localUser == null) {
+                        Log.i(TAG, "Creating default local profile for UID: ${firebaseUser.uid}")
+                        val defaultUser = User(
+                            id = firebaseUser.uid,
+                            username = "Traveler",
+                            dateOfBirth = LocalDate.now().minusYears(18),
+                            darkMode = false,
+                            language = "en",
+                            address = "",
+                            country = "",
+                            phoneNumber = "",
+                            acceptReceiveEmails = false
+                        )
+                        repository.addUser(defaultUser)
+                    }
                 }
             }
         }
     }
+
+    fun getFirebaseUid(): String = authRepository.getCurrentUser()?.uid ?: ""
+
 
     fun checkUsernameAvailability(username: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
@@ -96,8 +119,6 @@ class UserViewModel @Inject constructor(
             acceptReceiveEmails = acceptEmails
         )
 
-        _currentUser.value = newUser
-
         viewModelScope.launch {
             try {
                 repository.addUser(newUser)
@@ -116,7 +137,7 @@ class UserViewModel @Inject constructor(
         acceptEmails: Boolean,
         onResult: (ValidationResult) -> Unit
     ) {
-        val user = _currentUser.value ?: return
+        val user = currentUser.value ?: return
         val updatedUser = user.copy(
             username = username,
             dateOfBirth = dob,
@@ -125,8 +146,6 @@ class UserViewModel @Inject constructor(
             phoneNumber = phone,
             acceptReceiveEmails = acceptEmails
         )
-
-        _currentUser.value = updatedUser
 
         viewModelScope.launch {
             try {
@@ -138,12 +157,13 @@ class UserViewModel @Inject constructor(
         }
     }
 
+
     fun saveDarkMode(isDark: Boolean) {
-        val user = _currentUser.value ?: return
+        val user = currentUser.value ?: return
+
+        sharedPrefs.darkTheme = isDark
+
         val updatedUser = user.copy(darkMode = isDark)
-
-        _currentUser.value = updatedUser
-
         viewModelScope.launch {
             try {
                 repository.updateUser(updatedUser)
@@ -154,10 +174,8 @@ class UserViewModel @Inject constructor(
     }
 
     fun saveLanguage(newLanguage: String) {
-        val user = _currentUser.value ?: return
+        val user = currentUser.value ?: return
         val updatedUser = user.copy(language = newLanguage)
-
-        _currentUser.value = updatedUser
 
         viewModelScope.launch {
             try {

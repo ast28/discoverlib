@@ -1,19 +1,15 @@
 package com.example.discoverlib.ui.viewmodels
 
-
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.discoverlib.data.SharedPrefsManager
 import com.example.discoverlib.domain.AuthRepository
-import com.example.discoverlib.domain.User
-import com.example.discoverlib.domain.ValidationResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import javax.inject.Inject
 
 sealed class AuthState {
@@ -24,8 +20,6 @@ sealed class AuthState {
     object AwaitingVerification : AuthState()
     data class Error(val message: String) : AuthState()
 }
-
-
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
@@ -43,63 +37,40 @@ class AuthViewModel @Inject constructor(
     }
 
     fun checkAuthStatus() {
-        Log.d(TAG, "Checking initial auth status...")
         if (authRepository.getCurrentUser() == null) {
             _authState.value = AuthState.Unauthenticated
         } else {
-            Log.i(TAG, "User is already logged in: ${authRepository.getCurrentUser()?.uid}")
             _authState.value = AuthState.Authenticated
         }
     }
 
-    fun login(email: String, pass: String) {
-        Log.d(TAG, "Attempting login...")
-
-        if (email.isBlank() || pass.isBlank()) {
-            Log.w(TAG, "Login failed: Empty fields")
-            _authState.value = AuthState.Error("Email or password can't be empty")
-            return
-        }
-
+    fun login(gmail: String, pass: String) {
         _authState.value = AuthState.Loading
-
         viewModelScope.launch {
             try {
-                val uid = authRepository.login(email, pass)
-                Log.i(TAG, "Login successful. UID: $uid")
+                authRepository.login(gmail, pass)
                 _authState.value = AuthState.Authenticated
             } catch (e: Exception) {
-                Log.e(TAG, "Login error: ${e.message}")
-                _authState.value = AuthState.Error(e.message ?: "Something went wrong")
+                _authState.value = AuthState.Error(e.message ?: "Login failed")
             }
         }
     }
 
     fun signup(gmail: String, pass: String, username: String, dob: String, address: String, country: String, phone: String, acceptEmails: Boolean) {
-        Log.d(TAG, "Attempting signup...")
-
-        if (gmail.isBlank() || pass.isBlank()) {
-            Log.w(TAG, "Signup failed: Empty fields")
-            _authState.value = AuthState.Error("Email or password can't be empty")
-            return
-        }
-
         _authState.value = AuthState.Loading
-
         viewModelScope.launch {
             try {
-                val uid = authRepository.signup(gmail, pass, username, dob, address, country, phone, acceptEmails)
-                Log.i(TAG, "Signup successful. UID: $uid")
+                authRepository.signup(gmail, pass, username, dob, address, country, phone, acceptEmails)
                 _authState.value = AuthState.AwaitingVerification
             } catch (e: Exception) {
-                Log.e(TAG, "Signup error: ${e.message}")
-                _authState.value = AuthState.Error(e.message ?: "Something went wrong")
+                _authState.value = AuthState.Error(e.message ?: "Signup failed")
             }
         }
     }
 
     fun logout() {
-        Log.d(TAG, "Logging out user...")
+        Log.d(TAG, "Logging out user and resetting local theme preference")
+        sharedPrefs.darkTheme = false
         authRepository.logout()
         _authState.value = AuthState.Unauthenticated
     }
@@ -108,7 +79,7 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 authRepository.resetPassword(gmail)
-                onResult(true, "A reset link has been sent to your email.")
+                onResult(true, "Reset link sent to your email.")
             } catch (e: Exception) {
                 onResult(false, e.message ?: "Error sending reset email.")
             }
