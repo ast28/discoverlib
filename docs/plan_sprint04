@@ -1,0 +1,51 @@
+# Sprint 04 – Planning Document
+
+## 1. Sprint Goal
+El objetivo de este sprint es integrar la librería Retrofit para conectar la aplicación con una API REST de reservas de hoteles alojada en http://15.224.84.148:8090. Además, se busca implementar la búsqueda y reserva de habitaciones, el listado y cancelación de reservas, y la gestión de una galería de imágenes locales para cada viaje. Todo ello debe mantener la arquitectura MVVM estándar, utilizar ROOM para la persistencia local y HILT como inyector de dependencias.
+
+---
+
+## 2. Sprint Backlog
+
+| ID | Tarea | Responsable | Estimación (h) | Prioridad |
+|----|-------|-------------|----------------|-----------|
+| T1.1-3 | Configurar Retrofit, crear modelos/interfaces API e implementar la capa Repository | Alba | 3 | Alta |
+| T1.4 | Crear pruebas unitarias mockeando la conexión remota | Alba | 2 | Media |
+| T2.1-2 | Crear pantalla de búsqueda (Londres, París, Barcelona) con fechas y mostrar resultados de hoteles/habitaciones | Alba | 3 | Alta |
+| T2.3-4 | Implementar la reserva, mostrar imágenes de hoteles/habitaciones y guardar datos en Room (nuevo viaje) | Alba | 3 | Alta |
+| T3.1-3 | Permitir adjuntar, guardar localmente y visualizar una galería de imágenes específica por viaje | Alba | 3.5 | Media |
+| T4.1, T4.3-4 | Crear pantalla de reservas locales, mostrar imágenes asociadas y actualizar estado en "Mis Viajes" | Alba | 2.5 | Alta |
+| T4.2 | Añadir funcionalidad para eliminar reservas localmente y vía API | Alba | 1.5 | Media |
+| Entrega | Documentar Sprint.md, grabar vídeo demostrativo y preparar release v4.x.x | Alba | 1.5 | Alta |
+
+---
+
+## 3. Definition of Done (DoD)
+
+- [ ] Añadir dependencias de Retrofit y configurar el cliente HTTP.
+- [ ] Implementar inyección de dependencias obligatoriamente con HILT (o Koin).
+- [ ] Persistencia local implementada exclusivamente con ROOM.
+- [ ] Respetar la arquitectura estándar (View - ViewModel - Repository - DB) y estructura de carpetas (view, viewmodel, repo, di, data).
+- [ ] Implementar selectores de fecha (date pickers) en todos los campos de fecha y hora.
+- [ ] Pantalla de búsqueda de hoteles operativa para Londres, París y Barcelona.
+- [ ] Reserva de habitación funcional y guardada localmente con ID, hotel, habitación y precio.
+- [ ] Galería de múltiples imágenes por viaje implementada y guardada localmente.
+- [ ] Listado y borrado (local y remoto) de reservas completado.
+- [ ] Pruebas unitarias de conexión remota creadas y operativas.
+- [ ] Nombre del proyecto en Android Studio corregido (para evitar la penalización).
+- [ ] Vídeo demostrativo grabado y guardado en /docs o documentation/evidence/v4.x.x.
+- [ ] Release en GitHub etiquetada exactamente como v4.x.x.
+- [ ] Documento Sprint.md actualizado listando a todos los miembros y sus contribuciones.
+
+---
+
+## 4. Riesgos identificados
+
+- Desconocimiento del manejo avanzado de Retrofit y su integración con corrutinas/Flow.
+- Dificultades al gestionar la persistencia local de imágenes (URIs vs Base64 vs Storage).
+- Desincronización de estados entre la base de datos local (ROOM) y la API remota, especialmente al cancelar reservas.
+
+---
+
+⚠ Este documento no puede modificarse después del 30% del sprint.
+Fecha límite modificación: 14/05/2026
