@@ -199,6 +199,7 @@ fun PreferencesScreen(
             dateOfBirth = LocalDate.now().minusYears(18),
             darkMode = isDarkTheme,
             language = currentLangCode,
+            email = "",
             address = "",
             country = "",
             phoneNumber = "",
@@ -212,7 +213,6 @@ fun PreferencesScreen(
                 showProfileDialog = false
             },
             onCheckUsername = { newName, callback ->
-                // Pasamos la función de comprobación del ViewModel al Dialogo
                 userViewModel.checkUsernameAvailability(newName, callback)
             },
             onConfirm = { newName, newDob, newAddress, newCountry, newPhone, newAcceptEmails ->

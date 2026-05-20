@@ -4,6 +4,7 @@ object Routes {
     const val Splash = "splash"
     const val Login = "login"
     const val Signup = "signup"
+    const val ForgotPass = "forgot_password"
     const val Home = "home"
     const val Trips = "trips"
     const val Gallery = "gallery"

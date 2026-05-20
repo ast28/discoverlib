@@ -11,6 +11,7 @@ data class User(
     val dateOfBirth: LocalDate,
     val darkMode: Boolean,
     val language: String,
+    val email: String,
     val address: String,
     val country: String,
     val phoneNumber: String,

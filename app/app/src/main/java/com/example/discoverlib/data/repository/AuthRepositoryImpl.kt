@@ -99,6 +99,7 @@ class AuthRepositoryImpl @Inject constructor(
                 dateOfBirth = LocalDate.parse(dob),
                 darkMode = false,
                 language = "en",
+                email = gmail,
                 address = address,
                 country = country,
                 phoneNumber = phone,

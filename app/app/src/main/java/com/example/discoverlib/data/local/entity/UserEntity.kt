@@ -10,6 +10,7 @@ data class UserEntity(
     val dateOfBirth: String,
     val darkMode: Boolean,
     val language: String,
+    val email: String,
     val address: String,
     val country: String,
     val phoneNumber: String,

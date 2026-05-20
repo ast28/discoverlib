@@ -51,7 +51,7 @@ class UserViewModel @Inject constructor(
             } else {
                 repository.getUserFlow(firebaseUser.uid)
                     .map { it?.darkMode ?: false }
-                    .onStart { emit(sharedPrefs.darkTheme) } // Caché rápida para el Splash Screen
+                    .onStart { emit(sharedPrefs.darkTheme) }
             }
         }
         .stateIn(
@@ -76,6 +76,7 @@ class UserViewModel @Inject constructor(
                             dateOfBirth = LocalDate.now().minusYears(18),
                             darkMode = false,
                             language = "en",
+                            email = firebaseUser.email ?: "",
                             address = "",
                             country = "",
                             phoneNumber = "",
@@ -113,6 +114,7 @@ class UserViewModel @Inject constructor(
             dateOfBirth = dob,
             darkMode = false,
             language = "en",
+            email = firebaseUser.email ?: "",
             address = address,
             country = country,
             phoneNumber = phone,

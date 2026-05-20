@@ -32,23 +32,35 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.discoverlib.R
 import com.example.discoverlib.navegation.Routes
 import com.example.discoverlib.ui.theme.DiscoverlibTheme
+import com.example.discoverlib.ui.viewmodels.AuthState
+import com.example.discoverlib.ui.viewmodels.AuthViewModel
 import kotlinx.coroutines.delay
 
 private const val TAG = "SplashScreen"
 
 @Composable
-fun SplashScreen(navController: NavController) {
+fun SplashScreen(
+    navController: NavController,
+    authViewModel: AuthViewModel = hiltViewModel()
+) {
     LaunchedEffect(Unit) {
         Log.d(TAG, "SplashScreen initialized. Starting delay...")
         delay(1800)
-        Log.d(TAG, "Splash delay finished. Navigating to Home.")
-        navController.navigate(Routes.Login) {
-            popUpTo(Routes.Splash) { inclusive = true }
+
+        if (authViewModel.authState.value is AuthState.Authenticated) {
+            navController.navigate(Routes.Home) {
+                popUpTo(Routes.Splash) { inclusive = true }
+            }
+        } else {
+            navController.navigate(Routes.Login) {
+                popUpTo(Routes.Splash) { inclusive = true }
+            }
         }
     }
 
