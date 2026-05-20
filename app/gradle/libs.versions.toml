@@ -22,6 +22,8 @@ junitJunit = "4.12"
 junitJupiter = "6.0.0"
 sheetsComposeDialogs = "1.3.0"
 mockito = "5.23.0"
+mockitoKotlin = "5.1.0"
+coroutinesTest = "1.7.3"
 googleGmsGoogleServices = "4.4.4"
 firebaseAuth = "24.0.1"
 
@@ -58,6 +60,8 @@ sheets-compose-dialogs-core = { group = "com.maxkeppeler.sheets-compose-dialogs"
 sheets-compose-dialogs-calendar = { group = "com.maxkeppeler.sheets-compose-dialogs", name = "calendar", version.ref = "sheetsComposeDialogs" }
 mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
+mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

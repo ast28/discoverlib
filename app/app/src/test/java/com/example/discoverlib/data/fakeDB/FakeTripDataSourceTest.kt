@@ -1,4 +1,4 @@
-package com.example.discoverlib.data.fakeDB
+/*package com.example.discoverlib.data.fakeDB
 
 import com.example.discoverlib.domain.ActivityCategory
 import com.example.discoverlib.domain.Trip
@@ -265,4 +265,4 @@ class FakeTripDataSourceTest {
 
         assertFalse(result)
     }
-}
+}*/

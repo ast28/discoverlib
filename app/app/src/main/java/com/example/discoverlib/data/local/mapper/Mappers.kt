@@ -3,7 +3,15 @@ package com.example.discoverlib.data.local.mapper
 import com.example.discoverlib.data.local.entity.ActivityEntity
 import com.example.discoverlib.data.local.entity.TripEntity
 import com.example.discoverlib.data.local.entity.UserEntity
+import com.example.discoverlib.data.remote.dto.ReservationDto
+import com.example.discoverlib.data.remote.dto.RoomDto
+import com.example.discoverlib.data.remote.dto.ReserveRequestDto
+import com.example.discoverlib.data.remote.dto.HotelDto
 import com.example.discoverlib.domain.ActivityCategory
+import com.example.discoverlib.domain.Reservation
+import com.example.discoverlib.domain.Room
+import com.example.discoverlib.domain.Hotel
+import com.example.discoverlib.domain.ReserveRequest
 import com.example.discoverlib.domain.Trip
 import com.example.discoverlib.domain.TripActivity
 import com.example.discoverlib.domain.User
@@ -96,5 +104,46 @@ fun UserEntity.toDomain(): User {
         country = country,
         phoneNumber = phoneNumber,
         acceptReceiveEmails = acceptReceiveEmails
+    )
+}
+
+
+// Hoteles
+
+fun HotelDto.toDomain(): Hotel {
+    return Hotel(
+        id = this.id ?: "",
+        name = this.name,
+        city = this.city,
+        photo = this.photo,
+        rooms = this.rooms.map { it.toDomain() }
+    )
+}
+
+fun RoomDto.toDomain(): Room {
+    return Room(
+        id = this.id ?: "",
+        name = this.name,
+        price = this.price,
+        photo = this.photo
+    )
+}
+
+fun ReservationDto.toDomain(): Reservation {
+    return Reservation(
+        id = this.id,
+        hotelId = this.hotelId,
+        roomId = this.roomId,
+        startDate = LocalDate.parse(this.startDate),
+        endDate = LocalDate.parse(this.endDate)
+    )
+}
+
+fun ReserveRequest.toDto(): ReserveRequestDto {
+    return ReserveRequestDto(
+        hotelId = this.hotelId,
+        roomId = this.roomId,
+        startDate = this.startDate.toString(),
+        endDate = this.endDate.toString()
     )
 }
